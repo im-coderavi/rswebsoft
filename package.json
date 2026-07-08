@@ -7,12 +7,19 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "npm --prefix server run dev",
+    "server:install": "npm --prefix server install",
+    "server:seed": "npm --prefix server run seed",
+    "postinstall": "npm --prefix server install"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.2",
+    "axios": "^1.18.1",
     "lucide-react": "^1.23.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.18.1"
   },
   "devDependencies": {

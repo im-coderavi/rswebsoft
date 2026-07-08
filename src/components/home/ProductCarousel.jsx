@@ -31,7 +31,7 @@ export default function ProductCarousel({ title, to, products }) {
       >
         {products.map((p) => (
           <div
-            key={p.name}
+            key={p._id}
             className="w-[calc(50%-0.5rem)] shrink-0 snap-start sm:w-[calc(33.333%-0.75rem)] lg:w-[calc(16.666%-0.834rem)]"
           >
             <ProductCard product={p} />

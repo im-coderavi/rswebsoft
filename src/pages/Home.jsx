@@ -7,7 +7,17 @@ import BrandsSection from "../components/home/BrandsSection"
 import DemoCenter from "../components/home/DemoCenter"
 import Testimonials from "../components/home/Testimonials"
 import Newsletter from "../components/home/Newsletter"
-import { popularPlugins, premiumThemes } from "../data/site"
+import { useProducts } from "../hooks/useProducts"
+
+function TypeCarousel({ title, type }) {
+  const { data, isLoading } = useProducts({ type, status: "published", limit: 6 })
+  const products = data?.items || []
+
+  if (!isLoading && products.length === 0) return null
+  if (isLoading) return null
+
+  return <ProductCarousel title={title} to={`/products?type=${type}`} products={products} />
+}
 
 export default function Home() {
   return (
@@ -15,8 +25,8 @@ export default function Home() {
       <Hero />
       <StatsStrip />
       <CategoriesGrid />
-      <ProductCarousel title="Popular WordPress Plugins" to="/plugins" products={popularPlugins} />
-      <ProductCarousel title="Premium WordPress Themes" to="/themes" products={premiumThemes} />
+      <TypeCarousel title="Popular WordPress Plugins" type="plugin" />
+      <TypeCarousel title="Premium WordPress Themes" type="theme" />
       <ReadyWebsites />
       <BrandsSection />
       <DemoCenter />

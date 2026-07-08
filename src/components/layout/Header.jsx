@@ -1,23 +1,38 @@
-import { Search, Heart, ShoppingCart, ChevronDown } from "lucide-react"
+import { Link } from "react-router-dom"
+import { Search, Heart, ShoppingCart, ChevronDown, Menu, User } from "lucide-react"
 import Logo from "../ui/Logo"
+import { useCart } from "../../context/CartContext"
 
-function ActionIcon({ icon: Icon, count }) {
+function ActionIcon({ icon: Icon, count, to }) {
   return (
-    <button className="relative grid h-10 w-10 place-items-center rounded-xl text-cloud-300 transition hover:bg-ink-800 hover:text-cloud-100">
+    <Link
+      to={to}
+      className="relative grid h-10 w-10 place-items-center rounded-xl text-cloud-300 transition hover:bg-ink-800 hover:text-cloud-100"
+    >
       <Icon size={20} />
-      {count != null && (
+      {count != null && count > 0 && (
         <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand-gradient px-1 text-[10px] font-bold text-white">
           {count}
         </span>
       )}
-    </button>
+    </Link>
   )
 }
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
+  const { count } = useCart()
+
   return (
     <div className="border-b border-white/5 bg-ink-900/95">
-      <div className="container-rs flex h-[72px] items-center gap-4">
+      <div className="container-rs flex h-[72px] items-center gap-3">
+        <button
+          onClick={onMenuClick}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-cloud-300 transition hover:bg-ink-800 hover:text-cloud-100 lg:hidden"
+          aria-label="Open menu"
+        >
+          <Menu size={22} />
+        </button>
+
         <Logo />
 
         {/* Search with category selector */}
@@ -35,13 +50,16 @@ export default function Header() {
           </button>
         </div>
 
-        <div className="ml-auto flex items-center gap-1.5">
-          <div className="hidden items-center gap-1 sm:flex">
-            <ActionIcon icon={Heart} count={3} />
-            <ActionIcon icon={ShoppingCart} count={0} />
-          </div>
-          <button className="ml-1.5 rounded-xl bg-brand-gradient px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-95 glow-shadow">
-            Login / Register
+        <div className="ml-auto flex items-center gap-1">
+          <ActionIcon icon={Heart} count={3} to="/wishlist" />
+          <ActionIcon icon={ShoppingCart} count={count} to="/cart" />
+          <button
+            type="button"
+            title="Guest checkout only for now — no account needed to buy"
+            className="ml-1 flex items-center gap-2 rounded-xl bg-brand-gradient px-3.5 py-2.5 text-sm font-semibold text-white transition hover:opacity-95 glow-shadow sm:px-5"
+          >
+            <User size={16} className="sm:hidden" />
+            <span className="hidden sm:inline">Login / Register</span>
           </button>
         </div>
       </div>

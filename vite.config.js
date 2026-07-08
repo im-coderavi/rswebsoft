@@ -11,5 +11,11 @@ export default defineConfig({
       'quentin-plastered-worriedly.ngrok-free.dev',
       '.ngrok-free.dev', // allow any ngrok-free.dev subdomain
     ],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+    },
   },
 })

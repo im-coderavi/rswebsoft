@@ -11,7 +11,7 @@ export default function Logo({ compact = false }) {
           RSWebSoft
         </span>
         {!compact && (
-          <span className="block text-[11px] font-medium text-cloud-400">
+          <span className="hidden text-[11px] font-medium text-cloud-400 sm:block">
             Digital Ecosystem Platform
           </span>
         )}

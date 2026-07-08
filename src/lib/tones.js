@@ -17,6 +17,8 @@ const TONES = {
   lime: ["#84cc16", "#4d7c0f"],
 }
 
+export const TONE_KEYS = Object.keys(TONES)
+
 export function toneGradient(tone = "violet", angle = 135) {
   const [from, to] = TONES[tone] || TONES.violet
   return { backgroundImage: `linear-gradient(${angle}deg, ${from}, ${to})` }
