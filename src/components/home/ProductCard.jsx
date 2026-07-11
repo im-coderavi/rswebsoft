@@ -88,11 +88,13 @@ export default function ProductCard({ product }) {
           </span>
         )}
 
-        {/* live preview pill — shown on desktop hover, or after a tap on mobile (no hover there) */}
+        {/* live preview pill — shown on desktop hover, or after a tap on mobile (no hover there).
+            pointer-events-none while hidden so the first tap reaches the image div below instead
+            of silently hitting this (invisible but otherwise still-clickable) overlay. */}
         <div
           className={[
-            "absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition duration-200 group-hover:bg-black/35 group-hover:opacity-100",
-            showPreview ? "bg-black/35 opacity-100" : "",
+            "absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 pointer-events-none transition duration-200 group-hover:bg-black/35 group-hover:opacity-100 group-hover:pointer-events-auto",
+            showPreview ? "pointer-events-auto bg-black/35 opacity-100" : "",
           ].join(" ")}
         >
           <button
