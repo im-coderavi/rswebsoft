@@ -17,6 +17,8 @@ const productSchema = new mongoose.Schema(
     shortDescription: { type: String, default: "" },
     price: { type: Number, required: true, min: 0 },
     salePrice: { type: Number, min: 0 },
+    saleEndsAt: { type: Date },
+    features: [{ type: String, trim: true }],
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
     brand: { type: mongoose.Schema.Types.ObjectId, ref: "Brand" },
     type: {

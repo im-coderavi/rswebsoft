@@ -3,6 +3,7 @@ import { MessageSquareQuote, ChevronLeft, ChevronRight } from "lucide-react"
 import { StarRow } from "../ui/StarRating"
 import { toneGradient } from "../../lib/tones"
 import { testimonials } from "../../data/site"
+import Reveal, { RevealGroup, RevealItem } from "../ui/Reveal"
 
 const avatarTones = ["violet", "pink", "sky", "emerald"]
 
@@ -15,7 +16,7 @@ export default function Testimonials() {
 
   return (
     <section className="container-rs py-8">
-      <div className="relative overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-gradient-soft p-6 sm:p-8">
+      <Reveal className="relative overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-gradient-soft p-6 sm:p-8">
         <div className="pointer-events-none absolute -left-20 bottom-0 h-56 w-56 rounded-full bg-accent-500/15 blur-3xl" />
         <div className="relative mb-6 flex items-center gap-3">
           <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-gradient text-white">
@@ -38,13 +39,14 @@ export default function Testimonials() {
             <ChevronLeft size={18} />
           </button>
 
-          <div
+          <RevealGroup
             ref={trackRef}
             className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto"
           >
             {testimonials.map((t, i) => (
-              <figure
+              <RevealItem
                 key={t.name}
+                as="figure"
                 className="w-[calc(100%-0rem)] shrink-0 snap-start rounded-xl border border-white/8 bg-ink-850/80 p-5 backdrop-blur sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]"
               >
                 <div className="mb-3 flex items-center gap-3">
@@ -63,9 +65,9 @@ export default function Testimonials() {
                 <blockquote className="mt-3 text-sm leading-relaxed text-cloud-300">
                   “{t.quote}”
                 </blockquote>
-              </figure>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
 
           <button
             onClick={() => nudge(1)}
@@ -75,7 +77,7 @@ export default function Testimonials() {
             <ChevronRight size={18} />
           </button>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

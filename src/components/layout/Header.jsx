@@ -7,9 +7,10 @@ function ActionIcon({ icon: Icon, count, to }) {
   return (
     <Link
       to={to}
-      className="relative grid h-10 w-10 place-items-center rounded-xl text-cloud-300 transition hover:bg-ink-800 hover:text-cloud-100"
+      className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl text-cloud-300 transition hover:bg-ink-800 hover:text-cloud-100 sm:h-10 sm:w-10"
     >
-      <Icon size={20} />
+      <Icon size={19} className="sm:hidden" />
+      <Icon size={20} className="hidden sm:block" />
       {count != null && count > 0 && (
         <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand-gradient px-1 text-[10px] font-bold text-white">
           {count}
@@ -24,13 +25,13 @@ export default function Header({ onMenuClick }) {
 
   return (
     <div className="border-b border-white/5 bg-ink-900/95">
-      <div className="container-rs flex h-[72px] items-center gap-3">
+      <div className="container-rs flex h-[72px] min-w-0 items-center gap-1.5 sm:gap-3">
         <button
           onClick={onMenuClick}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-cloud-300 transition hover:bg-ink-800 hover:text-cloud-100 lg:hidden"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-cloud-300 transition hover:bg-ink-800 hover:text-cloud-100 sm:h-10 sm:w-10 lg:hidden"
           aria-label="Open menu"
         >
-          <Menu size={22} />
+          <Menu size={20} />
         </button>
 
         <Logo />
@@ -50,13 +51,13 @@ export default function Header({ onMenuClick }) {
           </button>
         </div>
 
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
           <ActionIcon icon={Heart} count={3} to="/wishlist" />
           <ActionIcon icon={ShoppingCart} count={count} to="/cart" />
           <button
             type="button"
             title="Guest checkout only for now — no account needed to buy"
-            className="ml-1 flex items-center gap-2 rounded-xl bg-brand-gradient px-3.5 py-2.5 text-sm font-semibold text-white transition hover:opacity-95 glow-shadow sm:px-5"
+            className="ml-0.5 flex shrink-0 items-center gap-2 rounded-xl bg-brand-gradient px-2.5 py-2 text-sm font-semibold text-white transition hover:opacity-95 glow-shadow sm:ml-1 sm:px-5 sm:py-2.5"
           >
             <User size={16} className="sm:hidden" />
             <span className="hidden sm:inline">Login / Register</span>

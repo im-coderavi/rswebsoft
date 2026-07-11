@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Outlet, useLocation } from "react-router-dom"
+import { AnimatePresence, motion } from "framer-motion"
 import { Toaster } from "react-hot-toast"
 import AdminSidebar from "./AdminSidebar"
 import AdminTopbar from "./AdminTopbar"
@@ -27,7 +28,17 @@ export default function AdminLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <AdminTopbar title={titleFor(pathname)} onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-x-hidden p-5">
-          <Outlet />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
       <Toaster position="top-right" toastOptions={{ style: { background: "#14111f", color: "#f5f3fb", border: "1px solid rgba(255,255,255,0.08)" } }} />

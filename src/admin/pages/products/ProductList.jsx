@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 import { useProducts, useDeleteProduct } from "../../../hooks/useProducts"
 import { useCategories } from "../../../hooks/useCategories"
 import { apiErrorMessage } from "../../../lib/api"
+import { formatINR } from "../../../lib/currency"
 import DataTable from "../../components/DataTable"
 import ConfirmDialog from "../../components/ConfirmDialog"
 
@@ -58,8 +59,10 @@ export default function ProductList() {
       label: "Price",
       render: (p) => (
         <span>
-          ${p.salePrice ?? p.price}
-          {p.salePrice != null && <span className="ml-1.5 text-xs text-cloud-500 line-through">${p.price}</span>}
+          {formatINR(p.salePrice ?? p.price)}
+          {p.salePrice != null && (
+            <span className="ml-1.5 text-xs text-cloud-500 line-through">{formatINR(p.price)}</span>
+          )}
         </span>
       ),
     },

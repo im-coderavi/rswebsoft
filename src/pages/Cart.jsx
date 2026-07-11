@@ -2,6 +2,7 @@ import { Link } from "react-router-dom"
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
 import { useCart } from "../context/CartContext"
 import { toneGradient } from "../lib/tones"
+import { formatINR } from "../lib/currency"
 
 function initialsOf(name) {
   return name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase()
@@ -47,10 +48,10 @@ export default function Cart() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <Link to={`/products/${item.slug}`} className="truncate text-sm font-semibold text-cloud-100 hover:text-brand-300">
+                <Link to={`/products/${item.slug}`} className="block truncate text-sm font-semibold text-cloud-100 hover:text-brand-300">
                   {item.name}
                 </Link>
-                <div className="mt-1 text-sm text-cloud-400">${item.price} each</div>
+                <div className="mt-1 text-sm text-cloud-400">{formatINR(item.price)} each</div>
               </div>
 
               <div className="flex items-center gap-2 rounded-lg border border-white/10">
@@ -71,8 +72,8 @@ export default function Cart() {
                 </button>
               </div>
 
-              <div className="w-16 shrink-0 text-right font-display text-sm font-bold text-cloud-100">
-                ${(item.price * item.qty).toFixed(2)}
+              <div className="w-20 shrink-0 text-right font-display text-sm font-bold text-cloud-100">
+                {formatINR(item.price * item.qty)}
               </div>
 
               <button
@@ -91,12 +92,12 @@ export default function Cart() {
           <h2 className="mb-4 font-display text-lg font-bold text-cloud-100">Order Summary</h2>
           <div className="flex items-center justify-between text-sm text-cloud-400">
             <span>Subtotal</span>
-            <span className="text-cloud-100">${subtotal.toFixed(2)}</span>
+            <span className="text-cloud-100">{formatINR(subtotal)}</span>
           </div>
           <div className="my-4 border-t border-white/8" />
           <div className="flex items-center justify-between font-display text-base font-bold text-cloud-100">
             <span>Total</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>{formatINR(subtotal)}</span>
           </div>
           <Link
             to="/checkout"

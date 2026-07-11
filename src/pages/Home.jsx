@@ -1,6 +1,8 @@
 import Hero from "../components/home/Hero"
 import StatsStrip from "../components/home/StatsStrip"
+import WhyChooseUs from "../components/home/WhyChooseUs"
 import CategoriesGrid from "../components/home/CategoriesGrid"
+import FeaturedProducts from "../components/home/FeaturedProducts"
 import ProductCarousel from "../components/home/ProductCarousel"
 import ReadyWebsites from "../components/home/ReadyWebsites"
 import BrandsSection from "../components/home/BrandsSection"
@@ -24,7 +26,9 @@ export default function Home() {
     <>
       <Hero />
       <StatsStrip />
+      <WhyChooseUs />
       <CategoriesGrid />
+      <FeaturedProducts />
       <TypeCarousel title="Popular WordPress Plugins" type="plugin" />
       <TypeCarousel title="Premium WordPress Themes" type="theme" />
       <ReadyWebsites />

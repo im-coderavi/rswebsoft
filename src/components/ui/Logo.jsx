@@ -2,12 +2,12 @@ import { Link } from "react-router-dom"
 
 export default function Logo({ compact = false }) {
   return (
-    <Link to="/" className="flex items-center gap-2.5">
-      <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-gradient font-display text-lg font-extrabold text-white glow-shadow">
+    <Link to="/" className="flex shrink-0 items-center gap-2 sm:gap-2.5">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-gradient font-display text-base font-extrabold text-white glow-shadow sm:h-10 sm:w-10 sm:text-lg">
         RS
       </span>
       <span className="leading-none">
-        <span className="block font-display text-lg font-bold tracking-tight text-cloud-100">
+        <span className="block whitespace-nowrap font-display text-base font-bold tracking-tight text-cloud-100 sm:text-lg">
           RSWebSoft
         </span>
         {!compact && (

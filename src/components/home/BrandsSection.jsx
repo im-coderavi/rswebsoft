@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { motion } from "framer-motion"
 import SectionHeader from "../ui/SectionHeader"
 import Icon from "../ui/Icon"
 import { toneGradient } from "../../lib/tones"
@@ -8,15 +9,18 @@ export default function BrandsSection() {
   const { data: brands, isLoading } = useBrands()
 
   return (
-    <section className="container-rs py-8">
+    <section id="brands" className="container-rs scroll-mt-32 py-8">
       <SectionHeader title="Our Brands (Sister Concerns)" linkLabel="View All Brands" to="/products" />
       {isLoading ? (
         <p className="text-sm text-cloud-500">Loading brands…</p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {(brands || []).map((brand) => (
-            <div
+          {(brands || []).map((brand, i) => (
+            <motion.div
               key={brand._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: i * 0.05, ease: [0.21, 0.47, 0.32, 0.98] }}
               className="flex flex-col items-center rounded-2xl border border-white/8 bg-ink-850 p-4 text-center transition hover:-translate-y-1 hover:border-brand-500/40"
             >
               <span
@@ -45,7 +49,7 @@ export default function BrandsSection() {
                   Explore Products
                 </Link>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}

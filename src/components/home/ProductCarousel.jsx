@@ -1,4 +1,5 @@
 import { useRef, useState } from "react"
+import { motion } from "framer-motion"
 import SectionHeader from "../ui/SectionHeader"
 import ProductCard from "./ProductCard"
 
@@ -29,13 +30,16 @@ export default function ProductCarousel({ title, to, products }) {
         onScroll={onScroll}
         className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-1"
       >
-        {products.map((p) => (
-          <div
+        {products.map((p, i) => (
+          <motion.div
             key={p._id}
-            className="w-[calc(50%-0.5rem)] shrink-0 snap-start sm:w-[calc(33.333%-0.75rem)] lg:w-[calc(16.666%-0.834rem)]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: i * 0.05, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="w-[calc(85%-0.5rem)] shrink-0 snap-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]"
           >
             <ProductCard product={p} />
-          </div>
+          </motion.div>
         ))}
       </div>
 

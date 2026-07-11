@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom"
 import { CheckCircle2, Clock, Download, XCircle, PackageCheck } from "lucide-react"
 import { useTrackOrder } from "../hooks/useOrders"
+import { formatINR } from "../lib/currency"
 
 const STEPS = [
   { key: "pending", label: "Order Placed", icon: Clock },
@@ -71,7 +72,7 @@ export default function OrderTrack() {
             <div key={i} className="flex items-center justify-between gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0">
               <div>
                 <div className="text-sm font-medium text-cloud-100">{item.name} × {item.qty}</div>
-                <div className="text-xs text-cloud-500">${item.price} each</div>
+                <div className="text-xs text-cloud-500">{formatINR(item.price)} each</div>
               </div>
               {item.downloadUrl ? (
                 <a
@@ -90,7 +91,7 @@ export default function OrderTrack() {
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-white/8 pt-4 font-display text-base font-bold text-cloud-100">
           <span>Total</span>
-          <span>${order.total.toFixed(2)}</span>
+          <span>{formatINR(order.total)}</span>
         </div>
       </div>
 

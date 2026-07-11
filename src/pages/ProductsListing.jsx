@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom"
+import { motion } from "framer-motion"
 import { Search, ChevronLeft, ChevronRight, PackageSearch } from "lucide-react"
 import ProductCard from "../components/home/ProductCard"
 import { useProducts } from "../hooks/useProducts"
@@ -20,6 +21,7 @@ export default function ProductsListing() {
   const category = params.get("category") || ""
   const brand = params.get("brand") || ""
   const type = params.get("type") || ""
+  const featured = params.get("featured") || ""
   const page = Number(params.get("page")) || 1
 
   const { data: categories } = useCategories()
@@ -29,6 +31,7 @@ export default function ProductsListing() {
     category: category || undefined,
     brand: brand || undefined,
     type: type || undefined,
+    featured: featured || undefined,
     page,
     limit: 12,
   })
@@ -94,9 +97,16 @@ export default function ProductsListing() {
           <p className="text-cloud-400">No products found. Try a different search or filter.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((p) => (
-            <ProductCard key={p._id} product={p} />
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-5 lg:grid-cols-3">
+          {products.map((p, i) => (
+            <motion.div
+              key={p._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: (i % 12) * 0.04, ease: [0.21, 0.47, 0.32, 0.98] }}
+            >
+              <ProductCard product={p} />
+            </motion.div>
           ))}
         </div>
       )}

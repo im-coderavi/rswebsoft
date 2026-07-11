@@ -6,6 +6,7 @@ import { useCart } from "../context/CartContext"
 import { usePaymentSettings } from "../hooks/usePaymentSettings"
 import { useCreateOrder } from "../hooks/useOrders"
 import { apiErrorMessage } from "../lib/api"
+import { formatINR } from "../lib/currency"
 
 export default function Checkout() {
   const { items, subtotal, clear } = useCart()
@@ -157,15 +158,15 @@ export default function Checkout() {
           <div className="space-y-2.5">
             {items.map((item) => (
               <div key={item.productId} className="flex justify-between text-sm text-cloud-400">
-                <span className="truncate pr-3">{item.name} × {item.qty}</span>
-                <span className="shrink-0 text-cloud-100">${(item.price * item.qty).toFixed(2)}</span>
+                <span className="min-w-0 truncate pr-3">{item.name} × {item.qty}</span>
+                <span className="shrink-0 text-cloud-100">{formatINR(item.price * item.qty)}</span>
               </div>
             ))}
           </div>
           <div className="border-t border-white/8 pt-4">
             <div className="flex items-center justify-between font-display text-base font-bold text-cloud-100">
               <span>Total</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>{formatINR(subtotal)}</span>
             </div>
           </div>
           <button

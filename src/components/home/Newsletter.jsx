@@ -1,9 +1,10 @@
 import { Mail } from "lucide-react"
+import Reveal from "../ui/Reveal"
 
 export default function Newsletter() {
   return (
     <section className="container-rs py-8">
-      <div className="relative overflow-hidden rounded-2xl border border-brand-500/25 bg-brand-gradient-soft p-6 sm:p-8">
+      <Reveal className="relative overflow-hidden rounded-2xl border border-brand-500/25 bg-brand-gradient-soft p-6 sm:p-8">
         <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-brand-600/25 blur-3xl" />
         <div className="relative flex flex-col items-center justify-between gap-6 lg:flex-row">
           <div className="flex items-center gap-4">
@@ -35,7 +36,7 @@ export default function Newsletter() {
             </button>
           </form>
         </div>
-      </div>
+      </Reveal>
     </section>
   )
 }

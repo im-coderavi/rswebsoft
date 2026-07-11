@@ -16,14 +16,24 @@ const emptyForm = {
   description: "",
   price: "",
   salePrice: "",
+  saleEndsAt: "",
   category: "",
   brand: "",
   type: "plugin",
   tags: "",
+  features: "",
   demoUrl: "",
   featured: false,
   status: "draft",
   images: [],
+}
+
+// datetime-local inputs need "YYYY-MM-DDTHH:mm" with no timezone/seconds
+function toDateTimeLocal(value) {
+  if (!value) return ""
+  const d = new Date(value)
+  const pad = (n) => String(n).padStart(2, "0")
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 export default function ProductForm() {
@@ -47,10 +57,12 @@ export default function ProductForm() {
       description: existing.description || "",
       price: existing.price ?? "",
       salePrice: existing.salePrice ?? "",
+      saleEndsAt: toDateTimeLocal(existing.saleEndsAt),
       category: existing.category?._id || "",
       brand: existing.brand?._id || "",
       type: existing.type || "plugin",
       tags: (existing.tags || []).join(", "),
+      features: (existing.features || []).join("\n"),
       demoUrl: existing.demoUrl || "",
       featured: Boolean(existing.featured),
       status: existing.status || "draft",
@@ -71,10 +83,12 @@ export default function ProductForm() {
       description: form.description,
       price: Number(form.price),
       salePrice: form.salePrice === "" ? undefined : Number(form.salePrice),
+      saleEndsAt: form.saleEndsAt || undefined,
       category: form.category,
       brand: form.brand || undefined,
       type: form.type,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
+      features: form.features.split("\n").map((t) => t.trim()).filter(Boolean),
       demoUrl: form.demoUrl,
       featured: form.featured,
       status: form.status,
@@ -142,11 +156,11 @@ export default function ProductForm() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-cloud-400">Price ($)</label>
+            <label className="mb-1.5 block text-xs font-medium text-cloud-400">Price (₹)</label>
             <input
               type="number"
               min="0"
-              step="0.01"
+              step="1"
               required
               value={form.price}
               onChange={(e) => setField("price", e.target.value)}
@@ -154,16 +168,28 @@ export default function ProductForm() {
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-cloud-400">Sale Price ($, optional)</label>
+            <label className="mb-1.5 block text-xs font-medium text-cloud-400">Sale Price (₹, optional)</label>
             <input
               type="number"
               min="0"
-              step="0.01"
+              step="1"
               value={form.salePrice}
               onChange={(e) => setField("salePrice", e.target.value)}
               className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+            Sale Ends At <span className="text-cloud-500">(optional — shows a countdown timer on the product page)</span>
+          </label>
+          <input
+            type="datetime-local"
+            value={form.saleEndsAt}
+            onChange={(e) => setField("saleEndsAt", e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -229,6 +255,19 @@ export default function ProductForm() {
             onChange={(e) => setField("tags", e.target.value)}
             className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
             placeholder="seo, wordpress, performance"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+            Features <span className="text-cloud-500">(one per line — shown as a checklist)</span>
+          </label>
+          <textarea
+            rows={4}
+            value={form.features}
+            onChange={(e) => setField("features", e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+            placeholder={"Lifetime updates\nPremium support included\nWorks with WooCommerce"}
           />
         </div>
 

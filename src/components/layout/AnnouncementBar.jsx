@@ -4,7 +4,7 @@ export default function AnnouncementBar() {
   return (
     <div className="bg-brand-gradient text-white">
       <div className="container-rs flex h-9 items-center justify-between gap-4 text-xs sm:text-[13px]">
-        <p className="flex items-center gap-1.5 font-medium">
+        <p className="flex min-w-0 flex-1 items-center gap-1.5 font-medium">
           <Sparkles size={14} className="shrink-0" />
           <span className="truncate">
             Special Offer! Get 20% OFF on All Products – Limited Time Deal!

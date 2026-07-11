@@ -1,65 +1,98 @@
+import { Link } from "react-router-dom"
+import { motion } from "framer-motion"
 import { Sparkles, ArrowRight } from "lucide-react"
-import Icon from "../ui/Icon"
 import DeviceMockup from "./DeviceMockup"
-import { heroStats } from "../../data/site"
 
-function HeroStatCard({ item }) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-ink-800/70 px-3.5 py-3 backdrop-blur transition hover:border-brand-500/40">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-gradient-soft text-brand-300">
-        <Icon name={item.icon} size={18} />
-      </span>
-      <div className="leading-tight">
-        <div className="font-display text-lg font-bold text-cloud-100">{item.value}</div>
-        <div className="text-xs text-cloud-400">{item.label}</div>
-      </div>
-    </div>
-  )
+const easeOut = [0.21, 0.47, 0.32, 0.98]
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 22 },
+  show: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, delay: 0.08 * i, ease: easeOut },
+  }),
 }
 
 export default function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* ambient glows */}
-      <div className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-brand-600/25 blur-[120px]" />
-      <div className="pointer-events-none absolute right-0 top-24 h-96 w-96 rounded-full bg-accent-500/20 blur-[130px]" />
+      {/* ambient glows — slow drifting pulse for a premium feel */}
+      <motion.div
+        className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-brand-600/25 blur-[120px]"
+        animate={{ opacity: [0.7, 1, 0.7], scale: [1, 1.08, 1] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="pointer-events-none absolute right-0 top-24 h-96 w-96 rounded-full bg-accent-500/20 blur-[130px]"
+        animate={{ opacity: [1, 0.7, 1], scale: [1.05, 1, 1.05] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      />
 
       <div className="container-rs relative grid grid-cols-1 items-center gap-10 py-14 lg:grid-cols-12 lg:py-20">
         {/* copy */}
-        <div className="lg:col-span-5">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-200">
+        <div className="lg:col-span-6">
+          <motion.span
+            custom={0}
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className="inline-flex items-center gap-1.5 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-xs font-medium text-brand-200"
+          >
             <Sparkles size={13} /> 1500+ Premium Products
-          </span>
-          <h1 className="mt-5 font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-cloud-100 sm:text-5xl">
+          </motion.span>
+          <motion.h1
+            custom={1}
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className="mt-5 font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-cloud-100 sm:text-5xl"
+          >
             Everything You Need to{" "}
             <span className="text-gradient">Build, Grow &amp; Automate</span>{" "}
             Your Digital Business
-          </h1>
-          <p className="mt-5 max-w-md text-[15px] leading-relaxed text-cloud-400">
+          </motion.h1>
+          <motion.p
+            custom={2}
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className="mt-5 max-w-md text-[15px] leading-relaxed text-cloud-400"
+          >
             Premium WordPress Plugins, Themes, SaaS Tools, Source Codes &amp;
             Developer Resources – All in One Place.
-          </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <button className="inline-flex items-center gap-2 rounded-xl bg-brand-gradient px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95 glow-shadow">
+          </motion.p>
+          <motion.div
+            custom={3}
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            className="mt-7 flex flex-wrap items-center gap-3"
+          >
+            <Link
+              to="/products"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand-gradient px-6 py-3 text-sm font-semibold text-white transition hover:opacity-95 glow-shadow"
+            >
               Browse All Products <ArrowRight size={17} />
-            </button>
-            <button className="rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-cloud-100 transition hover:bg-white/10">
+            </Link>
+            <a
+              href="#brands"
+              className="rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-cloud-100 transition hover:bg-white/10"
+            >
               Explore Our Brands
-            </button>
-          </div>
+            </a>
+          </motion.div>
         </div>
 
         {/* device */}
-        <div className="lg:col-span-4">
+        <motion.div
+          className="lg:col-span-6"
+          initial={{ opacity: 0, scale: 0.92, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.25, ease: easeOut }}
+        >
           <DeviceMockup />
-        </div>
-
-        {/* stats column */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:col-span-3 lg:grid-cols-1">
-          {heroStats.map((item) => (
-            <HeroStatCard key={item.label} item={item} />
-          ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   )
