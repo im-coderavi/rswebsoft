@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom"
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { Eye, ShoppingCart } from "lucide-react"
 import toast from "react-hot-toast"
 import StarRating from "../ui/StarRating"
@@ -17,6 +18,8 @@ function initialsOf(name) {
 
 export default function ProductCard({ product }) {
   const { add } = useCart()
+  const navigate = useNavigate()
+  const [showPreview, setShowPreview] = useState(false)
   const image = product.images?.[0]?.url
   const tone = product.category?.tone || "violet"
   const onSale = product.salePrice != null && product.salePrice < product.price
@@ -38,12 +41,26 @@ export default function ProductCard({ product }) {
     toast.success(`${product.name} added to cart`)
   }
 
+  // Mobile has no hover state, so the first tap on the image just reveals the
+  // "Live Preview" pill (matching the desktop hover look); a second tap, on
+  // the pill itself, actually opens the preview.
+  function handleImageTap() {
+    if (!showPreview) setShowPreview(true)
+  }
+
+  function handlePreviewClick(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (product.demoUrl) window.open(product.demoUrl, "_blank", "noopener")
+    else navigate(`/products/${product.slug}`)
+  }
+
   return (
     <div className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-white/8 bg-ink-850 transition hover:-translate-y-1 hover:border-brand-500/40 hover:shadow-2xl hover:shadow-black/40">
-      {/* image + hover preview */}
-      <Link
-        to={`/products/${product.slug}`}
-        className="relative block aspect-[4/3] overflow-hidden"
+      {/* image + live preview */}
+      <div
+        onClick={handleImageTap}
+        className="group relative block aspect-[4/3] cursor-pointer overflow-hidden"
         style={image ? undefined : toneGradient(tone, 140)}
       >
         {image ? (
@@ -71,18 +88,22 @@ export default function ProductCard({ product }) {
           </span>
         )}
 
-        {/* persistent badge on mobile — touch devices have no hover state */}
-        <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[9px] font-semibold text-white backdrop-blur-sm sm:hidden">
-          <Eye size={11} /> Live Preview
-        </span>
-
-        {/* hover overlay on desktop */}
-        <div className="absolute inset-0 hidden items-center justify-center bg-black/0 opacity-0 transition duration-200 group-hover:bg-black/35 group-hover:opacity-100 sm:flex">
-          <span className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md ring-1 ring-white/30 transition group-hover:scale-105">
+        {/* live preview pill — shown on desktop hover, or after a tap on mobile (no hover there) */}
+        <div
+          className={[
+            "absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition duration-200 group-hover:bg-black/35 group-hover:opacity-100",
+            showPreview ? "bg-black/35 opacity-100" : "",
+          ].join(" ")}
+        >
+          <button
+            type="button"
+            onClick={handlePreviewClick}
+            className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md ring-1 ring-white/30 transition hover:scale-105"
+          >
             <Eye size={16} /> Live Preview
-          </span>
+          </button>
         </div>
-      </Link>
+      </div>
 
       {/* body */}
       <div className="flex min-w-0 flex-1 flex-col p-2.5 sm:p-4">
