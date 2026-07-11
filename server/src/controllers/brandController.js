@@ -5,7 +5,10 @@ import Product from "../models/Product.js"
 
 export const listBrands = asyncHandler(async (req, res) => {
   const brands = await Brand.find().sort({ name: 1 })
-  res.json(brands)
+  const counts = await Product.aggregate([{ $group: { _id: "$brand", count: { $sum: 1 } } }])
+  const countMap = Object.fromEntries(counts.map((c) => [String(c._id), c.count]))
+
+  res.json(brands.map((b) => ({ ...b.toObject(), productCount: countMap[String(b._id)] || 0 })))
 })
 
 export const createBrand = asyncHandler(async (req, res) => {

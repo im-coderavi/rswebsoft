@@ -71,7 +71,12 @@ export default function ProductCard({ product }) {
           </span>
         )}
 
-        {/* hover overlay */}
+        {/* persistent badge on mobile — touch devices have no hover state */}
+        <span className="absolute bottom-1.5 right-1.5 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[9px] font-semibold text-white backdrop-blur-sm sm:hidden">
+          <Eye size={11} /> Live Preview
+        </span>
+
+        {/* hover overlay on desktop */}
         <div className="absolute inset-0 hidden items-center justify-center bg-black/0 opacity-0 transition duration-200 group-hover:bg-black/35 group-hover:opacity-100 sm:flex">
           <span className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md ring-1 ring-white/30 transition group-hover:scale-105">
             <Eye size={16} /> Live Preview
