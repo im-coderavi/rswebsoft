@@ -7,8 +7,9 @@ import { toneGradient, TONE_KEYS } from "../../../lib/tones"
 import Icon from "../../../components/ui/Icon"
 import DataTable from "../../components/DataTable"
 import ConfirmDialog from "../../components/ConfirmDialog"
+import ImageUploader from "../../components/ImageUploader"
 
-const emptyForm = { name: "", tag: "", icon: "Building2", tone: "violet", website: "" }
+const emptyForm = { name: "", tag: "", icon: "Building2", tone: "violet", website: "", logo: null }
 
 export default function BrandList() {
   const { data: brands, isLoading } = useBrands()
@@ -29,7 +30,14 @@ export default function BrandList() {
 
   function openEdit(brand) {
     setEditing(brand)
-    setForm({ name: brand.name, tag: brand.tag, icon: brand.icon, tone: brand.tone, website: brand.website })
+    setForm({
+      name: brand.name,
+      tag: brand.tag,
+      icon: brand.icon,
+      tone: brand.tone,
+      website: brand.website,
+      logo: brand.logo?.url ? brand.logo : null,
+    })
     setModalOpen(true)
   }
 
@@ -67,9 +75,15 @@ export default function BrandList() {
       label: "Brand",
       render: (b) => (
         <div className="flex items-center gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-lg text-white" style={toneGradient(b.tone)}>
-            <Icon name={b.icon} size={16} />
-          </span>
+          {b.logo?.url ? (
+            <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-lg bg-ink-800">
+              <img src={b.logo.url} alt="" className="h-full w-full object-contain p-1" />
+            </span>
+          ) : (
+            <span className="grid h-9 w-9 place-items-center rounded-lg text-white" style={toneGradient(b.tone)}>
+              <Icon name={b.icon} size={16} />
+            </span>
+          )}
           <div>
             <div className="font-medium text-cloud-100">{b.name}</div>
             <div className="text-xs text-cloud-500">{b.tag}</div>
@@ -156,7 +170,9 @@ export default function BrandList() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-cloud-400">Website</label>
+              <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+                Brand link <span className="text-cloud-500">(website — used when this brand's card is clicked)</span>
+              </label>
               <input
                 value={form.website}
                 onChange={(e) => setForm((f) => ({ ...f, website: e.target.value }))}
@@ -166,7 +182,18 @@ export default function BrandList() {
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-medium text-cloud-400">
-                Icon name <span className="text-cloud-500">(lucide-react name)</span>
+                Logo <span className="text-cloud-500">(optional — falls back to icon below)</span>
+              </label>
+              <ImageUploader
+                images={form.logo ? [form.logo] : []}
+                onChange={(imgs) => setForm((f) => ({ ...f, logo: imgs[imgs.length - 1] || null }))}
+                max={1}
+                folder="brands"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+                Icon name <span className="text-cloud-500">(lucide-react name, used when no logo is set)</span>
               </label>
               <input
                 required

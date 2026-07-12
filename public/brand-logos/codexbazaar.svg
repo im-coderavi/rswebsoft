@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 56" width="270" height="56">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14b8a6"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="48" height="48" rx="14" fill="url(#g)"/>
+  <path fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" d="M22 20l-7 8 7 8M34 20l7 8-7 8M30 17l-4 22"/>
+  <text x="64" y="35" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="800" fill="#f5f3fb">CodexBazaar</text>
+</svg>

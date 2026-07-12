@@ -4,6 +4,7 @@ import PublicLayout from "./components/layout/PublicLayout"
 import Home from "./pages/Home"
 import ProductsListing from "./pages/ProductsListing"
 import ProductDetail from "./pages/ProductDetail"
+import Brands from "./pages/Brands"
 import Cart from "./pages/Cart"
 import Checkout from "./pages/Checkout"
 import OrderTrack from "./pages/OrderTrack"
@@ -37,7 +38,7 @@ function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order/:id" element={<OrderTrack />} />
               <Route path="/categories" element={<Placeholder title="Categories" />} />
-              <Route path="/brands" element={<Placeholder title="Brands" />} />
+              <Route path="/brands" element={<Brands />} />
               <Route path="/wishlist" element={<Placeholder title="Wishlist" />} />
               <Route path="/demos" element={<Placeholder title="Demo Center" />} />
               <Route path="/resources" element={<Placeholder title="Resources" />} />

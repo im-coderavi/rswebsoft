@@ -3,6 +3,7 @@ import AnnouncementBar from "./AnnouncementBar"
 import Header from "./Header"
 import Navbar from "./Navbar"
 import MobileMenu from "./MobileMenu"
+import BottomNav from "./BottomNav"
 
 export default function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -17,6 +18,7 @@ export default function SiteHeader() {
         </div>
       </header>
       <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <BottomNav onMenuClick={() => setMobileOpen(true)} />
     </>
   )
 }

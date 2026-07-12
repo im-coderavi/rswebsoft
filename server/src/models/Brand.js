@@ -9,6 +9,10 @@ const brandSchema = new mongoose.Schema(
     icon: { type: String, default: "Building2" },
     tone: { type: String, default: "violet" },
     website: { type: String, default: "" },
+    logo: {
+      url: { type: String, default: "" },
+      publicId: { type: String, default: "" },
+    },
   },
   { timestamps: true }
 )

@@ -86,6 +86,22 @@
     background-clip: text;
     color: transparent;
   }
+  @keyframes brands-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .brands-marquee-track {
+    animation-name: brands-marquee;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .brands-marquee-track {
+      animation: none !important;
+    }
+  }
   .bg-brand-gradient {
     background-image: linear-gradient(100deg, #7c3aed 0%, #6d5cff 55%, #4f7dff 100%);
   }

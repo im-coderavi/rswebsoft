@@ -28,7 +28,7 @@ export default function ProductCarousel({ title, to, products }) {
       <div
         ref={trackRef}
         onScroll={onScroll}
-        className="no-scrollbar -mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-1"
+        className="grid grid-cols-2 gap-2.5 sm:no-scrollbar sm:-mx-1 sm:flex sm:snap-x sm:snap-mandatory sm:gap-4 sm:overflow-x-auto sm:px-1 sm:pb-1"
       >
         {products.map((p, i) => (
           <motion.div
@@ -36,15 +36,15 @@ export default function ProductCarousel({ title, to, products }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: i * 0.05, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="w-[calc(85%-0.5rem)] shrink-0 snap-start sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]"
+            className="min-w-0 sm:w-[calc(50%-0.5rem)] sm:shrink-0 sm:snap-start lg:w-[calc(25%-0.75rem)]"
           >
             <ProductCard product={p} />
           </motion.div>
         ))}
       </div>
 
-      {/* pagination dots */}
-      <div className="mt-5 flex justify-center gap-2">
+      {/* pagination dots — only relevant to the horizontally-scrolling sm+ carousel */}
+      <div className="mt-5 hidden justify-center gap-2 sm:flex">
         {Array.from({ length: pages }).map((_, i) => (
           <button
             key={i}

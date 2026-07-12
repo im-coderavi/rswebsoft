@@ -4,21 +4,22 @@ import { UploadCloud, X, Loader2 } from "lucide-react"
 import toast from "react-hot-toast"
 import { api, apiErrorMessage } from "../../lib/api"
 
-async function uploadFile(file) {
+async function uploadFile(file, folder) {
   const formData = new FormData()
   formData.append("image", file)
+  formData.append("folder", folder)
   const { data } = await api.post("/upload", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   })
   return data
 }
 
-export default function ImageUploader({ images, onChange, max = 6 }) {
+export default function ImageUploader({ images, onChange, max = 6, folder = "products" }) {
   const inputRef = useRef(null)
   const [dragOver, setDragOver] = useState(false)
 
   const mutation = useMutation({
-    mutationFn: uploadFile,
+    mutationFn: (file) => uploadFile(file, folder),
     onSuccess: (image) => onChange([...images, image]),
     onError: (err) => toast.error(apiErrorMessage(err)),
   })

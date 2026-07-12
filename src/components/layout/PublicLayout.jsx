@@ -8,7 +8,7 @@ export default function PublicLayout() {
   const location = useLocation()
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col pb-[calc(56px+env(safe-area-inset-bottom))] lg:pb-0">
       <SiteHeader />
       <main className="flex-1">
         <AnimatePresence mode="wait">

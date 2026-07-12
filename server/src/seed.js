@@ -32,12 +32,12 @@ const categories = [
 ]
 
 const brands = [
-  { name: "WPKartPro", tag: "WordPress Products", icon: "ShoppingCart", tone: "orange" },
-  { name: "ToolzyPro", tag: "Software & Tools", icon: "Wrench", tone: "violet" },
-  { name: "WPTemplatesHub", tag: "Ready Websites", icon: "LayoutTemplate", tone: "pink" },
-  { name: "CodexBazaar", tag: "Source Codes", icon: "Code2", tone: "teal" },
-  { name: "AppsClap", tag: "AI Tools", icon: "Sparkles", tone: "sky" },
-  { name: "BizzProfile", tag: "Digital Business Profile", icon: "Building2", tone: "emerald" },
+  { name: "WPKartPro", tag: "WordPress Products", icon: "ShoppingCart", tone: "orange", website: "https://wpkartpro.com/", logo: { url: "/brand-logos/wpkartpro.svg", publicId: "" } },
+  { name: "ToolzyPro", tag: "Software & Tools", icon: "Wrench", tone: "violet", website: "https://toolzypro.com/", logo: { url: "/brand-logos/toolzypro.svg", publicId: "" } },
+  { name: "WPTemplatesHub", tag: "Ready Websites", icon: "LayoutTemplate", tone: "pink", website: "https://wptemplateshub.com/", logo: { url: "/brand-logos/wptemplateshub.svg", publicId: "" } },
+  { name: "CodexBazaar", tag: "Source Codes", icon: "Code2", tone: "teal", website: "https://codexbazaar.com/", logo: { url: "/brand-logos/codexbazaar.svg", publicId: "" } },
+  { name: "AppsClap", tag: "AI Tools", icon: "Sparkles", tone: "sky", website: "https://appsclap.com/", logo: { url: "/brand-logos/appsclap.svg", publicId: "" } },
+  { name: "BizzProfile", tag: "Digital Business Profile", icon: "Building2", tone: "emerald", website: "https://bizzprofile.com/", logo: { url: "/brand-logos/bizzprofile.svg", publicId: "" } },
 ]
 
 // Real, freely-licensed stock photos (Unsplash CDN) grouped by theme, so
@@ -700,9 +700,10 @@ async function seed() {
   console.log(`Seeded ${categories.length} categories`)
 
   for (const b of brands) {
+    const { logo, website, ...rest } = b
     await Brand.updateOne(
       { name: b.name },
-      { $setOnInsert: { ...b, slug: slugify(b.name) } },
+      { $set: { logo, website }, $setOnInsert: { ...rest, slug: slugify(b.name) } },
       { upsert: true }
     )
   }
