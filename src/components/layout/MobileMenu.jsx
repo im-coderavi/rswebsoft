@@ -1,10 +1,29 @@
+import { useState, useEffect } from "react"
 import { NavLink, Link } from "react-router-dom"
-import { X, Search, Heart, ShoppingCart, User } from "lucide-react"
+import { X, Search, Heart, ShoppingCart, User, Sun, Moon } from "lucide-react"
 import { navLinks } from "../../data/site"
 import { useCart } from "../../context/CartContext"
 
 export default function MobileMenu({ open, onClose }) {
   const { count } = useCart()
+  const [isDark, setIsDark] = useState(false)
+
+  // Sync theme status on component mount
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"))
+  }, [])
+
+  const toggleTheme = () => {
+    if (document.documentElement.classList.contains("dark")) {
+      document.documentElement.classList.remove("dark")
+      localStorage.setItem("theme", "light")
+      setIsDark(false)
+    } else {
+      document.documentElement.classList.add("dark")
+      localStorage.setItem("theme", "dark")
+      setIsDark(true)
+    }
+  };
 
   return (
     <>
@@ -73,6 +92,24 @@ export default function MobileMenu({ open, onClose }) {
           >
             <ShoppingCart size={17} /> Cart {count > 0 && `(${count})`}
           </Link>
+
+          {/* Mobile Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            type="button"
+            className="flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cloud-400 hover:bg-ink-800 hover:text-cloud-100 cursor-pointer"
+          >
+            {isDark ? (
+              <>
+                <Sun size={17} /> Light Mode
+              </>
+            ) : (
+              <>
+                <Moon size={17} /> Dark Mode
+              </>
+            )}
+          </button>
+
           <button
             type="button"
             className="flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cloud-400 hover:bg-ink-800 hover:text-cloud-100"

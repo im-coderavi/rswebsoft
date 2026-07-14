@@ -27,7 +27,7 @@ export default function PublicLayout() {
       <Toaster
         position="top-right"
         toastOptions={{
-          style: { background: "#14111f", color: "#f5f3fb", border: "1px solid rgba(255,255,255,0.08)" },
+          style: { background: "#0f111a", color: "#f1f5f9", border: "1px solid rgba(255,255,255,0.08)" },
         }}
       />
     </div>

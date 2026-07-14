@@ -1,41 +1,99 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ */
-/*  RSWebSoft design tokens                                           */
+/*  RSWebSoft Design Tokens (Dynamic theme mapping via CSS variables) */
 /* ------------------------------------------------------------------ */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Poppins", "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  /* Surfaces (deep dark navy/violet) */
-  --color-ink-950: #07060d;
-  --color-ink-900: #0b0913;
-  --color-ink-850: #0f0d1a;
-  --color-ink-800: #14111f;
-  --color-ink-750: #191527;
-  --color-ink-700: #221d33;
-  --color-ink-600: #2c2542;
+  /* Surfaces mapping */
+  --color-ink-950: var(--ink-950);
+  --color-ink-900: var(--ink-900);
+  --color-ink-850: var(--ink-850);
+  --color-ink-800: var(--ink-800);
+  --color-ink-750: var(--ink-750);
+  --color-ink-700: var(--ink-700);
+  --color-ink-600: var(--ink-600);
 
-  /* Brand violet / purple */
-  --color-brand-50: #f3f0ff;
-  --color-brand-200: #d6c9ff;
-  --color-brand-300: #b79dff;
-  --color-brand-400: #9b74ff;
-  --color-brand-500: #8b5cf6;
-  --color-brand-600: #7c3aed;
-  --color-brand-700: #6d28d9;
+  /* Brand mapping */
+  --color-brand-50: var(--brand-50);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
 
-  /* Accent blue (secondary gradient stop) */
-  --color-accent-400: #4f7dff;
-  --color-accent-500: #3b6bff;
+  /* Accent mapping */
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
 
-  /* Text */
-  --color-cloud-100: #f5f3fb;
-  --color-cloud-300: #c9c4d6;
-  --color-cloud-400: #a29cb5;
-  --color-cloud-500: #837c96;
+  /* Text mapping */
+  --color-cloud-100: var(--cloud-100);
+  --color-cloud-300: var(--cloud-300);
+  --color-cloud-400: var(--cloud-400);
+  --color-cloud-500: var(--cloud-500);
 
   --color-star: #fbbf24;
+}
+
+:root {
+  /* ---------------------------------------------------------------- */
+  /*  DEFAULT THEME: DARK MODE — Premium Midnight Obsidian           */
+  /* ---------------------------------------------------------------- */
+  --ink-950: #030407; /* Extremely deep slate black base */
+  --ink-900: #080a0f; /* Section backgrounds, headers, footers */
+  --ink-850: #0e1118; /* Card surfaces, grids */
+  --ink-800: #141923; /* Active items, input background, select list */
+  --ink-750: #1c2230;
+  --ink-700: #283144; /* Borders, custom scrollbar tracks */
+  --ink-600: #3b4760;
+
+  --brand-50: #eef2ff;
+  --brand-200: #c7d2fe;
+  --brand-300: #a5b4fc;
+  --brand-400: #818cf8;
+  --brand-500: #6366f1; /* Royal Electric Indigo */
+  --brand-600: #4f46e5;
+  --brand-700: #4338ca;
+
+  --accent-400: #22d3ee; /* Luminous Ice Cyan */
+  --accent-500: #06b6d4;
+
+  --cloud-100: #f1f5f9; /* Silvery white, high legibility */
+  --cloud-300: #cbd5e1;
+  --cloud-400: #94a3b8;
+  --cloud-500: #64748b;
+}
+
+/* ------------------------------------------------------------------ */
+/*  OVERRIDE THEME: LIGHT MODE — Warm Alabaster / Floating Clean Slate*/
+/* ------------------------------------------------------------------ */
+:root:not(.dark) {
+  --ink-950: #f8fafc;
+  --ink-900: #f1f5f9;
+  --ink-850: #ffffff;
+  --ink-800: #e2e8f0;
+  --ink-750: #cbd5e1;
+  --ink-700: #94a3b8;
+  --ink-600: #64748b;
+
+  --brand-50: #f5f3ff;
+  --brand-200: #ddd6fe;
+  --brand-300: #c084fc;
+  --brand-400: #a855f7;
+  --brand-500: #6366f1;
+  --brand-600: #4f46e5;
+  --brand-700: #3730a3;
+
+  --accent-400: #06b6d4;
+  --accent-500: #0891b2;
+
+  --cloud-100: #0f172a;
+  --cloud-300: #334155;
+  --cloud-400: #475569;
+  --cloud-500: #64748b;
 }
 
 @layer base {
@@ -55,6 +113,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
   /* Custom scrollbar */
   ::-webkit-scrollbar {
@@ -80,12 +139,19 @@
     margin-inline: auto;
     padding-inline: 1rem;
   }
+  
+  /* Text gradient: Indigo -> Violet -> Cyan (Luminous in Dark Mode) */
   .text-gradient {
-    background: linear-gradient(100deg, #a78bff 0%, #7c5cff 45%, #5b8dff 100%);
+    background-image: linear-gradient(100deg, #c7d2fe 0%, #818cf8 40%, #a78bfa 70%, #22d3ee 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
+  /* Light mode override for text gradient (Darker contrast) */
+  :root:not(.dark) .text-gradient {
+    background-image: linear-gradient(100deg, #4f46e5 0%, #7c3aed 40%, #06b6d4 100%);
+  }
+  
   @keyframes brands-marquee {
     from {
       transform: translateX(0);
@@ -95,25 +161,54 @@
     }
   }
   .brands-marquee-track {
-    animation-name: brands-marquee;
+    animation: brands-marquee linear infinite;
+  }
+  @keyframes products-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .products-marquee-track {
+    animation: products-marquee linear infinite;
   }
   @media (prefers-reduced-motion: reduce) {
-    .brands-marquee-track {
+    .brands-marquee-track,
+    .products-marquee-track {
       animation: none !important;
     }
   }
+  
+  /* Brand Gradient default: Royal Indigo-Violet */
   .bg-brand-gradient {
-    background-image: linear-gradient(100deg, #7c3aed 0%, #6d5cff 55%, #4f7dff 100%);
+    background-image: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
   }
+  :root:not(.dark) .bg-brand-gradient {
+    background-image: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
+  }
+  
+  /* Soft background brand wash default */
   .bg-brand-gradient-soft {
-    background-image: linear-gradient(135deg, rgba(124, 58, 237, 0.18), rgba(79, 125, 255, 0.10));
+    background-image: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.08));
   }
+  :root:not(.dark) .bg-brand-gradient-soft {
+    background-image: linear-gradient(135deg, rgba(79, 70, 229, 0.06), rgba(124, 58, 237, 0.04));
+  }
+  
   .card-ring {
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   }
+  
+  /* Luminous Indigo Shadow default */
   .glow-shadow {
-    box-shadow: 0 18px 50px -18px rgba(124, 92, 255, 0.55);
+    box-shadow: 0 20px 50px -12px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(99, 102, 241, 0.08);
   }
+  :root:not(.dark) .glow-shadow {
+    box-shadow: 0 20px 40px -12px rgba(79, 70, 229, 0.15), 0 0 0 1px rgba(79, 70, 229, 0.04);
+  }
+  
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -121,4 +216,108 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/*  CSS Overrides for Light Mode (Auto-fix borders and badge text)     */
+/* ------------------------------------------------------------------ */
+:root:not(.dark) [class*="border-white/"] {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+:root:not(.dark) [class*="border-white-"] {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+:root:not(.dark) [class*="divide-white/"] {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+:root:not(.dark) [class*="hover:shadow-black/"] {
+  --tw-shadow-color: rgba(15, 23, 42, 0.06) !important;
+}
+:root:not(.dark) [class*="hover:shadow-2xl"] {
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12) !important;
+}
+:root:not(.dark) .text-emerald-400 {
+  color: #059669 !important; /* Rich green for readability */
+}
+:root:not(.dark) .text-rose-300 {
+  color: #dc2626 !important; /* Rich red for readability */
+}
+:root:not(.dark) .text-brand-200 {
+  color: #4f46e5 !important; /* Premium brand indigo instead of white-purple */
+}
+:root:not(.dark) .bg-brand-500\/10 {
+  background-color: rgba(79, 70, 229, 0.08) !important;
+}
+:root:not(.dark) .border-brand-500\/30 {
+  border-color: rgba(79, 70, 229, 0.18) !important;
+}
+:root:not(.dark) .bg-rose-500\/15 {
+  background-color: rgba(220, 38, 38, 0.08) !important;
+}
+:root:not(.dark) .bg-rose-500\/10 {
+  background-color: rgba(220, 38, 38, 0.08) !important;
+}
+:root:not(.dark) .border-rose-500\/30 {
+  border-color: rgba(220, 38, 38, 0.18) !important;
+}
+:root:not(.dark) .text-rose-400 {
+  color: #dc2626 !important;
+}
+:root:not(.dark) .bg-pink-500\/15 {
+  background-color: rgba(219, 39, 119, 0.08) !important;
+}
+:root:not(.dark) .text-pink-400 {
+  color: #db2777 !important;
+}
+:root:not(.dark) .text-cloud-400 {
+  color: #475569 !important; /* Slate-600 for readable secondary text */
+}
+:root:not(.dark) .text-cloud-500 {
+  color: #64748b !important; /* Slate-500 for captions */
+}
+:root:not(.dark) .text-cloud-300 {
+  color: #334155 !important; /* Slate-700 for body text */
+}
+:root:not(.dark) .hover\:text-cloud-100:hover {
+  color: #0f172a !important; /* Slate-900 on hover */
+}
+:root:not(.dark) .text-cloud-200 {
+  color: #1e293b !important; /* Slate-800 */
+}
+:root:not(.dark) .hover\:bg-white\/5:hover {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+}
+:root:not(.dark) .hover\:bg-white\/10:hover {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+:root:not(.dark) .bg-white\/5 {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+}
+:root:not(.dark) .bg-white\/15 {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+:root:not(.dark) .bg-white\/90 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+}
+:root:not(.dark) .ring-white\/5 {
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.05) !important;
+}
+:root:not(.dark) .ring-white\/30 {
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.15) !important;
+}
+:root:not(.dark) .border-white\/15 {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+:root:not(.dark) .border-white\/12 {
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+:root:not(.dark) .border-white\/8 {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+:root:not(.dark) .border-white\/5 {
+  border-color: rgba(15, 23, 42, 0.05) !important;
+}
+:root:not(.dark) .border-white\/10 {
+  border-color: rgba(15, 23, 42, 0.08) !important;
 }

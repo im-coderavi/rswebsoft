@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Sparkles, ArrowRight } from "lucide-react"
@@ -14,17 +15,57 @@ const fadeUp = {
   }),
 }
 
+function TypingText({ words, typingSpeed = 80, deletingSpeed = 40, delayBetweenWords = 2200 }) {
+  const [index, setIndex] = useState(0)
+  const [subIndex, setSubIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [blink, setBlink] = useState(true)
+
+  useEffect(() => {
+    if (subIndex === words[index].length + 1 && !isDeleting) {
+      const timeout = setTimeout(() => setIsDeleting(true), delayBetweenWords)
+      return () => clearTimeout(timeout)
+    }
+
+    if (subIndex === 0 && isDeleting) {
+      setIsDeleting(false)
+      setIndex((prev) => (prev + 1) % words.length)
+      return
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (isDeleting ? -1 : 1))
+    }, isDeleting ? deletingSpeed : typingSpeed)
+
+    return () => clearTimeout(timeout)
+  }, [subIndex, isDeleting, index, words, typingSpeed, deletingSpeed, delayBetweenWords])
+
+  useEffect(() => {
+    const cursorBlink = setInterval(() => {
+      setBlink((prev) => !prev)
+    }, 500)
+    return () => clearInterval(cursorBlink)
+  }, [])
+
+  return (
+    <span className="text-gradient inline font-extrabold">
+      {words[index].substring(0, subIndex)}
+      <span className={`inline-block w-[2px] sm:w-[3px] ml-1 bg-accent-400 h-[0.85em] align-middle ${blink ? 'opacity-100' : 'opacity-0'}`} />
+    </span>
+  )
+}
+
 export default function Hero() {
   return (
     <section className="relative overflow-hidden">
       {/* ambient glows — slow drifting pulse for a premium feel */}
       <motion.div
-        className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full bg-brand-600/25 blur-[120px]"
+        className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-brand-600/20 blur-[140px]"
         animate={{ opacity: [0.7, 1, 0.7], scale: [1, 1.08, 1] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="pointer-events-none absolute right-0 top-24 h-96 w-96 rounded-full bg-accent-500/20 blur-[130px]"
+        className="pointer-events-none absolute right-0 top-24 h-[450px] w-[450px] rounded-full bg-accent-500/15 blur-[140px]"
         animate={{ opacity: [1, 0.7, 1], scale: [1.05, 1, 1.05] }}
         transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
@@ -46,11 +87,11 @@ export default function Hero() {
             variants={fadeUp}
             initial="hidden"
             animate="show"
-            className="mt-5 font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-cloud-100 sm:text-5xl"
+            className="mt-5 font-display text-3xl font-extrabold leading-[1.15] tracking-tight text-cloud-100 sm:text-5xl sm:leading-[1.08]"
           >
             Everything You Need to{" "}
             <span className="text-gradient">Build, Grow &amp; Automate</span>{" "}
-            Your Digital Business
+            Your <TypingText words={["Digital Products", "WordPress Plugins", "Premium Themes", "SaaS Software", "Website Templates", "Digital Business"]} />
           </motion.h1>
           <motion.p
             custom={2}

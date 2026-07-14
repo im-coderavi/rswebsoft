@@ -112,8 +112,9 @@ export default function ProductCard({ product }) {
         <Link to={`/products/${product.slug}`} className="truncate text-xs font-semibold text-cloud-100 hover:text-brand-300 sm:text-sm">
           {product.name}
         </Link>
-        <p className="mt-1 line-clamp-1 text-[11px] leading-relaxed text-cloud-400 sm:line-clamp-2 sm:text-xs">{product.shortDescription}</p>
-
+        <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-cloud-400 sm:line-clamp-3 sm:text-xs min-h-[34px] sm:min-h-[50px]">
+          {product.description || product.shortDescription}
+        </p>
         <div className="mt-2 flex min-w-0 flex-col gap-1 sm:mt-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
           <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
             <span className="hidden text-[11px] text-cloud-500 sm:inline">Price:</span>

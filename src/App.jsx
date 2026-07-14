@@ -9,6 +9,10 @@ import Cart from "./pages/Cart"
 import Checkout from "./pages/Checkout"
 import OrderTrack from "./pages/OrderTrack"
 import Placeholder from "./pages/Placeholder"
+import Categories from "./pages/Categories"
+import Resources from "./pages/Resources"
+import Support from "./pages/Support"
+import Tools from "./pages/Tools"
 import { AuthProvider } from "./context/AuthContext"
 import { CartProvider } from "./context/CartContext"
 import ProtectedAdminRoute from "./admin/ProtectedAdminRoute"
@@ -37,12 +41,13 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order/:id" element={<OrderTrack />} />
-              <Route path="/categories" element={<Placeholder title="Categories" />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/tools" element={<Tools />} />
               <Route path="/brands" element={<Brands />} />
               <Route path="/wishlist" element={<Placeholder title="Wishlist" />} />
               <Route path="/demos" element={<Placeholder title="Demo Center" />} />
-              <Route path="/resources" element={<Placeholder title="Resources" />} />
-              <Route path="/support" element={<Placeholder title="Support" />} />
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/support" element={<Support />} />
               <Route path="*" element={<Placeholder title="Page Not Found" />} />
             </Route>
 

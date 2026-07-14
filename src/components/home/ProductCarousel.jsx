@@ -1,61 +1,45 @@
-import { useRef, useState } from "react"
-import { motion } from "framer-motion"
+import { useState } from "react"
 import SectionHeader from "../ui/SectionHeader"
 import ProductCard from "./ProductCard"
 
 export default function ProductCarousel({ title, to, products }) {
-  const trackRef = useRef(null)
-  const [page, setPage] = useState(0)
-  const pages = 3
+  const [paused, setPaused] = useState(false)
 
-  const scrollToPage = (i) => {
-    const el = trackRef.current
-    if (!el) return
-    setPage(i)
-    el.scrollTo({ left: (el.scrollWidth / pages) * i, behavior: "smooth" })
-  }
+  if (!products || products.length === 0) return null
 
-  const onScroll = () => {
-    const el = trackRef.current
-    if (!el) return
-    const i = Math.round(el.scrollLeft / (el.scrollWidth / pages))
-    setPage(Math.min(pages - 1, Math.max(0, i)))
-  }
+  // Duplicate the product items to enable seamless, infinite loop scrolling
+  const track = [...products, ...products]
+
+  // Slower speed for products so users can read the titles, prices, and ratings
+  // Each product gets around 7.5 seconds of animation time, with a minimum of 35 seconds total
+  const duration = Math.max(products.length * 7.5, 35)
 
   return (
     <section className="container-rs py-8">
       <SectionHeader title={title} to={to} />
       <div
-        ref={trackRef}
-        onScroll={onScroll}
-        className="grid grid-cols-2 gap-2.5 sm:no-scrollbar sm:-mx-1 sm:flex sm:snap-x sm:snap-mandatory sm:gap-4 sm:overflow-x-auto sm:px-1 sm:pb-1"
+        className="relative overflow-hidden py-3 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={() => setPaused(true)}
+        onTouchEnd={() => setPaused(false)}
       >
-        {products.map((p, i) => (
-          <motion.div
-            key={p._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: i * 0.05, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="min-w-0 sm:w-[calc(50%-0.5rem)] sm:shrink-0 sm:snap-start lg:w-[calc(25%-0.75rem)]"
-          >
-            <ProductCard product={p} />
-          </motion.div>
-        ))}
-      </div>
-
-      {/* pagination dots — only relevant to the horizontally-scrolling sm+ carousel */}
-      <div className="mt-5 hidden justify-center gap-2 sm:flex">
-        {Array.from({ length: pages }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => scrollToPage(i)}
-            aria-label={`Go to slide ${i + 1}`}
-            className={[
-              "h-2 rounded-full transition-all",
-              i === page ? "w-6 bg-brand-gradient" : "w-2 bg-ink-600 hover:bg-ink-700",
-            ].join(" ")}
-          />
-        ))}
+        <div
+          className="products-marquee-track flex w-max gap-4 sm:gap-6"
+          style={{
+            animationDuration: `${duration}s`,
+            animationPlayState: paused ? "paused" : "running",
+          }}
+        >
+          {track.map((p, i) => (
+            <div
+              key={`${p._id}-${i}`}
+              className="w-[260px] shrink-0 sm:w-[310px]"
+            >
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )

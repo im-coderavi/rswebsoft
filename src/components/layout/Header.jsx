@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { Search, Heart, ShoppingCart, ChevronDown, Menu, User } from "lucide-react"
+import { Search, Heart, ShoppingCart, ChevronDown, Menu, User, Sun, Moon } from "lucide-react"
 import Logo from "../ui/Logo"
 import { useCart } from "../../context/CartContext"
 
@@ -22,6 +23,24 @@ function ActionIcon({ icon: Icon, count, to }) {
 
 export default function Header({ onMenuClick }) {
   const { count } = useCart()
+  const [isDark, setIsDark] = useState(false)
+
+  // Sync theme status on component mount
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"))
+  }, [])
+
+  const toggleTheme = () => {
+    if (document.documentElement.classList.contains("dark")) {
+      document.documentElement.classList.remove("dark")
+      localStorage.setItem("theme", "light")
+      setIsDark(false)
+    } else {
+      document.documentElement.classList.add("dark")
+      localStorage.setItem("theme", "dark")
+      setIsDark(true)
+    }
+  }
 
   return (
     <div className="border-b border-white/5 bg-ink-900/95">
@@ -54,6 +73,18 @@ export default function Header({ onMenuClick }) {
         <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
           <ActionIcon icon={Heart} count={3} to="/wishlist" />
           <ActionIcon icon={ShoppingCart} count={count} to="/cart" />
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            type="button"
+            title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl text-cloud-300 transition hover:bg-ink-800 hover:text-cloud-100 sm:h-10 sm:w-10 cursor-pointer"
+            aria-label="Toggle Theme"
+          >
+            {isDark ? <Sun size={19} /> : <Moon size={19} />}
+          </button>
+
           <button
             type="button"
             title="Guest checkout only for now — no account needed to buy"

@@ -685,6 +685,71 @@ const productGroups = [
       },
     ],
   },
+  {
+    category: "Developer Tools", type: "tool", theme: "analytics", brand: "ToolzyPro", priceRange: [999, 2499],
+    items: [
+      {
+        name: "SEO Crawler & Auditor Pro", tag: "Web SEO Crawler & Link Auditor",
+        description: "Analyze any website's SEO health, indexability, page load speeds, and metadata structure dynamically. It generates white-label audit reports that you can brand and send to clients to convert them to paying customers.",
+        features: ["Deep crawl link analysis & redirect chains", "XML sitemap verification & check", "Core Web Vitals loading metrics", "Custom PDF white-label reports generator"],
+      },
+      {
+        name: "Bulk Image Compressor AI", tag: "AI-Powered Bulk Image Compressor",
+        description: "Reduce image file sizes by up to 80% without losing quality. Works on WebP, PNG, and JPG formats. Super easy to configure and deploy as a self-hosted API widget.",
+        features: ["Smart lossy & lossless compression", "Bulk drag-and-drop file uploader", "WebP & Avif auto-conversion", "Developer API key billing support"],
+      },
+      {
+        name: "Security Scan Vulnerability Tool", tag: "Server & Code Security Scanner",
+        description: "Scans PHP and JS codebases for common vulnerabilities, out-of-date packages, and SQL injection flaws. Essential tool for web developers and admins.",
+        features: ["Static code analysis threat scanner", "OWASP top 10 vulnerability checks", "Automatic PDF report generator", "Scheduled daily security scanning"],
+      },
+      {
+        name: "Dynamic QR Code Builder SaaS", tag: "QR Code Marketing Platform",
+        description: "Generate and track dynamic QR codes for menus, events, app downloads, and marketing campaigns. Complete with a manageable multi-brand dashboard.",
+        features: ["Dynamic URL redirection tracking & analytics", "Custom logo & brand styled templates", "Real-time scan counter statistics", "Vector SVG & high-res PNG export formats"],
+      },
+      {
+        name: "Server Speed Optimizer", tag: "Performance Optimization Tool",
+        description: "Analyze server response bottlenecks and automatically configure optimized caching directives, OPcache profiles, and Gzip/Brotli headers for faster page load times.",
+        features: ["Server bottleneck tracer & report", "OPcache profile fine-tuner", "Gzip & Brotli config script generator", "One-click deployment for Apache & Nginx"],
+      },
+      {
+        name: "Dynamic Link Cloaker", tag: "Short Link Management Software",
+        description: "Create professional branded short links with built-in geo-targeting redirection, device type detection, and scan tracking analytics. Ideal for marketing teams.",
+        features: ["Dynamic georouting URL redirects", "Device-aware link forwarding rules", "Real-time analytics click maps", "Branded short domain setup guides"],
+      },
+      {
+        name: "Database Security Shield", type: "tool", tag: "Real-Time SQL Guard",
+        description: "Monitor database queries in real-time, blocking unauthorized attempts, privilege escalation queries, and SQL injection exploits before they breach your servers.",
+        features: ["Real-time SQL query tracer & auditor", "SQL injection exploit blocker", "Privilege escalation query check alerts", "Daily security posture report logs"],
+      },
+      {
+        name: "CSS & JS Minifier API", tag: "Developer Build Optimizer",
+        description: "Minify and compile front-end assets on the fly with a simple REST API, bulk directory uploader, and custom optimization algorithms that preserve JS functionality.",
+        features: ["Smart lossy asset minifier algorithm", "API key setup for automated pipelines", "Bulk directory folder builder zip", "Supports Tailwind & ES6 compilation"],
+      },
+      {
+        name: "AI Website Translation Widget", tag: "AI Language Translation SaaS",
+        description: "Translate website content dynamically into 50+ languages using self-hosted lightweight AI translation models. Zero latency, high accuracy, and easy configuration.",
+        features: ["Self-hosted offline machine translation models", "Auto-locale redirection triggers", "Fuzzy-logic translation editor admin", "Supports 50+ international languages"],
+      },
+      {
+        name: "Web Scraping API SaaS", tag: "Proxy-Protected Web Scraper",
+        description: "Extract data from any web page smoothly, bypassing CAPTCHAs, cookie prompts, and cloudflare blockers. Ready to use as a self-hosted API widget.",
+        features: ["CAPTCHA & cookie bypass wrappers", "Rotating IP proxy pools built-in", "JSON structure content parser", "API dashboard metrics & analytics logs"],
+      },
+      {
+        name: "Uptime & Port Monitor", tag: "Server Health Warning System",
+        description: "Ping servers and monitor HTTP/TCP ports continuously, sending instant notifications via Telegram or Discord on failure to minimize site downtime.",
+        features: ["Continuous port ping monitoring check", "Instant Telegram & Discord alerts integration", "Uptime status page public template", "Weekly reliability performance logs"],
+      },
+      {
+        name: "Digital License Manager", tag: "API Key & License Distributor",
+        description: "Issue, verify, and track API keys and licenses for themes, plugins, and software products. Fully integrable with WordPress and custom billing APIs.",
+        features: ["Dynamic API key generator dashboard", "WooCommerce license verification addon", "Active site verification logs", "Custom webhooks for license revocation"],
+      }
+    ]
+  }
 ]
 
 async function seed() {

@@ -5,6 +5,7 @@ export const navLinks = [
   { label: "Home", to: "/" },
   { label: "Products", to: "/products", dropdown: true },
   { label: "Categories", to: "/categories", dropdown: true },
+  { label: "Web Tools", to: "/tools" },
   { label: "Brands", to: "/brands", dropdown: true },
   { label: "Demo Center", to: "/demos" },
   { label: "Resources", to: "/resources", dropdown: true },

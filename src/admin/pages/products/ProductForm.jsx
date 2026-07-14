@@ -8,7 +8,7 @@ import { useProduct, useCreateProduct, useUpdateProduct } from "../../../hooks/u
 import { apiErrorMessage } from "../../../lib/api"
 import ImageUploader from "../../components/ImageUploader"
 
-const TYPES = ["plugin", "theme", "ready-website", "saas", "source-code", "other"]
+const TYPES = ["plugin", "theme", "ready-website", "saas", "source-code", "tool", "other"]
 
 const emptyForm = {
   name: "",
