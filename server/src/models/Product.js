@@ -23,7 +23,7 @@ const productSchema = new mongoose.Schema(
     brand: { type: mongoose.Schema.Types.ObjectId, ref: "Brand" },
     type: {
       type: String,
-      enum: ["plugin", "theme", "ready-website", "saas", "source-code", "tool", "other"],
+      enum: ["plugin", "theme", "ready-website", "delivered-website", "package", "saas", "source-code", "tool", "other"],
       default: "other",
     },
     tags: [{ type: String, trim: true }],

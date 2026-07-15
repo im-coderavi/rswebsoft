@@ -10,6 +10,8 @@ const TYPES = [
   { value: "plugin", label: "Plugins" },
   { value: "theme", label: "Themes" },
   { value: "ready-website", label: "Ready Websites" },
+  { value: "delivered-website", label: "Delivered Websites" },
+  { value: "package", label: "Development Packages" },
   { value: "saas", label: "SaaS Software" },
   { value: "source-code", label: "Source Codes" },
   { value: "other", label: "Other" },

@@ -6,6 +6,8 @@ import FeaturedProducts from "../components/home/FeaturedProducts"
 import LatestStack from "../components/home/LatestStack"
 import ProductCarousel from "../components/home/ProductCarousel"
 import ReadyWebsites from "../components/home/ReadyWebsites"
+import DeliveredWebsites from "../components/home/DeliveredWebsites"
+import PricingPlans from "../components/home/PricingPlans"
 import BrandsSection from "../components/home/BrandsSection"
 import DemoCenter from "../components/home/DemoCenter"
 import Testimonials from "../components/home/Testimonials"
@@ -34,6 +36,8 @@ export default function Home() {
       <TypeCarousel title="Popular WordPress Plugins" type="plugin" />
       <TypeCarousel title="Premium WordPress Themes" type="theme" />
       <ReadyWebsites />
+      <DeliveredWebsites />
+      <PricingPlans />
       <BrandsSection />
       <DemoCenter />
       <Testimonials />

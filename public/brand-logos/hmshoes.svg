@@ -1,0 +1,8 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(15, 10)">
+    <!-- Elegant serif/sans "H&MSHOES" -->
+    <text x="85" y="32" font-family="Georgia, 'Times New Roman', serif" font-weight="900" font-size="28" fill="#111827" text-anchor="middle" letter-spacing="1">
+      H&amp;M<tspan font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="24" letter-spacing="2">SHOES</tspan>
+    </text>
+  </g>
+</svg>

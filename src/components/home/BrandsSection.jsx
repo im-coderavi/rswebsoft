@@ -7,7 +7,7 @@ import { useBrands } from "../../hooks/useBrands"
 
 function BrandCard({ brand }) {
   const className =
-    "group flex h-28 w-[190px] shrink-0 flex-col items-center justify-center gap-2.5 rounded-2xl border border-white/8 bg-ink-850 px-5 transition hover:-translate-y-1 hover:border-brand-500/40 hover:shadow-xl hover:shadow-black/30 sm:h-32 sm:w-[230px]"
+    "group flex h-16 w-[180px] shrink-0 items-center justify-center rounded-xl border border-slate-200/60 bg-white px-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/30 hover:shadow-md hover:shadow-black/5 sm:h-20 sm:w-[220px]"
 
   const content = (
     <>
@@ -16,18 +16,18 @@ function BrandCard({ brand }) {
           src={brand.logo.url}
           alt={brand.name}
           draggable={false}
-          className="h-9 max-w-[150px] object-contain sm:h-10 sm:max-w-[180px]"
+          className="h-8 max-w-full object-contain transition duration-300 group-hover:scale-105 sm:h-10"
         />
       ) : (
-        <>
+        <div className="flex items-center gap-2">
           <span
-            className="grid h-11 w-11 place-items-center rounded-xl text-white shadow-lg transition group-hover:scale-105"
+            className="grid h-7 w-7 place-items-center rounded-lg text-white shadow"
             style={toneGradient(brand.tone)}
           >
-            <Icon name={brand.icon} size={22} />
+            <Icon name={brand.icon} size={14} />
           </span>
-          <span className="truncate text-sm font-bold text-cloud-100">{brand.name}</span>
-        </>
+          <span className="truncate text-xs font-bold text-slate-800">{brand.name}</span>
+        </div>
       )}
     </>
   )
@@ -51,8 +51,17 @@ function BrandCard({ brand }) {
 
 function BrandMarquee({ brands }) {
   const [paused, setPaused] = useState(false)
-  const track = [...brands, ...brands]
-  const duration = Math.max(brands.length * 4.5, 24)
+  
+  if (!brands || brands.length === 0) return null
+
+  // Ensure we have enough items to loop seamlessly on large displays
+  let track = [...brands]
+  while (track.length > 0 && track.length < 20) {
+    track = [...track, ...brands]
+  }
+
+  // Consistent scrolling speed: ~2.5s per item
+  const duration = track.length * 2.5
 
   return (
     <div
@@ -63,7 +72,7 @@ function BrandMarquee({ brands }) {
       onTouchEnd={() => setPaused(false)}
     >
       <div
-        className="brands-marquee-track flex w-max gap-3 sm:gap-4"
+        className="brands-marquee-track flex w-max gap-3 py-2 sm:gap-4"
         style={{ animationDuration: `${duration}s`, animationPlayState: paused ? "paused" : "running" }}
       >
         {track.map((brand, i) => (
@@ -78,13 +87,30 @@ export default function BrandsSection() {
   const { data: brands, isLoading } = useBrands()
 
   return (
-    <section id="brands" className="container-rs scroll-mt-32 py-8">
-      <SectionHeader title="Our Brands" linkLabel="View All Brands" to="/brands" />
-      {isLoading ? (
-        <p className="text-sm text-cloud-500">Loading brands…</p>
-      ) : (
-        <BrandMarquee brands={brands || []} />
-      )}
+    <section id="brands" className="scroll-mt-32 py-12 sm:py-16 bg-ink-900/20">
+      <div className="container-rs text-center mb-8 sm:mb-12">
+        <h2 className="font-display text-2xl font-extrabold tracking-tight text-cloud-100 sm:text-3xl lg:text-4xl">
+          Trusted by{" "}
+          <span className="relative inline-block text-emerald-500 dark:text-emerald-400">
+            350+ Clients
+            <span className="absolute left-0 bottom-0.5 h-[3px] w-full rounded bg-emerald-500" />
+          </span>{" "}
+          Worldwide
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-xs font-medium text-cloud-400 sm:text-sm md:text-base">
+          Building High-Impact Websites &amp; Tailored Solutions That Drive Business Growth
+        </p>
+      </div>
+
+      <div className="container-rs">
+        {isLoading ? (
+          <div className="flex justify-center py-4">
+            <p className="text-sm text-cloud-500 animate-pulse">Loading brands…</p>
+          </div>
+        ) : (
+          <BrandMarquee brands={brands || []} />
+        )}
+      </div>
     </section>
   )
 }

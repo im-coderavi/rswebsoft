@@ -32,12 +32,13 @@ const categories = [
 ]
 
 const brands = [
-  { name: "WPKartPro", tag: "WordPress Products", icon: "ShoppingCart", tone: "orange", website: "https://wpkartpro.com/", logo: { url: "/brand-logos/wpkartpro.svg", publicId: "" } },
-  { name: "ToolzyPro", tag: "Software & Tools", icon: "Wrench", tone: "violet", website: "https://toolzypro.com/", logo: { url: "/brand-logos/toolzypro.svg", publicId: "" } },
-  { name: "WPTemplatesHub", tag: "Ready Websites", icon: "LayoutTemplate", tone: "pink", website: "https://wptemplateshub.com/", logo: { url: "/brand-logos/wptemplateshub.svg", publicId: "" } },
-  { name: "CodexBazaar", tag: "Source Codes", icon: "Code2", tone: "teal", website: "https://codexbazaar.com/", logo: { url: "/brand-logos/codexbazaar.svg", publicId: "" } },
-  { name: "AppsClap", tag: "AI Tools", icon: "Sparkles", tone: "sky", website: "https://appsclap.com/", logo: { url: "/brand-logos/appsclap.svg", publicId: "" } },
-  { name: "BizzProfile", tag: "Digital Business Profile", icon: "Building2", tone: "emerald", website: "https://bizzprofile.com/", logo: { url: "/brand-logos/bizzprofile.svg", publicId: "" } },
+  { name: "WeftKart", tag: "Fashion & Lifestyle Store", icon: "ShoppingCart", tone: "orange", website: "https://weftkart.com/", logo: { url: "/brand-logos/weftkart.svg", publicId: "" } },
+  { name: "BUYON", tag: "E-Commerce Shopping Portal", icon: "ShoppingBag", tone: "rose", website: "https://buyon.in/", logo: { url: "/brand-logos/buyon.svg", publicId: "" } },
+  { name: "ONOFFER", tag: "Daily Deals & Offers", icon: "Gift", tone: "pink", website: "https://onoffer.in/", logo: { url: "/brand-logos/onoffer.svg", publicId: "" } },
+  { name: "Vassio", tag: "Premium Comfort Solutions", icon: "Home", tone: "emerald", website: "https://vassio.in/", logo: { url: "/brand-logos/vassio.svg", publicId: "" } },
+  { name: "H&MSHOES", tag: "Premium Footwear Brand", icon: "Sparkles", tone: "violet", website: "https://hmshoes.in/", logo: { url: "/brand-logos/hmshoes.svg", publicId: "" } },
+  { name: "okmart", tag: "Online Grocery Mart", icon: "Store", tone: "amber", website: "https://okmart.co.in/", logo: { url: "/brand-logos/okmart.svg", publicId: "" } },
+  { name: "Zest Shop", tag: "E-Commerce Shopping Hub", icon: "ShoppingCart", tone: "sky", website: "https://zestshop.in/", logo: { url: "/brand-logos/zestshop.svg", publicId: "" } },
 ]
 
 // Real, freely-licensed stock photos (Unsplash CDN) grouped by theme, so
@@ -749,6 +750,149 @@ const productGroups = [
         features: ["Dynamic API key generator dashboard", "WooCommerce license verification addon", "Active site verification logs", "Custom webhooks for license revocation"],
       }
     ]
+  },
+  {
+    category: "Ready Websites", type: "delivered-website", theme: "ecommerce", priceRange: [9999, 39999],
+    items: [
+      {
+        name: "ShoeszoN.in", tag: "Fashion & Lifestyle Store", tags: ["Fashion"], price: 29999, demoUrl: "https://shoeszon.in",
+        features: [
+          "Responsive, mobile-friendly design",
+          "Optimized WooCommerce store & checkout",
+          "Fast loading & SEO ready",
+          "Secure payments & easy order management",
+          "Clean, modern user interface"
+        ]
+      },
+      {
+        name: "Shonzone.in", tag: "E-Commerce Shopping Portal", tags: ["Fashion"], price: 34999, demoUrl: "https://shonzone.in",
+        features: [
+          "Custom-coded homepage (HTML, CSS, JS)",
+          "Responsive & mobile-friendly",
+          "Optimized WooCommerce checkout",
+          "Fast & SEO-friendly",
+          "Interactive, smooth navigation"
+        ]
+      },
+      {
+        name: "Watchesworld.in", tag: "Luxury Watch Store", tags: ["Watches"], price: 9999, demoUrl: "https://watchesworld.in",
+        features: [
+          "Clean, user-friendly online store",
+          "Responsive design for all devices",
+          "Smooth navigation & product browsing",
+          "Fast-loading pages for better experience",
+          "Secure checkout & easy payment options"
+        ]
+      },
+      {
+        name: "Buyon.in", tag: "E-Commerce Shopping Hub", tags: ["Shopping"], price: 30000, demoUrl: "https://buyon.in",
+        features: [
+          "Beautiful, user-friendly online store",
+          "Works perfectly on mobile and desktop",
+          "Easy and smooth checkout experience",
+          "Fast loading pages for a better shopping experience",
+          "Safe and secure payments"
+        ]
+      },
+      {
+        name: "Brandsworld.in", tag: "Branded Retail Store", tags: ["Shopping"], price: 25999, demoUrl: "https://brandsworld.in",
+        features: [
+          "Fully dynamic product management",
+          "Modern minimalist aesthetic",
+          "Optimized cart conversion funnel",
+          "Robust performance under high traffic",
+          "Multi-currency & localization ready"
+        ]
+      },
+      {
+        name: "Zestshop.in", tag: "Online Gadgets Shop", tags: ["Shopping"], price: 27999, demoUrl: "https://zestshop.in",
+        features: [
+          "Elegant layout with grid animations",
+          "Lightning fast performance (sub-1s load)",
+          "Seamless payment gateway integrations",
+          "Advanced live search & recommendations",
+          "Interactive user reviews and ratings"
+        ]
+      }
+    ]
+  },
+  {
+    category: "Ready Websites", type: "package", theme: "webdesign", priceRange: [7999, 50000],
+    items: [
+      {
+        name: "Standard Plan", tag: "Perfect for small businesses & startups", tags: ["Save 20%+"], price: 10000, salePrice: 7999, demoUrl: "tel:+919876543210", description: "Talk to a web expert",
+        features: [
+          "5 pages Website",
+          "1 Year Free Domain Name (.com / .in / .org)",
+          "1 Year Free Cloud Hosting",
+          "Dynamic Website (Premium Design)",
+          "Admin Access",
+          "Lifetime 24/7 Free Hosting Support",
+          "Unlimited Images & Videos Upload",
+          "Free SSL Certificates",
+          "5 Free Email IDs"
+        ]
+      },
+      {
+        name: "Premium Plan", tag: "For growing brands & serious businesses", tags: ["Most Popular", "Best Value"], price: 20000, salePrice: 13999, demoUrl: "tel:+919876543210", description: "Upgrade to Premium",
+        features: [
+          "12 pages Website",
+          "1 Year Free Domain Name (.com / .in / .org)",
+          "1 Year Free Cloud Hosting",
+          "Dynamic Website (Premium Design)",
+          "Admin Access",
+          "Google Search Console Setup",
+          "Lifetime 24/7 Free Hosting Support",
+          "Unlimited Images & Videos Upload",
+          "Free SSL Certificates",
+          "10 Free Email IDs"
+        ]
+      },
+      {
+        name: "Custom Plan (Pro)", tag: "Tailored web solution for your business", tags: ["Fully Custom"], price: 4999, salePrice: 0, demoUrl: "https://wa.me/919876543210", description: "Discuss Your Requirements",
+        features: [
+          "Pages: According to Requirement",
+          "1 Year Free Domain Name (.com / .in / .org)",
+          "1 Year Free Cloud Hosting",
+          "Dynamic Website",
+          "Admin Access",
+          "Google Search Console Setup",
+          "Lifetime 24/7 Free Hosting Support",
+          "Unlimited Images & Videos Upload",
+          "Free SSL Certificates"
+        ]
+      },
+      {
+        name: "Premium E-commerce Plan", tag: "Complete, sales-ready online store", tags: ["E Commerce Ready"], price: 30000, salePrice: 21999, demoUrl: "tel:+919876543210", description: "Start Your Online Store",
+        features: [
+          "30 pages Website",
+          "1 Year Free Domain Name (.com / .in / .org)",
+          "1 Year Free Cloud Hosting",
+          "20 Product Categories",
+          "30 Product Listing from Our Side",
+          "Premium Design",
+          "Dynamic Website",
+          "Admin Access",
+          "Google Search Console Setup",
+          "Free SSL Certificates"
+        ]
+      },
+      {
+        name: "Multi-vendor E-commerce Plan", tag: "Marketplace style business solution", tags: ["For Marketplaces"], price: 60000, salePrice: 50000, demoUrl: "tel:+919876543210", description: "Launch Your Marketplace",
+        features: [
+          "40 pages Website",
+          "1 Year Free Domain Name (.com / .in / .org)",
+          "1 Year Free Cloud Hosting",
+          "50 Product Categories",
+          "30 Product Listing (from our side)",
+          "Premium Design",
+          "Dynamic Website",
+          "Admin Access",
+          "Google Search Console Setup",
+          "Free SSL Certificates"
+        ]
+      }
+    ]
   }
 ]
 
@@ -764,11 +908,15 @@ async function seed() {
   }
   console.log(`Seeded ${categories.length} categories`)
 
+  // Clear any existing brands that are not in the new brands list
+  const seededBrandNames = brands.map((b) => b.name)
+  await Brand.deleteMany({ name: { $nin: seededBrandNames } })
+
   for (const b of brands) {
     const { logo, website, ...rest } = b
     await Brand.updateOne(
       { name: b.name },
-      { $set: { logo, website }, $setOnInsert: { ...rest, slug: slugify(b.name) } },
+      { $set: { logo, website, tag: b.tag, icon: b.icon, tone: b.tone }, $setOnInsert: { slug: slugify(b.name) } },
       { upsert: true }
     )
   }
@@ -785,11 +933,15 @@ async function seed() {
 
   for (const group of productGroups) {
     for (let i = 0; i < group.items.length; i++) {
-      const { name, tag, theme: themeOverride, description, features } = group.items[i]
+      const item = group.items[i]
+      const { name, tag, theme: themeOverride, description, features } = item
       const [minPrice, maxPrice] = group.priceRange
-      const price = Math.round(rand(minPrice, maxPrice) / 100) * 100
-      const onSale = Math.random() < 0.55
-      const salePrice = onSale ? Math.round((price * (rand(60, 80) / 100)) / 50) * 50 : undefined
+      const price = item.price || Math.round(rand(minPrice, maxPrice) / 100) * 100
+      let salePrice = item.salePrice
+      if (salePrice === undefined) {
+        const onSale = item.price ? false : Math.random() < 0.55
+        salePrice = onSale ? Math.round((price * (rand(60, 80) / 100)) / 50) * 50 : undefined
+      }
       // first product of every group is featured, giving a healthy spread across categories
       const featured = i === 0
       if (featured) featuredCount++
@@ -801,12 +953,23 @@ async function seed() {
         price,
         salePrice,
         category: categoryIdByName.get(group.category),
-        brand: group.brand ? brandIdByName.get(group.brand) : undefined,
+        brand: group.brand ? brandIdByName.get(
+          {
+            "WPKartPro": "WeftKart",
+            "WPTemplatesHub": "ONOFFER",
+            "ToolzyPro": "BUYON",
+            "AppsClap": "Vassio",
+            "CodexBazaar": "H&MSHOES",
+            "BizzProfile": "okmart"
+          }[group.brand] || group.brand
+        ) : undefined,
         type: group.type,
         rating: Number((rand(43, 49) / 10).toFixed(1)),
         numReviews: rand(40, 4200),
         featured,
         status: "published",
+        tags: item.tags || [],
+        demoUrl: item.demoUrl || "",
       }
 
       const image = stockImage(themeOverride || group.theme, name)

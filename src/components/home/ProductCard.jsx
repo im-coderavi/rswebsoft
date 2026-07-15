@@ -56,11 +56,11 @@ export default function ProductCard({ product }) {
   }
 
   return (
-    <div className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-white/8 bg-ink-850 transition hover:-translate-y-1 hover:border-brand-500/40 hover:shadow-2xl hover:shadow-black/40">
+    <div className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-white/8 bg-ink-850 transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-500/45 hover:shadow-2xl hover:shadow-black/45">
       {/* image + live preview */}
       <div
         onClick={handleImageTap}
-        className="group relative block aspect-[4/3] cursor-pointer overflow-hidden"
+        className="group relative block aspect-[4/3] cursor-pointer overflow-hidden bg-ink-900 border-b border-white/5"
         style={image ? undefined : toneGradient(tone, 140)}
       >
         {image ? (
@@ -68,72 +68,96 @@ export default function ProductCard({ product }) {
             src={image}
             alt={product.name}
             loading="lazy"
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-106"
           />
         ) : (
           <>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_55%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent_55%)]" />
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4 text-center">
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/90 font-display text-base font-extrabold text-ink-900 shadow-lg">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/95 font-display text-sm font-black text-ink-950 shadow-lg">
                 {initialsOf(product.name)}
               </span>
-              <span className="text-sm font-semibold text-white drop-shadow">{product.name}</span>
+              <span className="text-xs font-semibold text-white drop-shadow-sm truncate max-w-full">{product.name}</span>
             </div>
           </>
         )}
 
         {onSale && (
-          <span className="absolute left-1.5 top-1.5 rounded-md bg-rose-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow sm:left-2.5 sm:top-2.5 sm:px-2 sm:py-1 sm:text-[10px]">
+          <span className="absolute left-2.5 top-2.5 rounded-lg bg-gradient-to-r from-rose-500 to-red-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-md">
             Sale
           </span>
         )}
 
-        {/* live preview pill — shown on desktop hover, or after a tap on mobile (no hover there).
-            pointer-events-none while hidden so the first tap reaches the image div below instead
-            of silently hitting this (invisible but otherwise still-clickable) overlay. */}
+        {/* live preview pill */}
         <div
           className={[
-            "absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 pointer-events-none transition duration-200 group-hover:bg-black/35 group-hover:opacity-100 group-hover:pointer-events-auto",
-            showPreview ? "pointer-events-auto bg-black/35 opacity-100" : "",
+            "absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 pointer-events-none transition duration-200 group-hover:bg-black/40 group-hover:opacity-100 group-hover:pointer-events-auto",
+            showPreview ? "pointer-events-auto bg-black/40 opacity-100" : "",
           ].join(" ")}
         >
           <button
             type="button"
             onClick={handlePreviewClick}
-            className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-md ring-1 ring-white/30 transition hover:scale-105"
+            className="flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-md ring-1 ring-white/30 transition hover:scale-105"
           >
-            <Eye size={16} /> Live Preview
+            <Eye size={14} /> Live Preview
           </button>
         </div>
       </div>
 
       {/* body */}
-      <div className="flex min-w-0 flex-1 flex-col p-2.5 sm:p-4">
-        <Link to={`/products/${product.slug}`} className="truncate text-xs font-semibold text-cloud-100 hover:text-brand-300 sm:text-sm">
+      <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
+        <Link 
+          to={`/products/${product.slug}`} 
+          className="truncate font-display text-sm font-extrabold text-cloud-100 hover:text-emerald-400 transition"
+        >
           {product.name}
         </Link>
-        <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-cloud-400 sm:line-clamp-3 sm:text-xs min-h-[34px] sm:min-h-[50px]">
-          {product.description || product.shortDescription}
-        </p>
-        <div className="mt-2 flex min-w-0 flex-col gap-1 sm:mt-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
-          <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
-            <span className="hidden text-[11px] text-cloud-500 sm:inline">Price:</span>
-            {onSale && <span className="text-[11px] text-cloud-500 line-through sm:text-xs">{formatINR(product.price)}</span>}
-            <span className="font-display text-sm font-bold text-cloud-100 sm:text-base">{formatINR(effectivePrice)}</span>
+        
+        {/* Features Checklist / Description bullet points */}
+        <ul className="mt-3 space-y-1.5 flex-1 min-h-[64px] sm:min-h-[76px] text-left">
+          {product.features && product.features.length > 0 ? (
+            product.features.slice(0, 3).map((feat, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-[11px] leading-tight text-cloud-400 sm:text-xs">
+                <span className="text-emerald-400 font-bold select-none mt-0.5">•</span>
+                <span className="line-clamp-1">{feat}</span>
+              </li>
+            ))
+          ) : (
+            <li className="text-[11px] leading-normal text-cloud-500 sm:text-xs line-clamp-3">
+              {product.shortDescription || product.description}
+            </li>
+          )}
+        </ul>
+
+        {/* Price & Rating */}
+        <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
+          <div className="flex flex-col text-left">
+            {onSale && (
+              <span className="text-[10px] text-cloud-500 line-through leading-none">
+                {formatINR(product.price)}
+              </span>
+            )}
+            <span className="font-display text-sm font-black text-cloud-100 sm:text-base leading-tight mt-0.5">
+              {formatINR(effectivePrice)}
+            </span>
           </div>
-          <StarRating rating={product.rating} reviews={product.numReviews} />
+          <div className="flex flex-col items-end">
+            <StarRating rating={product.rating} reviews={product.numReviews} />
+          </div>
         </div>
 
-        <div className="mt-2 flex flex-col gap-1.5 sm:mt-3 sm:flex-row sm:gap-2">
+        {/* Buttons */}
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <button
             onClick={handleBuyNow}
-            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-brand-gradient px-3 py-1.5 text-[11px] font-semibold text-white transition hover:opacity-95 sm:w-auto sm:flex-1 sm:py-2 sm:text-xs"
+            className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-brand-gradient px-4 py-2 text-xs font-bold text-white transition hover:opacity-95 shadow-md shadow-brand-500/10 sm:flex-1 cursor-pointer"
           >
             <ShoppingCart size={13} /> Buy Now
           </button>
           <Link
             to={`/products/${product.slug}`}
-            className="flex w-full items-center justify-center rounded-lg border border-white/15 px-3 py-1.5 text-[11px] font-semibold text-cloud-200 transition hover:bg-white/5 sm:w-auto sm:py-2 sm:text-xs"
+            className="flex w-full items-center justify-center rounded-xl border border-white/12 px-4 py-2 text-xs font-bold text-cloud-200 transition hover:bg-white/5 sm:w-auto cursor-pointer"
           >
             Details
           </Link>

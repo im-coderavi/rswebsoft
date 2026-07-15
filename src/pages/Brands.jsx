@@ -30,12 +30,14 @@ export default function Brands() {
                 style={toneGradient(brand.tone)}
               />
               {brand.logo?.url ? (
-                <img
-                  src={brand.logo.url}
-                  alt={brand.name}
-                  draggable={false}
-                  className="mb-3 h-11 max-w-[85%] object-contain sm:h-12"
-                />
+                <div className="mb-3 flex h-14 w-full items-center justify-center rounded-xl bg-white p-2 border border-slate-100/50">
+                  <img
+                    src={brand.logo.url}
+                    alt={brand.name}
+                    draggable={false}
+                    className="h-full max-w-full object-contain transition duration-300 group-hover:scale-105"
+                  />
+                </div>
               ) : (
                 <span
                   className="mb-3 grid h-12 w-12 shrink-0 place-items-center rounded-xl text-white shadow-lg transition group-hover:scale-105 sm:h-14 sm:w-14"

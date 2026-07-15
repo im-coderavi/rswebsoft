@@ -1,0 +1,14 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(15, 8)">
+    <!-- Text "BUY" -->
+    <text x="10" y="32" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="28" fill="#111827" letter-spacing="-1">BUY</text>
+    
+    <!-- Red/Orange polygon block for "ON" -->
+    <g transform="translate(74, 6)">
+      <!-- angled/tilted box representation matching the 3D-ish feel from screenshot -->
+      <path d="M 0,2 L 48,0 L 44,32 L -4,34 Z" fill="#e11d48"/>
+      <!-- Text "ON" -->
+      <text x="21" y="25" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="23" fill="#ffffff" text-anchor="middle">ON</text>
+    </g>
+  </g>
+</svg>
