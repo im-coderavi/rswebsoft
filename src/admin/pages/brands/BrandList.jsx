@@ -9,7 +9,7 @@ import DataTable from "../../components/DataTable"
 import ConfirmDialog from "../../components/ConfirmDialog"
 import ImageUploader from "../../components/ImageUploader"
 
-const emptyForm = { name: "", tag: "", icon: "Building2", tone: "violet", website: "", logo: null }
+const emptyForm = { name: "", tag: "", icon: "Building2", tone: "violet", website: "", description: "", logo: null }
 
 export default function BrandList() {
   const { data: brands, isLoading } = useBrands()
@@ -36,6 +36,7 @@ export default function BrandList() {
       icon: brand.icon,
       tone: brand.tone,
       website: brand.website,
+      description: brand.description || "",
       logo: brand.logo?.url ? brand.logo : null,
     })
     setModalOpen(true)
@@ -178,6 +179,18 @@ export default function BrandList() {
                 onChange={(e) => setForm((f) => ({ ...f, website: e.target.value }))}
                 placeholder="https://…"
                 className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+                Description <span className="text-cloud-500">(short description shown on brand card)</span>
+              </label>
+              <textarea
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                placeholder="e.g. Premium digital products, templates & more…"
+                rows={2}
+                className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none resize-none"
               />
             </div>
             <div>

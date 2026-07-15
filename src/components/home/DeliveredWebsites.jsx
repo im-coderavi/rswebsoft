@@ -96,38 +96,16 @@ function DeliveredWebsiteCard({ product }) {
   )
 }
 
-function DeliveredWebsiteMarquee({ products }) {
-  const [paused, setPaused] = useState(false)
-
+function DeliveredWebsiteMobileSlider({ products }) {
   if (!products || products.length === 0) return null
 
-  // Duplicate products to create a seamless scrolling loop
-  let track = [...products]
-  while (track.length > 0 && track.length < 15) {
-    track = [...track, ...products]
-  }
-
-  // Consistent speed
-  const duration = track.length * 6.5
-
   return (
-    <div
-      className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] py-2"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onTouchStart={() => setPaused(true)}
-      onTouchEnd={() => setPaused(false)}
-    >
-      <div
-        className="brands-marquee-track flex w-max gap-4"
-        style={{ animationDuration: `${duration}s`, animationPlayState: paused ? "paused" : "running" }}
-      >
-        {track.map((p, i) => (
-          <div key={`${p._id}-${i}`} className="w-[280px] shrink-0">
-            <DeliveredWebsiteCard product={p} />
-          </div>
-        ))}
-      </div>
+    <div className="flex w-full gap-4 overflow-x-auto pb-6 pt-2 no-scrollbar snap-x snap-mandatory -mx-4 px-4">
+      {products.map((p) => (
+        <div key={p._id} className="w-[290px] shrink-0 snap-center">
+          <DeliveredWebsiteCard product={p} />
+        </div>
+      ))}
     </div>
   )
 }
@@ -214,9 +192,9 @@ export default function DeliveredWebsites() {
             )}
           </div>
 
-          {/* 2. Mobile View: Infinite Auto-scrolling Marquee */}
+          {/* 2. Mobile View: Manual Touch-scrolling Slider */}
           <div className="block sm:hidden">
-            <DeliveredWebsiteMarquee products={allItems} />
+            <DeliveredWebsiteMobileSlider products={allItems} />
           </div>
         </>
       )}

@@ -6,6 +6,7 @@ import {
   Headphones, Image, LayoutDashboard, LayoutGrid, LayoutTemplate, Megaphone,
   Monitor, Package, Palette, PlayCircle, ShoppingCart, Smartphone, Smile,
   Sparkles, Stethoscope, TrendingUp, Users, UtensilsCrossed, Wrench,
+  ShoppingBag, Key, User, ExternalLink, ArrowRight
 } from "lucide-react"
 
 const REGISTRY = {
@@ -14,6 +15,7 @@ const REGISTRY = {
   Headphones, Image, LayoutDashboard, LayoutGrid, LayoutTemplate, Megaphone,
   Monitor, Package, Palette, PlayCircle, ShoppingCart, Smartphone, Smile,
   Sparkles, Stethoscope, TrendingUp, Users, UtensilsCrossed, Wrench,
+  ShoppingBag, Key, User, ExternalLink, ArrowRight
 }
 
 // Simple WordPress "W" glyph (lucide ships no brand icons).

@@ -32,12 +32,16 @@ const categories = [
 ]
 
 const brands = [
-  { name: "WPKartPro", tag: "WordPress Products", icon: "ShoppingCart", tone: "orange", website: "https://wpkartpro.com/", logo: { url: "/brand-logos/wpkartpro.svg", publicId: "" } },
-  { name: "ToolzyPro", tag: "Software & Tools", icon: "Wrench", tone: "violet", website: "https://toolzypro.com/", logo: { url: "/brand-logos/toolzypro.svg", publicId: "" } },
-  { name: "WPTemplatesHub", tag: "Ready Websites", icon: "LayoutTemplate", tone: "pink", website: "https://wptemplateshub.com/", logo: { url: "/brand-logos/wptemplateshub.svg", publicId: "" } },
-  { name: "CodexBazaar", tag: "Source Codes", icon: "Code2", tone: "teal", website: "https://codexbazaar.com/", logo: { url: "/brand-logos/codexbazaar.svg", publicId: "" } },
-  { name: "AppsClap", tag: "AI Tools", icon: "Sparkles", tone: "sky", website: "https://appsclap.com/", logo: { url: "/brand-logos/appsclap.svg", publicId: "" } },
-  { name: "BizzProfile", tag: "Digital Business Profile", icon: "Building2", tone: "emerald", website: "https://bizzprofile.com/", logo: { url: "/brand-logos/bizzprofile.svg", publicId: "" } },
+  { name: "WPKartPro", tag: "Digital Products Marketplace", icon: "ShoppingCart", tone: "orange", website: "https://wpkartpro.com/", description: "Premium digital products, templates, plugins, themes & more for creators and businesses.", logo: { url: "/brand-logos/wpkartpro.svg", publicId: "" } },
+  { name: "CodexBazaar", tag: "Source Code & Templates", icon: "Code2", tone: "teal", website: "https://codexbazaar.com/", description: "Source codes, scripts, templates and developer resources for your next big project.", logo: { url: "/brand-logos/codexbazaar.svg", publicId: "" } },
+  { name: "WPMart99", tag: "Ready Made Websites", icon: "Globe", tone: "pink", website: "https://wpmart99.com/", description: "Affordable ready-made WordPress websites for every business and niche.", logo: { url: "/brand-logos/wpmart99.svg", publicId: "" } },
+  { name: "WPKeyHub", tag: "Licenses & Keys", icon: "Key", tone: "sky", website: "https://wpkeyhub.com/", description: "Genuine licenses & keys for premium themes, plugins and software.", logo: { url: "/brand-logos/wpkeyhub.svg", publicId: "" } },
+  { name: "ToolzyPro", tag: "Reseller Panel & Tools", icon: "Wrench", tone: "violet", website: "https://toolzypro.in/", description: "Reseller panel to sell digital products, tools, themes, plugins & SaaS solutions.", logo: { url: "/brand-logos/toolzypro.svg", publicId: "" } },
+  { name: "WPTemplatesHub", tag: "Premium WP Templates", icon: "LayoutTemplate", tone: "pink", website: "https://wptemplateshub.com/", description: "Premium & professional WordPress templates for businesses and agencies.", logo: { url: "/brand-logos/wptemplateshub.svg", publicId: "" } },
+  { name: "AppsClap", tag: "AI Tools & Software", icon: "Sparkles", tone: "sky", website: "https://appsclap.com/", description: "Smart AI tools, software and automation solutions to grow your business.", logo: { url: "/brand-logos/appsclap.svg", publicId: "" } },
+  { name: "GPThemeMart", tag: "GeneratePress Themes", icon: "Palette", tone: "emerald", website: "https://gpthememart.com/", description: "Beautiful & lightweight GeneratePress themes for fast and SEO-friendly websites.", logo: { url: "/brand-logos/gpthememart.svg", publicId: "" } },
+  { name: "BizzProfile", tag: "Digital Business Profile", icon: "Building2", tone: "emerald", website: "https://bizzprofile.com/", description: "Create professional digital business profiles & boost your online presence.", logo: { url: "/brand-logos/bizzprofile.svg", publicId: "" } },
+  { name: "RSWebSoft", tag: "Agency & Web Solutions", icon: "Globe", tone: "indigo", website: "https://rswebsoft.in/", description: "Our main agency platform offering web development, design & digital solutions.", logo: { url: "/brand-logos/rswebsoft.svg", publicId: "" } },
 ]
 
 // Real, freely-licensed stock photos (Unsplash CDN) grouped by theme, so
