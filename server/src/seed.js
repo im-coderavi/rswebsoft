@@ -32,13 +32,12 @@ const categories = [
 ]
 
 const brands = [
-  { name: "WeftKart", tag: "Fashion & Lifestyle Store", icon: "ShoppingCart", tone: "orange", website: "https://weftkart.com/", logo: { url: "/brand-logos/weftkart.svg", publicId: "" } },
-  { name: "BUYON", tag: "E-Commerce Shopping Portal", icon: "ShoppingBag", tone: "rose", website: "https://buyon.in/", logo: { url: "/brand-logos/buyon.svg", publicId: "" } },
-  { name: "ONOFFER", tag: "Daily Deals & Offers", icon: "Gift", tone: "pink", website: "https://onoffer.in/", logo: { url: "/brand-logos/onoffer.svg", publicId: "" } },
-  { name: "Vassio", tag: "Premium Comfort Solutions", icon: "Home", tone: "emerald", website: "https://vassio.in/", logo: { url: "/brand-logos/vassio.svg", publicId: "" } },
-  { name: "H&MSHOES", tag: "Premium Footwear Brand", icon: "Sparkles", tone: "violet", website: "https://hmshoes.in/", logo: { url: "/brand-logos/hmshoes.svg", publicId: "" } },
-  { name: "okmart", tag: "Online Grocery Mart", icon: "Store", tone: "amber", website: "https://okmart.co.in/", logo: { url: "/brand-logos/okmart.svg", publicId: "" } },
-  { name: "Zest Shop", tag: "E-Commerce Shopping Hub", icon: "ShoppingCart", tone: "sky", website: "https://zestshop.in/", logo: { url: "/brand-logos/zestshop.svg", publicId: "" } },
+  { name: "WPKartPro", tag: "WordPress Products", icon: "ShoppingCart", tone: "orange", website: "https://wpkartpro.com/", logo: { url: "/brand-logos/wpkartpro.svg", publicId: "" } },
+  { name: "ToolzyPro", tag: "Software & Tools", icon: "Wrench", tone: "violet", website: "https://toolzypro.com/", logo: { url: "/brand-logos/toolzypro.svg", publicId: "" } },
+  { name: "WPTemplatesHub", tag: "Ready Websites", icon: "LayoutTemplate", tone: "pink", website: "https://wptemplateshub.com/", logo: { url: "/brand-logos/wptemplateshub.svg", publicId: "" } },
+  { name: "CodexBazaar", tag: "Source Codes", icon: "Code2", tone: "teal", website: "https://codexbazaar.com/", logo: { url: "/brand-logos/codexbazaar.svg", publicId: "" } },
+  { name: "AppsClap", tag: "AI Tools", icon: "Sparkles", tone: "sky", website: "https://appsclap.com/", logo: { url: "/brand-logos/appsclap.svg", publicId: "" } },
+  { name: "BizzProfile", tag: "Digital Business Profile", icon: "Building2", tone: "emerald", website: "https://bizzprofile.com/", logo: { url: "/brand-logos/bizzprofile.svg", publicId: "" } },
 ]
 
 // Real, freely-licensed stock photos (Unsplash CDN) grouped by theme, so
@@ -953,16 +952,7 @@ async function seed() {
         price,
         salePrice,
         category: categoryIdByName.get(group.category),
-        brand: group.brand ? brandIdByName.get(
-          {
-            "WPKartPro": "WeftKart",
-            "WPTemplatesHub": "ONOFFER",
-            "ToolzyPro": "BUYON",
-            "AppsClap": "Vassio",
-            "CodexBazaar": "H&MSHOES",
-            "BizzProfile": "okmart"
-          }[group.brand] || group.brand
-        ) : undefined,
+        brand: group.brand ? brandIdByName.get(group.brand) : undefined,
         type: group.type,
         rating: Number((rand(43, 49) / 10).toFixed(1)),
         numReviews: rand(40, 4200),

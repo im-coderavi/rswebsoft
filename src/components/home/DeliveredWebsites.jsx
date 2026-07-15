@@ -7,7 +7,7 @@ function DeliveredWebsiteCard({ product }) {
   const displayTag = product.tags?.[0] || product.category?.name || "Website"
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-white/8 bg-ink-850 p-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-500/40 hover:shadow-2xl hover:shadow-black/40">
+    <div className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/8 bg-ink-850 p-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-500/40 hover:shadow-2xl hover:shadow-black/40">
       {/* Browser Window Mockup */}
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-ink-800 border border-white/5 shadow-inner">
         {/* Browser Top Bar */}
@@ -46,12 +46,10 @@ function DeliveredWebsiteCard({ product }) {
           )}
 
           {/* Badges Overlay */}
-          {/* Top Left: Category/Tag */}
           <span className="absolute left-2.5 top-2.5 z-20 rounded-md bg-emerald-500/90 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
             {displayTag}
           </span>
 
-          {/* Top Right: Starting Price */}
           <span className="absolute right-2.5 top-2.5 z-20 rounded-full bg-white/95 backdrop-blur-sm px-3 py-1 text-xs font-bold text-slate-800 shadow-sm border border-slate-200">
             Starting ₹{product.price}
           </span>
@@ -63,15 +61,15 @@ function DeliveredWebsiteCard({ product }) {
         <h3 className="font-display text-sm font-bold text-cloud-100 sm:text-base line-clamp-1 hover:text-brand-400 transition">
           {product.demoUrl ? (
             <a href={product.demoUrl} target="_blank" rel="noopener noreferrer">
-              {product.name} – Project Highlights
+              {product.name}
             </a>
           ) : (
-            `${product.name} – Project Highlights`
+            product.name
           )}
         </h3>
 
         {/* Highlights list */}
-        <ul className="mt-3.5 space-y-2 flex-1">
+        <ul className="mt-3 space-y-2 flex-1">
           {product.features?.map((highlight, idx) => (
             <li key={idx} className="flex items-start gap-2 text-xs text-cloud-400 leading-normal">
               <span className="text-emerald-400 font-bold select-none mt-0.5">•</span>
@@ -98,19 +96,58 @@ function DeliveredWebsiteCard({ product }) {
   )
 }
 
+function DeliveredWebsiteMarquee({ products }) {
+  const [paused, setPaused] = useState(false)
+
+  if (!products || products.length === 0) return null
+
+  // Duplicate products to create a seamless scrolling loop
+  let track = [...products]
+  while (track.length > 0 && track.length < 15) {
+    track = [...track, ...products]
+  }
+
+  // Consistent speed
+  const duration = track.length * 6.5
+
+  return (
+    <div
+      className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] py-2"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onTouchStart={() => setPaused(true)}
+      onTouchEnd={() => setPaused(false)}
+    >
+      <div
+        className="brands-marquee-track flex w-max gap-4"
+        style={{ animationDuration: `${duration}s`, animationPlayState: paused ? "paused" : "running" }}
+      >
+        {track.map((p, i) => (
+          <div key={`${p._id}-${i}`} className="w-[280px] shrink-0">
+            <DeliveredWebsiteCard product={p} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function DeliveredWebsites() {
   const [page, setPage] = useState(1)
   const { data, isLoading } = useProducts({
     type: "delivered-website",
     status: "published",
-    page,
-    limit: 6,
+    limit: 100 // Fetch all client items so we can render them all on mobile marquee
   })
 
-  const products = data?.items || []
-  const pages = data?.pages || 1
+  const allItems = data?.items || []
+  const itemsPerPage = 6
+  const pages = Math.ceil(allItems.length / itemsPerPage)
+  
+  const startIndex = (page - 1) * itemsPerPage
+  const desktopItems = allItems.slice(startIndex, startIndex + itemsPerPage)
 
-  if (!isLoading && products.length === 0) return null
+  if (!isLoading && allItems.length === 0) return null
 
   return (
     <section className="container-rs py-12 sm:py-16 scroll-mt-32">
@@ -129,50 +166,58 @@ export default function DeliveredWebsites() {
         </div>
       ) : (
         <>
-          <div className="relative">
-            <motion.div 
-              layout
-              className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-            >
-              <AnimatePresence mode="popLayout">
-                {products.map((p, i) => (
-                  <motion.div
-                    key={p._id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3, delay: i * 0.05 }}
-                  >
-                    <DeliveredWebsiteCard product={p} />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </motion.div>
+          {/* 1. Desktop & Tablet Grid View */}
+          <div className="hidden sm:block">
+            <div className="relative">
+              <motion.div 
+                layout
+                className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+              >
+                <AnimatePresence mode="popLayout">
+                  {desktopItems.map((p, i) => (
+                    <motion.div
+                      key={p._id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.3, delay: i * 0.05 }}
+                    >
+                      <DeliveredWebsiteCard product={p} />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            </div>
+
+            {/* Pagination Controls */}
+            {pages > 1 && (
+              <div className="mt-10 flex items-center justify-center gap-3">
+                <button
+                  disabled={page <= 1}
+                  onClick={() => setPage(page - 1)}
+                  className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-cloud-300 disabled:opacity-30 transition hover:bg-white/5 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="text-sm text-cloud-400 select-none">
+                  Page {page} of {pages}
+                </span>
+                <button
+                  disabled={page >= pages}
+                  onClick={() => setPage(page + 1)}
+                  className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-cloud-300 disabled:opacity-30 transition hover:bg-white/5 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Pagination Controls */}
-          {pages > 1 && (
-            <div className="mt-10 flex items-center justify-center gap-3">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage(page - 1)}
-                className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-cloud-300 disabled:opacity-30 transition hover:bg-white/5 cursor-pointer disabled:cursor-not-allowed"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <span className="text-sm text-cloud-400 select-none">
-                Page {page} of {pages}
-              </span>
-              <button
-                disabled={page >= pages}
-                onClick={() => setPage(page + 1)}
-                className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-cloud-300 disabled:opacity-30 transition hover:bg-white/5 cursor-pointer disabled:cursor-not-allowed"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          )}
+          {/* 2. Mobile View: Infinite Auto-scrolling Marquee */}
+          <div className="block sm:hidden">
+            <DeliveredWebsiteMarquee products={allItems} />
+          </div>
         </>
       )}
     </section>

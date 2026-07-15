@@ -8,6 +8,7 @@ import ProductCarousel from "../components/home/ProductCarousel"
 import ReadyWebsites from "../components/home/ReadyWebsites"
 import DeliveredWebsites from "../components/home/DeliveredWebsites"
 import PricingPlans from "../components/home/PricingPlans"
+import ClientsMarquee from "../components/home/ClientsMarquee"
 import BrandsSection from "../components/home/BrandsSection"
 import DemoCenter from "../components/home/DemoCenter"
 import Testimonials from "../components/home/Testimonials"
@@ -38,6 +39,7 @@ export default function Home() {
       <ReadyWebsites />
       <DeliveredWebsites />
       <PricingPlans />
+      <ClientsMarquee />
       <BrandsSection />
       <DemoCenter />
       <Testimonials />
