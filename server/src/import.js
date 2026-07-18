@@ -182,6 +182,19 @@ function getCategoryDesign(name) {
   return { icon: "Box", tone: "violet" };
 }
 
+// Helper to clean WooCommerce descriptions (newlines, shortcodes, etc.)
+function cleanDescription(text) {
+  if (!text) return "";
+  return text
+    .replace(/\\r\\n/g, "<br />")
+    .replace(/\\n/g, "<br />")
+    .replace(/\\r/g, "<br />")
+    // Translate WordPress [button] shortcode into actual styled responsive button
+    .replace(/\[button\s+link="([^"]+)"[^\]]*\](.*?)\[\/button\]/gi, (match, url, label) => {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-600 px-6 py-2.5 text-sm font-extrabold text-white transition hover:opacity-95 shadow-md hover:scale-102 my-3 cursor-pointer">${label.trim()}</a>`;
+    });
+}
+
 // Helper to generate professional fallback features based on type
 function getDefaultFeatures(type) {
   switch (type) {
@@ -529,8 +542,8 @@ async function runImport() {
 
       const productDoc = {
         name: name.trim(),
-        description: row.Description || row.description || "",
-        shortDescription: row["Short description"] || row["short description"] || "",
+        description: cleanDescription(row.Description || row.description || ""),
+        shortDescription: cleanDescription(row["Short description"] || row["short description"] || ""),
         price: regularPrice,
         salePrice: salePrice && salePrice < regularPrice ? salePrice : undefined,
         features: features,

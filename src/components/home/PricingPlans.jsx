@@ -118,7 +118,7 @@ export default function PricingPlans() {
   const { data, isLoading } = useProducts({
     type: "package",
     status: "published",
-    limit: 20
+    limit: 150
   })
 
   const packages = data?.items || []
