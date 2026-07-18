@@ -130,8 +130,10 @@ export default function PricingPlans() {
     .sort((a, b) => {
       // Sort priority: Standard -> Premium -> Premium E-commerce -> Custom -> Multi-vendor
       const order = ["standard", "premium plan", "premium e-commerce", "custom", "multi-vendor"]
-      const idxA = order.findIndex(key => a.name.toLowerCase().includes(key))
-      const idxB = order.findIndex(key => b.name.toLowerCase().includes(key))
+      let idxA = order.findIndex(key => a.name.toLowerCase().includes(key))
+      let idxB = order.findIndex(key => b.name.toLowerCase().includes(key))
+      if (idxA === -1) idxA = 999
+      if (idxB === -1) idxB = 999
       return idxA - idxB
     })
     .slice(0, 3) // Keep exactly 3 plans

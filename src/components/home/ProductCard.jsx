@@ -68,7 +68,7 @@ export default function ProductCard({ product }) {
             src={image}
             alt={product.name}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-106"
+            className="h-full w-full object-cover object-top transition-all duration-[3000ms] ease-in-out group-hover:object-bottom"
           />
         ) : (
           <>
@@ -125,7 +125,7 @@ export default function ProductCard({ product }) {
             ))
           ) : (
             <li className="text-[11px] leading-normal text-cloud-500 sm:text-xs line-clamp-3">
-              {product.shortDescription || product.description}
+              {(product.shortDescription || product.description || "").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").trim()}
             </li>
           )}
         </ul>

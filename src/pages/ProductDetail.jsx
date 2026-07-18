@@ -158,9 +158,16 @@ export default function ProductDetail() {
             <h1 className="font-display text-3xl font-extrabold tracking-tight text-cloud-100 sm:text-4xl lg:text-5xl">
               {product.name}
             </h1>
-            <p className="text-sm sm:text-base text-cloud-400 leading-relaxed max-w-2xl">
-              {product.shortDescription || "Get access to our premium digital resource optimized for speed, scalability, and performance."}
-            </p>
+            {product.shortDescription ? (
+              <div 
+                className="text-sm sm:text-base text-cloud-400 leading-relaxed max-w-2xl html-content"
+                dangerouslySetInnerHTML={{ __html: product.shortDescription }}
+              />
+            ) : (
+              <p className="text-sm sm:text-base text-cloud-400 leading-relaxed max-w-2xl">
+                Get access to our premium digital resource optimized for speed, scalability, and performance.
+              </p>
+            )}
 
             {/* Ratings count */}
             <div className="flex items-center gap-2">
@@ -411,9 +418,16 @@ export default function ProductDetail() {
           <h3 className="font-display text-lg sm:text-xl font-bold text-cloud-100">
             {product.name}
           </h3>
-          <p className="mt-3 text-xs sm:text-sm text-cloud-400 leading-relaxed">
-            {product.shortDescription || "Get access to our premium digital resource optimized for speed, scalability, and performance."}
-          </p>
+          {product.shortDescription ? (
+            <div 
+              className="mt-3 text-xs sm:text-sm text-cloud-400 leading-relaxed html-content"
+              dangerouslySetInnerHTML={{ __html: product.shortDescription }}
+            />
+          ) : (
+            <p className="mt-3 text-xs sm:text-sm text-cloud-400 leading-relaxed">
+              Get access to our premium digital resource optimized for speed, scalability, and performance.
+            </p>
+          )}
 
           {product.features && product.features.length > 0 && (
             <div className="mt-6">
@@ -431,11 +445,12 @@ export default function ProductDetail() {
           )}
 
           {product.description && (
-            <div className="mt-6 border-t border-white/5 pt-4 text-xs sm:text-sm text-cloud-400 leading-relaxed">
-              <p className="text-cloud-400">
-                <span className="font-bold text-cloud-200">Note: </span>
-                {product.description}
-              </p>
+            <div className="mt-6 border-t border-white/5 pt-6 text-xs sm:text-sm text-cloud-400 leading-relaxed html-content space-y-4">
+              <h4 className="text-xs sm:text-sm font-bold text-cloud-200 uppercase tracking-wider mb-2">Description / Details:</h4>
+              <div 
+                className="space-y-4"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
             </div>
           )}
         </div>

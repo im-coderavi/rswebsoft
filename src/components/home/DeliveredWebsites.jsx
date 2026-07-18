@@ -26,7 +26,7 @@ function DeliveredWebsiteCard({ product }) {
             <img
               src={product.images[0].url}
               alt={product.name}
-              className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+              className="h-full w-full object-cover object-top transition-all duration-[3000ms] ease-in-out group-hover:object-bottom"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-brand-gradient-soft text-brand-300 font-bold text-xs select-none">
