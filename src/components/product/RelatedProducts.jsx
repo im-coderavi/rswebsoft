@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Layers } from "lucide-react"
 import ProductCard from "../home/ProductCard"
 import { useProducts } from "../../hooks/useProducts"
 
-const PAGE_SIZE = 12
+const PAGE_SIZE = 3
 
 export default function RelatedProducts({ categoryId, excludeId }) {
   const [page, setPage] = useState(1)
@@ -25,12 +25,12 @@ export default function RelatedProducts({ categoryId, excludeId }) {
   }
 
   return (
-    <div id="related-products" className="mt-16 scroll-mt-24">
+    <div id="related-products" className="mt-12 scroll-mt-24">
       <div className="mb-5 flex items-center gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-gradient-soft text-brand-300">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-gradient-soft text-brand-300">
           <Layers size={18} />
         </span>
-        <h2 className="font-display text-2xl font-bold text-cloud-100">Related Products</h2>
+        <h2 className="font-display text-xl font-bold text-cloud-100">Related Products</h2>
       </div>
 
       {isLoading ? (
@@ -51,23 +51,23 @@ export default function RelatedProducts({ categoryId, excludeId }) {
       )}
 
       {data && data.pages > 1 && (
-        <div className="mt-8 flex items-center justify-center gap-3">
+        <div className="mt-6 flex items-center justify-center gap-3">
           <button
             disabled={page <= 1}
             onClick={() => goToPage(page - 1)}
-            className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-cloud-300 disabled:opacity-30"
+            className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-cloud-300 disabled:opacity-30 cursor-pointer"
             aria-label="Previous page"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={15} />
           </button>
-          <span className="text-sm text-cloud-400">Page {data.page} of {data.pages}</span>
+          <span className="text-xs text-cloud-400 font-medium">Page {data.page} of {data.pages}</span>
           <button
             disabled={page >= data.pages}
             onClick={() => goToPage(page + 1)}
-            className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-cloud-300 disabled:opacity-30"
+            className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-cloud-300 disabled:opacity-30 cursor-pointer"
             aria-label="Next page"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={15} />
           </button>
         </div>
       )}
