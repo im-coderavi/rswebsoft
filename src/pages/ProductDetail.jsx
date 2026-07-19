@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useSearchParams } from "react-router-dom"
 import { 
   ShoppingCart, 
   Zap, 
@@ -23,6 +23,7 @@ import { useCart } from "../context/CartContext"
 import { toneGradient } from "../lib/tones"
 import { formatINR } from "../lib/currency"
 import RelatedProducts from "../components/product/RelatedProducts"
+import ProductPreviewModal from "../components/product/ProductPreviewModal"
 
 function initialsOf(name) {
   return name ? name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase() : "RS"
@@ -79,10 +80,26 @@ function ScarcityTimer() {
 export default function ProductDetail() {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { data: product, isLoading } = useProduct(slug)
   const { add } = useCart()
   const [selectedImgIndex, setSelectedImgIndex] = useState(0)
   const [showFullDesc, setShowFullDesc] = useState(false)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+
+  useEffect(() => {
+    if (searchParams.get("preview") === "true") {
+      setIsPreviewOpen(true)
+    }
+  }, [searchParams])
+
+  function handleOpenPreview(e) {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    setIsPreviewOpen(true)
+  }
 
   if (isLoading) {
     return (
@@ -215,16 +232,12 @@ export default function ProductDetail() {
               )}
 
               {/* Floating Live Preview CTA on Image */}
-              {product.demoUrl && (
-                <a
-                  href={product.demoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="absolute bottom-4 right-4 flex items-center gap-2 rounded-xl bg-ink-950/80 backdrop-blur-md border border-white/15 px-4 py-2 text-xs font-bold text-cloud-100 hover:bg-ink-900 transition shadow-lg"
-                >
-                  <Eye size={14} className="text-brand-400" /> Live Demo Preview <ExternalLink size={12} />
-                </a>
-              )}
+              <button
+                onClick={handleOpenPreview}
+                className="absolute bottom-4 right-4 flex items-center gap-2 rounded-xl bg-ink-950/90 backdrop-blur-md border border-brand-500/40 px-4 py-2 text-xs font-bold text-cloud-100 hover:bg-brand-500/20 hover:text-white transition shadow-lg cursor-pointer"
+              >
+                <Eye size={14} className="text-brand-400" /> Live Demo Preview <ExternalLink size={12} />
+              </button>
             </div>
 
             {/* Thumbnail Navigation (If multiple images exist) */}
@@ -344,20 +357,12 @@ export default function ProductDetail() {
                     <ShoppingCart size={15} /> Add to Cart
                   </button>
 
-                  {product.demoUrl ? (
-                    <a
-                      href={product.demoUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-center gap-1.5 rounded-xl border border-brand-500/30 bg-brand-500/10 py-3 px-4 text-xs font-bold text-brand-300 transition hover:bg-brand-500/20"
-                    >
-                      <Eye size={15} /> Live Preview <ExternalLink size={12} />
-                    </a>
-                  ) : (
-                    <div className="flex items-center justify-center gap-1.5 rounded-xl border border-white/5 bg-white/5 py-3 px-4 text-xs font-semibold text-cloud-500 cursor-not-allowed">
-                      <Eye size={15} /> No Preview
-                    </div>
-                  )}
+                  <button
+                    onClick={handleOpenPreview}
+                    className="flex items-center justify-center gap-1.5 rounded-xl border border-brand-500/30 bg-brand-500/10 py-3 px-4 text-xs font-bold text-brand-300 transition hover:bg-brand-500/20 cursor-pointer"
+                  >
+                    <Eye size={15} /> Live Preview <ExternalLink size={12} />
+                  </button>
                 </div>
               </div>
 
@@ -555,6 +560,13 @@ export default function ProductDetail() {
       <section className="container-rs pt-6">
         <RelatedProducts categoryId={product.category?._id} excludeId={product._id} />
       </section>
+
+      {/* FULL-SCREEN LIVE TEMPLATE PREVIEW MODAL */}
+      <ProductPreviewModal 
+        product={product} 
+        isOpen={isPreviewOpen} 
+        onClose={() => setIsPreviewOpen(false)} 
+      />
 
     </div>
   )

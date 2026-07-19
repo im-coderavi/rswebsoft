@@ -51,8 +51,11 @@ export default function ProductCard({ product }) {
   function handlePreviewClick(e) {
     e.preventDefault()
     e.stopPropagation()
-    if (product.demoUrl) window.open(product.demoUrl, "_blank", "noopener")
-    else navigate(`/products/${product.slug}`)
+    if (product.demoUrl && (product.demoUrl.startsWith("http://") || product.demoUrl.startsWith("https://"))) {
+      window.open(product.demoUrl, "_blank", "noopener,noreferrer")
+    } else {
+      navigate(`/products/${product.slug}?preview=true`)
+    }
   }
 
   return (

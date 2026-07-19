@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom"
 
 function DeliveredWebsiteCard({ product }) {
   const navigate = useNavigate()
-  const displayTag = product.tags?.[0] || product.category?.name || "Website"
-  const demoUrl = product.demoUrl || (product.slug ? `/products/${product.slug}` : "#")
+  const demoUrl = product.demoUrl || (product.slug ? `/products/${product.slug}?preview=true` : "#")
   const isExternal = demoUrl.startsWith("http://") || demoUrl.startsWith("https://")
 
   // Show max 3-4 points max as requested
