@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50" fill="none">
+  <!-- Stylokicks Logo -->
+  <defs>
+    <linearGradient id="stylo-grad" x1="0" y1="0" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <!-- Shopping bag / shoe icon -->
+  <path d="M12 18 h12 v16 h-12 z" fill="url(#stylo-grad)" opacity="0.15"/>
+  <path d="M18 10 c-3 0-5 2-5 5 v3 h10 v-3 c0-3-2-5-5-5 z" stroke="url(#stylo-grad)" stroke-width="2" fill="none"/>
+  <path d="M11 18 h14 v18 c0 2-2 4-4 4 h-6 c-2 0-4-2-4-4 z" stroke="url(#stylo-grad)" stroke-width="2" fill="none"/>
+  <path d="M14 26 q4 4 8 0" stroke="url(#stylo-grad)" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Text -->
+  <text x="38" y="27" font-family="'Poppins', 'Inter', system-ui, sans-serif" font-weight="900" font-size="16" fill="#0f172a" letter-spacing="0.5">STYLO</text>
+  <text x="96" y="27" font-family="'Poppins', 'Inter', system-ui, sans-serif" font-weight="900" font-size="16" fill="#dc2626" letter-spacing="0.5">KICKS</text>
+  <text x="38" y="39" font-family="'Poppins', 'Inter', system-ui, sans-serif" font-weight="500" font-size="7.5" fill="#64748b" letter-spacing="0.8">STYLE MAKES CONFIDENCE</text>
+</svg>

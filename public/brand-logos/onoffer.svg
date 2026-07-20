@@ -1,0 +1,19 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(10, 8)">
+    <!-- "ON" -->
+    <text x="10" y="33" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="25" fill="#111827" letter-spacing="-0.5">ON</text>
+    
+    <!-- Shopping bag icon matching the screenshot -->
+    <g transform="translate(52, 6)">
+      <!-- Bag body -->
+      <path d="M 5,9 L 27,9 L 29,28 C 29,30 27,32 25,32 L 7,32 C 5,32 3,30 3,28 Z" fill="#d97706" />
+      <!-- Handles -->
+      <path d="M 9,9 C 9,4 23,4 23,9" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Inner O-shape or tag detail -->
+      <circle cx="16" cy="20" r="4" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+    </g>
+    
+    <!-- "OFFER" -->
+    <text x="88" y="33" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="25" fill="#111827" letter-spacing="-0.5">OFFER</text>
+  </g>
+</svg>

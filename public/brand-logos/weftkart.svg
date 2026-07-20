@@ -1,0 +1,13 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(10, 5)">
+    <!-- Stylized weaving 'W' thread icon -->
+    <path d="M10 25 C10 15, 15 12, 18 20 C21 28, 25 32, 28 22 C31 12, 35 15, 35 25" fill="none" stroke="#f97316" stroke-width="3" stroke-linecap="round"/>
+    <path d="M5 28 L40 28" fill="none" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="3,3"/>
+    
+    <!-- Text WeftKart -->
+    <text x="48" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="21" fill="#1e293b" letter-spacing="-0.5">Weft<tspan fill="#f97316" font-weight="500">Kart</tspan></text>
+    
+    <!-- Subtext -->
+    <text x="49" y="40" font-family="system-ui, -apple-system, sans-serif" font-weight="600" font-size="8" fill="#94a3b8" letter-spacing="0.3">INDIA'S ONLINE FASHION STORE</text>
+  </g>
+</svg>

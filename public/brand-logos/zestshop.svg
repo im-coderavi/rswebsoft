@@ -1,0 +1,18 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(10, 8)">
+    <!-- Fast moving orange shopping cart -->
+    <g transform="translate(10, 2)">
+      <!-- Speed lines -->
+      <path d="M 0,10 L 8,10 M 2,15 L 10,15 M 1,20 L 7,20" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Cart basket -->
+      <path d="M 12,8 L 18,22 L 34,22 L 38,10 Z" fill="none" stroke="#f97316" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+      <!-- Cart handle/wheels -->
+      <path d="M 12,8 L 8,8" fill="none" stroke="#f97316" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="21" cy="27" r="3.5" fill="#f97316"/>
+      <circle cx="31" cy="27" r="3.5" fill="#f97316"/>
+    </g>
+    
+    <!-- Text "Zest Shop" -->
+    <text x="58" y="27" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="20" fill="#1e293b">Zest <tspan font-weight="400" fill="#475569">Shop</tspan></text>
+  </g>
+</svg>

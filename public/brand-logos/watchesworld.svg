@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50" fill="none">
+  <circle cx="22" cy="25" r="12" stroke="#4f46e5" stroke-width="2.5"/>
+  <path d="M22 17 v8 h5" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/>
+  <path d="M16 13 h12 M16 37 h12" stroke="#4f46e5" stroke-width="2.5"/>
+  <text x="44" y="29" font-family="'Poppins', 'Inter', system-ui, sans-serif" font-weight="900" font-size="16" fill="#1e293b">WATCHESWORLD</text>
+  <text x="44" y="40" font-family="'Poppins', 'Inter', system-ui, sans-serif" font-weight="600" font-size="8" fill="#64748b" letter-spacing="0.5">LUXURY TIMEPIECES</text>
+</svg>

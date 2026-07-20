@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50" fill="none">
+  <path d="M12 25 c0-6 4-10 10-10 s10 4 10 10 s-4 10-10 10 s-10-4-10-10 z" stroke="#0ea5e9" stroke-width="2"/>
+  <path d="M22 10 c3 0 5 2 5 5 v3 h-10 v-3 c0-3 2-5 5-5 z" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="40" y="29" font-family="'Poppins', 'Inter', system-ui, sans-serif" font-weight="900" font-size="18" fill="#1e293b">Brandsworld</text>
+  <text x="40" y="41" font-family="'Poppins', 'Inter', system-ui, sans-serif" font-weight="600" font-size="8" fill="#64748b" letter-spacing="1.2">ONLINE RETAIL SHOP</text>
+</svg>

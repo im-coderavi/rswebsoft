@@ -1,0 +1,13 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(10, 8)">
+    <!-- Script style "Vassio" -->
+    <text x="90" y="27" font-family="'Brush Script MT', cursive, Georgia, serif" font-style="italic" font-weight="bold" font-size="34" fill="#dc2626" text-anchor="middle" letter-spacing="1">Vassio</text>
+    
+    <!-- Registered trademark R in circle -->
+    <circle cx="140" cy="8" r="3.5" fill="none" stroke="#dc2626" stroke-width="0.8"/>
+    <text x="140" y="10.5" font-family="system-ui, sans-serif" font-size="5" font-weight="bold" fill="#dc2626" text-anchor="middle">R</text>
+    
+    <!-- Green subtext "Your Comfort Partner" -->
+    <text x="90" y="41" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="10.5" fill="#15803d" text-anchor="middle" letter-spacing="0.5">Your Comfort Partner</text>
+  </g>
+</svg>

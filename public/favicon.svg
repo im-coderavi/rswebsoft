@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <!-- Brand gradient definition -->
+  <defs>
+    <linearGradient id="brand-grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded Tile matching bg-brand-gradient -->
+  <rect width="64" height="64" rx="18" fill="url(#brand-grad)"/>
+
+  <!-- Subtle glow overlay -->
+  <rect width="64" height="64" rx="18" fill="white" fill-opacity="0.05"/>
+
+  <!-- Centered "RS" Bold Text -->
+  <text x="32" y="41" font-family="'Poppins', 'Inter', system-ui, sans-serif" font-weight="900" font-size="28" fill="#ffffff" text-anchor="middle" letter-spacing="-0.5">RS</text>
+</svg>
