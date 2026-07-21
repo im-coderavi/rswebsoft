@@ -75,7 +75,15 @@ export default function ProductList() {
         </span>
       ),
     },
-    { key: "rating", label: "Rating", render: (p) => `${p.rating.toFixed(1)} (${p.numReviews})` },
+    { 
+      key: "rating", 
+      label: "Rating", 
+      render: (p) => {
+        const r = typeof p.rating === "number" ? p.rating : parseFloat(p.rating)
+        const formatted = !isNaN(r) ? r.toFixed(1) : "5.0"
+        return `${formatted} (${p.numReviews ?? 0})`
+      } 
+    },
   ]
 
   return (

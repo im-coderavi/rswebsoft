@@ -298,13 +298,21 @@ export default function ProductDetail() {
                 </h1>
 
                 <div className="flex items-center gap-2.5">
-                  <div className="flex items-center gap-0.5 text-amber-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} fill="currentColor" />
-                    ))}
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, i) => {
+                      const numRating = typeof product.rating === "number" ? product.rating : parseFloat(product.rating) || 5
+                      return (
+                        <Star
+                          key={i}
+                          size={14}
+                          className={i < Math.round(numRating) ? "fill-star text-star" : "text-ink-600"}
+                        />
+                      )
+                    })}
                   </div>
                   <span className="text-xs font-bold text-cloud-300">
-                    4.9 <span className="text-cloud-500 font-normal">({product.numReviews || 128} reviews)</span>
+                    {typeof product.rating === "number" ? product.rating.toFixed(1) : parseFloat(product.rating || 5).toFixed(1)}{" "}
+                    <span className="text-cloud-500 font-normal">({(product.numReviews != null ? product.numReviews : 128).toLocaleString()} reviews)</span>
                   </span>
                 </div>
               </div>

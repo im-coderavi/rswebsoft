@@ -554,7 +554,7 @@ async function runImport() {
         images: images,
         demoUrl: row["External URL"] || row["external url"] || "",
         downloadUrl: row["Download 1 URL"] || row["Download URL"] || row["download url"] || "",
-        rating: 4.0 + (Math.random() * 1.0), // Seed a premium rating (4.0 to 5.0)
+        rating: Number((4.0 + (Math.random() * 1.0)).toFixed(1)), // Seed a premium rating (4.0 to 5.0)
         numReviews: Math.floor(Math.random() * 45) + 5, // Seed random reviews count (5 to 50)
         featured: isFeatured,
         status: isPublished ? "published" : "draft",
