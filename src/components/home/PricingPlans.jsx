@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { Link } from "react-router-dom"
 import { Check } from "lucide-react"
 import { useProducts } from "../../hooks/useProducts"
 
@@ -20,7 +20,7 @@ function PricingCard({ product }) {
     }).format(amount)
   }
 
-  const targetUrl = product.demoUrl || "tel:+919876543210"
+  const hasDemoUrl = Boolean(product.demoUrl)
 
   return (
     <div className={`relative flex flex-col justify-between rounded-3xl bg-white text-slate-800 p-8 shadow-md border transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${isMostPopular ? "border-emerald-500 ring-4 ring-emerald-500/10 scale-102 z-10" : "border-slate-100"}`}>
@@ -47,7 +47,7 @@ function PricingCard({ product }) {
         <div className="my-6 rounded-2xl bg-slate-50 p-5 text-left border border-slate-100/80">
           {isCustomQuote ? (
             <div>
-              <div className="text-[10px] font-bold text-slate-400 line-through">MRP: ₹ 4,999</div>
+              <div className="text-[10px] font-bold text-slate-400 line-through">MRP: ₹{formatINR(originalPrice)}</div>
               <div className="text-[10px] font-bold tracking-wider text-emerald-600 uppercase mt-0.5">Custom Quote</div>
               <div className="flex items-center justify-between mt-1">
                 <span className="font-display text-3xl font-black text-slate-900">Contact</span>
@@ -92,22 +92,45 @@ function PricingCard({ product }) {
       {/* Button Action CTA */}
       <div className="mt-8 text-center">
         {isCustomQuote ? (
+          hasDemoUrl ? (
+            <a
+              href={product.demoUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="block w-full rounded-xl border-2 border-emerald-500 py-3 text-xs font-bold text-emerald-600 transition hover:bg-emerald-50 text-center"
+            >
+              Discuss Your Requirements
+            </a>
+          ) : (
+            <Link
+              to="/support"
+              className="block w-full rounded-xl border-2 border-emerald-500 py-3 text-xs font-bold text-emerald-600 transition hover:bg-emerald-50 text-center"
+            >
+              Discuss Your Requirements
+            </Link>
+          )
+        ) : hasDemoUrl ? (
           <a
-            href={targetUrl}
-            className="block w-full rounded-xl border-2 border-emerald-500 py-3 text-xs font-bold text-emerald-600 transition hover:bg-emerald-50 text-center"
-          >
-            Discuss Your Requirements
-          </a>
-        ) : (
-          <a
-            href={targetUrl}
+            href={product.demoUrl}
+            target="_blank"
+            rel="noreferrer"
             className="block w-full rounded-xl bg-emerald-600 py-3 text-xs font-bold text-white transition hover:bg-emerald-700 shadow-md shadow-emerald-700/10 text-center"
           >
-            <div className="font-extrabold text-sm">Call Now</div>
+            <div className="font-extrabold text-sm">Get Started</div>
             <div className="text-[9px] font-medium text-emerald-100/90 tracking-wide mt-0.5 uppercase">
               {product.description || "Talk to a web expert"}
             </div>
           </a>
+        ) : (
+          <Link
+            to="/support"
+            className="block w-full rounded-xl bg-emerald-600 py-3 text-xs font-bold text-white transition hover:bg-emerald-700 shadow-md shadow-emerald-700/10 text-center"
+          >
+            <div className="font-extrabold text-sm">Get Started</div>
+            <div className="text-[9px] font-medium text-emerald-100/90 tracking-wide mt-0.5 uppercase">
+              {product.description || "Talk to a web expert"}
+            </div>
+          </Link>
         )}
       </div>
     </div>
@@ -125,18 +148,12 @@ export default function PricingPlans() {
 
   if (!isLoading && packages.length === 0) return null
 
-  // Filter to show exactly 3 plans: Standard, Premium, and Premium E-commerce (or fallback to any 3)
-  const displayPackages = [...packages]
-    .sort((a, b) => {
-      // Sort priority: Standard -> Premium -> Premium E-commerce -> Custom -> Multi-vendor
-      const order = ["standard", "premium plan", "premium e-commerce", "custom", "multi-vendor"]
-      let idxA = order.findIndex(key => a.name.toLowerCase().includes(key))
-      let idxB = order.findIndex(key => b.name.toLowerCase().includes(key))
-      if (idxA === -1) idxA = 999
-      if (idxB === -1) idxB = 999
-      return idxA - idxB
-    })
-    .slice(0, 3) // Keep exactly 3 plans
+  // Shows every published "package" product, cheapest first — admin controls
+  // how many plans exist and what's in them entirely through the Products
+  // admin panel, no fixed slot count here.
+  const displayPackages = [...packages].sort(
+    (a, b) => (a.salePrice ?? a.price) - (b.salePrice ?? b.price)
+  )
 
   return (
     <section className="scroll-mt-32 py-16 sm:py-20 bg-ink-950/20">
