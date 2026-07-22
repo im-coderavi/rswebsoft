@@ -16,7 +16,7 @@ export function useUpdateOrderStatus() {
   })
 }
 
-// Public — guest checkout, no auth header required.
+// Requires login — the auth token is attached automatically by the axios interceptor.
 export function useCreateOrder() {
   return useMutation({
     mutationFn: async (payload) => (await api.post("/orders", payload)).data,
@@ -29,5 +29,12 @@ export function useTrackOrder(id) {
     queryKey: ["order-track", id],
     queryFn: async () => (await api.get(`/orders/${id}/track`)).data,
     enabled: Boolean(id),
+  })
+}
+
+export function useMyOrders() {
+  return useQuery({
+    queryKey: ["orders", "mine"],
+    queryFn: async () => (await api.get("/orders/mine")).data,
   })
 }

@@ -1,8 +1,9 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import { Copy, Check, QrCode } from "lucide-react"
 import toast from "react-hot-toast"
 import { useCart } from "../context/CartContext"
+import { useAuth } from "../context/AuthContext"
 import { usePaymentSettings } from "../hooks/usePaymentSettings"
 import { useCreateOrder } from "../hooks/useOrders"
 import { apiErrorMessage } from "../lib/api"
@@ -10,6 +11,7 @@ import { formatINR } from "../lib/currency"
 
 export default function Checkout() {
   const { items, subtotal, clear } = useCart()
+  const { user } = useAuth()
   const { data: settings, isLoading: loadingSettings } = usePaymentSettings()
   const createOrder = useCreateOrder()
   const navigate = useNavigate()
@@ -18,6 +20,10 @@ export default function Checkout() {
   const [paymentReference, setPaymentReference] = useState("")
   const [copied, setCopied] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    if (user) setForm((f) => ({ ...f, name: f.name || user.name, email: f.email || user.email }))
+  }, [user])
 
   if (items.length === 0 && !submitted) {
     return <Navigate to="/cart" replace />
