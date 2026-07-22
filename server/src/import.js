@@ -141,24 +141,13 @@ function getProductType(categoriesStr, nameStr, idx) {
     return "tool";
   }
 
-  // 8. Packages / Bundles
-  if (
-    cat.includes("bundle") || 
-    cat.includes("package") || 
-    cat.includes("kit") || 
-    cat.includes("canva") ||
-    name.includes("bundle") || 
-    name.includes("package") || 
-    name.includes("collection") ||
-    name.includes("megapack") ||
-    name.includes("templates bundle") ||
-    name.includes("excel") ||
-    name.includes("checklist") ||
-    name.includes("planner") ||
-    name.includes("prompts")
-  ) {
-    return "package";
-  }
+  // NOTE: "package" is intentionally not assigned here. It's reserved for the
+  // 5 hardcoded web development pricing plans below (Standard/Premium/Custom/
+  // Premium E-commerce/Multi-vendor), which power the homepage's "Packages &
+  // Pricing" section and the admin's dedicated Packages & Pricing list. CSV
+  // rows that look like bundles/kits/planners/etc. fall through to "other"
+  // instead - they used to also get tagged "package", which mixed unrelated
+  // digital bundles into that same list.
 
   return "other";
 }
