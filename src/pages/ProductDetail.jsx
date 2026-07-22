@@ -10,9 +10,8 @@ import {
   ShieldCheck, 
   Clock, 
   Sparkles, 
-  CheckCircle2, 
-  FileText, 
-  Package, 
+  CheckCircle2,
+  FileText,
   ExternalLink,
   ChevronDown,
   ChevronUp
@@ -149,38 +148,6 @@ export default function ProductDetail() {
     navigate("/checkout")
   }
 
-  // Maximum 2 support/setup packages
-  const supportPlans = [
-    { 
-      id: "starter",
-      name: "Standard Source Code", 
-      price: 0, 
-      desc: "Instant download & lifetime updates", 
-      tag: "Included Free",
-      isPopular: false,
-      features: [
-        "Full Source Code Access",
-        "Online Documentation & Setup Guide",
-        "Free Lifetime Product Updates",
-        "Community & Standard Support"
-      ] 
-    },
-    { 
-      id: "pro",
-      name: "VIP Done-For-You Setup", 
-      price: 4999, 
-      desc: "Complete end-to-end server deployment", 
-      tag: "Most Popular",
-      isPopular: true,
-      features: [
-        "Full Server & DB Deployment",
-        "Payment Gateway & WooCommerce Config",
-        "Custom Branding & Domain Mapping",
-        "1-on-1 Dedicated Support Line",
-        "100% Money-Back Setup Guarantee"
-      ] 
-    }
-  ]
 
   const activeImage = images[selectedImgIndex]?.url || images[0]?.url
 
@@ -495,74 +462,6 @@ export default function ProductDetail() {
 
       </section>
 
-      {/* SETUP & SUPPORT PACKAGES (MAX 2 PACKAGES) */}
-      <section className="container-rs py-10 border-t border-white/5">
-        <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-brand-500/10 px-3 py-1 text-xs font-bold text-brand-300">
-            <Package size={14} /> Deployment Options
-          </div>
-          <h2 className="font-display text-2xl font-extrabold text-cloud-100 sm:text-3xl">
-            Choose Your Setup <span className="text-emerald-400">Package</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-cloud-400 font-medium">
-            Select between self-installation or let our expert dev team handle full deployment for you.
-          </p>
-        </div>
-
-        {/* 2 Packages Max */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          {supportPlans.map((plan) => (
-            <div 
-              key={plan.id}
-              className={`relative rounded-2xl border p-6 sm:p-7 flex flex-col justify-between transition duration-300 ${
-                plan.isPopular 
-                  ? "border-brand-500/50 bg-ink-900 shadow-xl shadow-brand-500/5 ring-1 ring-brand-500/20" 
-                  : "border-white/8 bg-ink-900/60 hover:border-white/20"
-              }`}
-            >
-              {plan.isPopular && (
-                <span className="absolute -top-3 right-6 rounded-full bg-brand-gradient px-3 py-0.5 text-[10px] font-extrabold uppercase text-white shadow-md">
-                  {plan.tag}
-                </span>
-              )}
-
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-display text-lg font-bold text-cloud-100">{plan.name}</h3>
-                  <p className="text-xs text-cloud-400 mt-1">{plan.desc}</p>
-                </div>
-
-                <div className="font-display text-3xl font-black text-cloud-100">
-                  {plan.price === 0 ? "Free" : `₹${plan.price.toLocaleString("en-IN")}`}
-                  {plan.price === 0 && <span className="text-xs font-normal text-cloud-500 ml-1.5">(With asset purchase)</span>}
-                </div>
-
-                <ul className="space-y-2 pt-2 border-t border-white/5">
-                  {plan.features.map((feat, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-xs font-medium text-cloud-300">
-                      <Check size={14} className="text-emerald-400 mt-0.5 shrink-0" strokeWidth={3} />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="pt-6">
-                <button 
-                  onClick={handleBuyNow}
-                  className={`w-full rounded-xl py-3 text-xs font-extrabold transition cursor-pointer ${
-                    plan.isPopular 
-                      ? "bg-brand-gradient text-white hover:opacity-95 shadow-md" 
-                      : "border border-white/10 bg-white/5 text-cloud-200 hover:bg-white/10"
-                  }`}
-                >
-                  {plan.price === 0 ? "Buy Asset Only" : "Select VIP Setup Plan"}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* RELATED PRODUCTS SECTION (Max 3 items) */}
       <section className="container-rs pt-6">
