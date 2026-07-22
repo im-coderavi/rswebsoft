@@ -55,3 +55,24 @@ export const NAV_SECTIONS = [
 export const ADMIN_TITLES = NAV_SECTIONS.flatMap((section) => section.links)
   .map((link) => ({ prefix: link.to, title: link.label }))
   .sort((a, b) => b.prefix.length - a.prefix.length)
+
+// Delivered Websites and Packages & Pricing are just filtered views over the
+// shared Product form (/admin/products/new, /admin/products/:id/edit). Both
+// TypedProductList's "New"/"Edit" links carry a ?type= param so this can map
+// back to the section the admin actually came from — otherwise the topbar
+// title and sidebar highlight both fall back to "Products" on those routes,
+// which reads as if the click had redirected away from the section entirely.
+const TYPE_SECTION_PATH = {
+  "delivered-website": "/admin/delivered-websites",
+  package: "/admin/packages",
+}
+
+const PRODUCT_FORM_ROUTE = /^\/admin\/products\/(new|[^/]+\/edit)$/
+
+export function resolveAdminPath(pathname, search) {
+  if (PRODUCT_FORM_ROUTE.test(pathname)) {
+    const type = new URLSearchParams(search).get("type")
+    if (type && TYPE_SECTION_PATH[type]) return TYPE_SECTION_PATH[type]
+  }
+  return pathname
+}

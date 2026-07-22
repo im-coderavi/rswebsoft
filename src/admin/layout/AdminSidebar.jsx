@@ -1,9 +1,12 @@
-import { NavLink } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { X } from "lucide-react"
 import Logo from "../../components/ui/Logo"
-import { NAV_SECTIONS } from "../navConfig"
+import { NAV_SECTIONS, resolveAdminPath } from "../navConfig"
 
 export default function AdminSidebar({ open, onClose }) {
+  const location = useLocation()
+  const effectivePath = resolveAdminPath(location.pathname, location.search)
+
   return (
     <>
       {open && (
@@ -37,25 +40,27 @@ export default function AdminSidebar({ open, onClose }) {
                 {section.label}
               </p>
               <div className="space-y-1">
-                {section.links.map(({ to, label, icon: Icon, end }) => (
-                  <NavLink
-                    key={to}
-                    to={to}
-                    end={end}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      [
+                {section.links.map(({ to, label, icon: Icon, end }) => {
+                  const isActive = end
+                    ? effectivePath === to
+                    : effectivePath === to || effectivePath.startsWith(`${to}/`)
+                  return (
+                    <Link
+                      key={to}
+                      to={to}
+                      onClick={onClose}
+                      className={[
                         "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition",
                         isActive
                           ? "bg-brand-gradient text-white glow-shadow"
                           : "text-cloud-400 hover:bg-ink-800 hover:text-cloud-100",
-                      ].join(" ")
-                    }
-                  >
-                    <Icon size={18} />
-                    {label}
-                  </NavLink>
-                ))}
+                      ].join(" ")}
+                    >
+                      <Icon size={18} />
+                      {label}
+                    </Link>
+                  )
+                })}
               </div>
             </div>
           ))}

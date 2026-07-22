@@ -144,7 +144,7 @@ export default function ProductList() {
         actions={(p) => (
           <>
             <Link
-              to={`/admin/products/${p._id}/edit`}
+              to={`/admin/products/${p._id}/edit?type=${p.type}`}
               className="grid h-8 w-8 place-items-center rounded-lg text-cloud-400 transition hover:bg-ink-800 hover:text-cloud-100"
               aria-label="Edit"
             >

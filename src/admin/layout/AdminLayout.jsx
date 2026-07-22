@@ -4,21 +4,22 @@ import { AnimatePresence, motion } from "framer-motion"
 import { Toaster } from "react-hot-toast"
 import AdminSidebar from "./AdminSidebar"
 import AdminTopbar from "./AdminTopbar"
-import { ADMIN_TITLES } from "../navConfig"
+import { ADMIN_TITLES, resolveAdminPath } from "../navConfig"
 
-function titleFor(pathname) {
-  return ADMIN_TITLES.find((t) => pathname.startsWith(t.prefix))?.title || "Admin"
+function titleFor(pathname, search) {
+  const resolved = resolveAdminPath(pathname, search)
+  return ADMIN_TITLES.find((t) => resolved.startsWith(t.prefix))?.title || "Admin"
 }
 
 export default function AdminLayout() {
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="flex min-h-screen bg-ink-950 text-cloud-100">
       <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <AdminTopbar title={titleFor(pathname)} onMenuClick={() => setSidebarOpen(true)} />
+        <AdminTopbar title={titleFor(pathname, search)} onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-x-hidden p-5">
           <AnimatePresence mode="wait">
             <motion.div
