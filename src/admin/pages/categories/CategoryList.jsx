@@ -12,8 +12,9 @@ import { toneGradient, TONE_KEYS } from "../../../lib/tones"
 import Icon from "../../../components/ui/Icon"
 import DataTable from "../../components/DataTable"
 import ConfirmDialog from "../../components/ConfirmDialog"
+import ImageUploader from "../../components/ImageUploader"
 
-const emptyForm = { name: "", icon: "Box", tone: "violet" }
+const emptyForm = { name: "", icon: "Box", tone: "violet", image: null }
 
 export default function CategoryList() {
   const { data: categories, isLoading } = useCategories()
@@ -34,7 +35,12 @@ export default function CategoryList() {
 
   function openEdit(category) {
     setEditing(category)
-    setForm({ name: category.name, icon: category.icon, tone: category.tone })
+    setForm({
+      name: category.name,
+      icon: category.icon,
+      tone: category.tone,
+      image: category.image?.url ? category.image : null,
+    })
     setModalOpen(true)
   }
 
@@ -72,9 +78,15 @@ export default function CategoryList() {
       label: "Category",
       render: (c) => (
         <div className="flex items-center gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-lg text-white" style={toneGradient(c.tone)}>
-            <Icon name={c.icon} size={16} />
-          </span>
+          {c.image?.url ? (
+            <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-lg bg-ink-800">
+              <img src={c.image.url} alt="" className="h-full w-full object-cover" />
+            </span>
+          ) : (
+            <span className="grid h-9 w-9 place-items-center rounded-lg text-white" style={toneGradient(c.tone)}>
+              <Icon name={c.icon} size={16} />
+            </span>
+          )}
           <span className="font-medium text-cloud-100">{c.name}</span>
         </div>
       ),
@@ -140,7 +152,18 @@ export default function CategoryList() {
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-medium text-cloud-400">
-                Icon name <span className="text-cloud-500">(lucide-react name)</span>
+                Image <span className="text-cloud-500">(optional — falls back to the icon below)</span>
+              </label>
+              <ImageUploader
+                images={form.image ? [form.image] : []}
+                onChange={(imgs) => setForm((f) => ({ ...f, image: imgs[imgs.length - 1] || null }))}
+                max={1}
+                folder="categories"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+                Icon name <span className="text-cloud-500">(lucide-react name, used when no image is set)</span>
               </label>
               <input
                 required
