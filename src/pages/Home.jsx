@@ -38,6 +38,9 @@ export default function Home() {
       <TypeCarousel title="Premium WordPress Themes" type="theme" />
       <ReadyWebsites />
       <DeliveredWebsites />
+      <TypeCarousel title="Handy Tools" type="tool" />
+      <TypeCarousel title="Source Codes" type="source-code" />
+      <TypeCarousel title="SaaS Software" type="saas" />
       <PricingPlans />
       <ClientsMarquee />
       <BrandsSection />
