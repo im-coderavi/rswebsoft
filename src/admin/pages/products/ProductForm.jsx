@@ -23,9 +23,34 @@ const emptyForm = {
   tags: "",
   features: "",
   demoUrl: "",
+  downloadUrl: "",
   featured: false,
   status: "draft",
   images: [],
+}
+
+// Descriptions are stored and shown as plain text (see ProductDetail.jsx) —
+// this turns HTML someone pasted in (e.g. copied from a rendered web page)
+// back into readable plain text instead of leaving raw tags in the field.
+function stripHtmlToText(html) {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h[1-6])>/gi, "\n\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+}
+
+function looksLikeHtml(text) {
+  return /<[a-z][\s\S]*>/i.test(text)
 }
 
 // datetime-local inputs need "YYYY-MM-DDTHH:mm" with no timezone/seconds
@@ -64,6 +89,7 @@ export default function ProductForm() {
       tags: (existing.tags || []).join(", "),
       features: (existing.features || []).join("\n"),
       demoUrl: existing.demoUrl || "",
+      downloadUrl: existing.downloadUrl || "",
       featured: Boolean(existing.featured),
       status: existing.status || "draft",
       images: existing.images || [],
@@ -72,6 +98,29 @@ export default function ProductForm() {
 
   function setField(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
+  }
+
+  function cleanField(field) {
+    setForm((f) => ({ ...f, [field]: stripHtmlToText(f[field]) }))
+  }
+
+  // Only intercepts pastes that actually look like HTML — normal plain-text
+  // pastes go through untouched.
+  function handleDescriptionPaste(field) {
+    return (e) => {
+      const raw = e.clipboardData.getData("text/plain")
+      if (!looksLikeHtml(raw)) return
+
+      e.preventDefault()
+      const cleaned = stripHtmlToText(raw)
+      const el = e.target
+      const start = el.selectionStart
+      const end = el.selectionEnd
+      setForm((f) => {
+        const current = f[field]
+        return { ...f, [field]: current.slice(0, start) + cleaned + current.slice(end) }
+      })
+    }
   }
 
   async function handleSubmit(e) {
@@ -90,6 +139,7 @@ export default function ProductForm() {
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
       features: form.features.split("\n").map((t) => t.trim()).filter(Boolean),
       demoUrl: form.demoUrl,
+      downloadUrl: form.downloadUrl,
       featured: form.featured,
       status: form.status,
       images: form.images,
@@ -134,23 +184,45 @@ export default function ProductForm() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-cloud-400">Short Description</label>
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="block text-xs font-medium text-cloud-400">Short Description</label>
+            <button
+              type="button"
+              onClick={() => cleanField("shortDescription")}
+              className="text-xs font-medium text-brand-300 hover:underline"
+            >
+              Clean formatting
+            </button>
+          </div>
           <input
             value={form.shortDescription}
             onChange={(e) => setField("shortDescription", e.target.value)}
+            onPaste={handleDescriptionPaste("shortDescription")}
             className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-            placeholder="One-line summary shown on cards"
+            placeholder="One-line summary shown on cards — plain text only"
           />
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-cloud-400">Description</label>
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="block text-xs font-medium text-cloud-400">
+              Description <span className="text-cloud-500">(plain text — no HTML)</span>
+            </label>
+            <button
+              type="button"
+              onClick={() => cleanField("description")}
+              className="text-xs font-medium text-brand-300 hover:underline"
+            >
+              Clean formatting
+            </button>
+          </div>
           <textarea
-            rows={4}
+            rows={6}
             value={form.description}
             onChange={(e) => setField("description", e.target.value)}
+            onPaste={handleDescriptionPaste("description")}
             className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-            placeholder="Full product description"
+            placeholder="Full product description — write it as plain paragraphs, blank line between paragraphs"
           />
         </div>
 
@@ -278,6 +350,18 @@ export default function ProductForm() {
             onChange={(e) => setField("demoUrl", e.target.value)}
             className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
             placeholder="https://…"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+            Download Link <span className="text-cloud-500">(given to the customer after purchase — Drive, Dropbox, or any link)</span>
+          </label>
+          <input
+            value={form.downloadUrl}
+            onChange={(e) => setField("downloadUrl", e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+            placeholder="https://drive.google.com/…"
           />
         </div>
 

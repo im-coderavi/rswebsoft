@@ -319,10 +319,9 @@ export default function ProductDetail() {
 
               {/* Short Description (Concise 2 lines max) */}
               {product.shortDescription && (
-                <div 
-                  className="text-xs text-cloud-300 leading-relaxed html-content line-clamp-2"
-                  dangerouslySetInnerHTML={{ __html: product.shortDescription }}
-                />
+                <p className="text-xs text-cloud-300 leading-relaxed line-clamp-2 whitespace-pre-line">
+                  {product.shortDescription}
+                </p>
               )}
 
               {/* Price Display */}
@@ -402,12 +401,13 @@ export default function ProductDetail() {
 
               {product.description ? (
                 <div>
-                  <div 
-                    className={`text-xs sm:text-sm text-cloud-300 leading-relaxed html-content transition-all duration-300 ${
+                  <p
+                    className={`text-xs sm:text-sm text-cloud-300 leading-relaxed whitespace-pre-line transition-all duration-300 ${
                       showFullDesc ? "" : "line-clamp-4 overflow-hidden"
                     }`}
-                    dangerouslySetInnerHTML={{ __html: product.description }}
-                  />
+                  >
+                    {product.description}
+                  </p>
 
                   {/* Toggle Full Description */}
                   <button
