@@ -10,6 +10,7 @@ import orderRoutes from "./routes/orderRoutes.js"
 import uploadRoutes from "./routes/uploadRoutes.js"
 import dashboardRoutes from "./routes/dashboardRoutes.js"
 import paymentSettingRoutes from "./routes/paymentSettingRoutes.js"
+import userRoutes from "./routes/userRoutes.js"
 import { notFound, errorHandler } from "./middleware/errorHandler.js"
 
 const app = express()
@@ -28,6 +29,7 @@ app.use("/api/orders", orderRoutes)
 app.use("/api/upload", uploadRoutes)
 app.use("/api/dashboard", dashboardRoutes)
 app.use("/api/payment-settings", paymentSettingRoutes)
+app.use("/api/users", userRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
