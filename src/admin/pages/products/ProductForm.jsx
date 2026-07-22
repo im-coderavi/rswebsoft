@@ -13,6 +13,7 @@ const TYPES = ["plugin", "theme", "ready-website", "delivered-website", "package
 const emptyForm = {
   name: "",
   shortDescription: "",
+  displayTag: "",
   description: "",
   price: "",
   salePrice: "",
@@ -79,6 +80,7 @@ export default function ProductForm() {
     setForm({
       name: existing.name || "",
       shortDescription: existing.shortDescription || "",
+      displayTag: existing.displayTag || "",
       description: existing.description || "",
       price: existing.price ?? "",
       salePrice: existing.salePrice ?? "",
@@ -129,6 +131,7 @@ export default function ProductForm() {
     const payload = {
       name: form.name,
       shortDescription: form.shortDescription,
+      displayTag: form.displayTag,
       description: form.description,
       price: Number(form.price),
       salePrice: form.salePrice === "" ? undefined : Number(form.salePrice),
@@ -200,6 +203,18 @@ export default function ProductForm() {
             onPaste={handleDescriptionPaste("shortDescription")}
             className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
             placeholder="One-line summary shown on cards — plain text only"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+            Display Tag <span className="text-cloud-500">(small badge shown on the "Delivered Websites" homepage cards — e.g. "E-commerce")</span>
+          </label>
+          <input
+            value={form.displayTag}
+            onChange={(e) => setField("displayTag", e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+            placeholder="e.g. E-commerce"
           />
         </div>
 

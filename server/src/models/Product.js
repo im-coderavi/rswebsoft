@@ -15,6 +15,7 @@ const productSchema = new mongoose.Schema(
     slug: { type: String, unique: true },
     description: { type: String, default: "" },
     shortDescription: { type: String, default: "" },
+    displayTag: { type: String, default: "" },
     price: { type: Number, required: true, min: 0 },
     salePrice: { type: Number, min: 0 },
     saleEndsAt: { type: Date },
