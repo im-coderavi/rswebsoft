@@ -20,15 +20,6 @@ export const heroStats = [
   { icon: "Clock", value: "24/7", label: "Customer Support" },
 ]
 
-export const statStrip = [
-  { icon: "Package", value: "1500+", label: "Products" },
-  { icon: "Grid3x3", value: "40+", label: "Categories" },
-  { icon: "Building2", value: "12+", label: "Sister Brands" },
-  { icon: "Smile", value: "1000+", label: "Happy Customers" },
-  { icon: "Activity", value: "99.9%", label: "Uptime" },
-  { icon: "Headphones", value: "24/7", label: "Support" },
-]
-
 export const demoCenter = [
   { icon: "Monitor", title: "Frontend Demos", sub: "Live website preview" },
   { icon: "LayoutDashboard", title: "Admin Demos", sub: "Backend preview" },

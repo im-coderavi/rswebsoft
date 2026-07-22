@@ -1,9 +1,26 @@
 import Icon from "../ui/Icon"
 import AnimatedCounter from "../ui/AnimatedCounter"
 import { RevealGroup, RevealItem } from "../ui/Reveal"
-import { statStrip } from "../../data/site"
+import { useSiteStats } from "../../hooks/useSiteStats"
+
+// Uptime/support aren't measurable per-account numbers — kept as fixed
+// service claims alongside the real, database-backed counts below.
+const STATIC_STATS = [
+  { icon: "Activity", value: "99.9%", label: "Uptime" },
+  { icon: "Headphones", value: "24/7", label: "Support" },
+]
 
 export default function StatsStrip() {
+  const { data, isLoading } = useSiteStats()
+
+  const liveStats = [
+    { icon: "Package", value: isLoading ? "…" : `${data.products}+`, label: "Products" },
+    { icon: "Grid3x3", value: isLoading ? "…" : `${data.categories}+`, label: "Categories" },
+    { icon: "Building2", value: isLoading ? "…" : `${data.brands}+`, label: "Sister Brands" },
+    { icon: "Smile", value: isLoading ? "…" : `${data.customers}+`, label: "Happy Customers" },
+  ]
+  const statStrip = [...liveStats, ...STATIC_STATS]
+
   return (
     <section className="container-rs -mt-4 pb-4">
       <RevealGroup className="grid grid-cols-2 gap-y-6 rounded-2xl border border-white/8 bg-ink-850/80 px-6 py-6 backdrop-blur sm:grid-cols-3 lg:grid-cols-6 lg:divide-x lg:divide-white/8">

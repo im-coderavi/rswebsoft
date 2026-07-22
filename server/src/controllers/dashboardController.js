@@ -17,3 +17,16 @@ export const getStats = asyncHandler(async (req, res) => {
 
   res.json({ products, categories, brands, orders, users, publishedProducts })
 })
+
+// Public — safe aggregate counts only, no sensitive data. Powers the
+// storefront's homepage stats strip.
+export const getPublicStats = asyncHandler(async (req, res) => {
+  const [products, categories, brands, customers] = await Promise.all([
+    Product.countDocuments({ status: "published" }),
+    Category.countDocuments(),
+    Brand.countDocuments(),
+    User.countDocuments({ role: "user" }),
+  ])
+
+  res.json({ products, categories, brands, customers })
+})
