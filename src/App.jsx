@@ -13,6 +13,7 @@ import Categories from "./pages/Categories"
 import Resources from "./pages/Resources"
 import Support from "./pages/Support"
 import Tools from "./pages/Tools"
+import Demos from "./pages/Demos"
 import CustomerLogin from "./pages/Login"
 import Register from "./pages/Register"
 import AccountOrders from "./pages/AccountOrders"
@@ -31,6 +32,8 @@ import OrderList from "./admin/pages/orders/OrderList"
 import Settings from "./admin/pages/Settings"
 import CustomerList from "./admin/pages/customers/CustomerList"
 import CustomerDetail from "./admin/pages/customers/CustomerDetail"
+import DemoLinkList from "./admin/pages/demos/DemoLinkList"
+import SubscriberList from "./admin/pages/SubscriberList"
 
 const queryClient = new QueryClient()
 
@@ -50,7 +53,7 @@ function App() {
               <Route path="/tools" element={<Tools />} />
               <Route path="/brands" element={<Brands />} />
               <Route path="/wishlist" element={<Placeholder title="Wishlist" />} />
-              <Route path="/demos" element={<Placeholder title="Demo Center" />} />
+              <Route path="/demos" element={<Demos />} />
               <Route path="/resources" element={<Resources />} />
               <Route path="/support" element={<Support />} />
 
@@ -76,6 +79,8 @@ function App() {
                 <Route path="orders" element={<OrderList />} />
                 <Route path="customers" element={<CustomerList />} />
                 <Route path="customers/:id" element={<CustomerDetail />} />
+                <Route path="demo-links" element={<DemoLinkList />} />
+                <Route path="subscribers" element={<SubscriberList />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
             </Route>
