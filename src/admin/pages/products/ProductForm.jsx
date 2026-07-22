@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useNavigate, useParams, Link } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
 import { ArrowLeft, Save } from "lucide-react"
 import toast from "react-hot-toast"
 import { useCategories } from "../../../hooks/useCategories"
@@ -66,6 +66,7 @@ export default function ProductForm() {
   const { id } = useParams()
   const isEdit = Boolean(id)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   const { data: categories } = useCategories()
   const { data: brands } = useBrands()
@@ -73,7 +74,10 @@ export default function ProductForm() {
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
 
-  const [form, setForm] = useState(emptyForm)
+  const [form, setForm] = useState(() => {
+    const typeParam = searchParams.get("type")
+    return typeParam && TYPES.includes(typeParam) ? { ...emptyForm, type: typeParam } : emptyForm
+  })
 
   useEffect(() => {
     if (!existing) return

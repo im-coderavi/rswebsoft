@@ -1,10 +1,12 @@
 import { NavLink } from "react-router-dom"
-import { LayoutDashboard, Package, Grid3x3, Building2, ShoppingCart, Users, Monitor, Mail, CreditCard, X } from "lucide-react"
+import { LayoutDashboard, Package, Grid3x3, Building2, ShoppingCart, Users, Monitor, Mail, CreditCard, X, Globe, Tags } from "lucide-react"
 import Logo from "../../components/ui/Logo"
 
 const links = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/products", label: "Products", icon: Package },
+  { to: "/admin/delivered-websites", label: "Delivered Websites", icon: Globe },
+  { to: "/admin/packages", label: "Packages & Pricing", icon: Tags },
   { to: "/admin/categories", label: "Categories", icon: Grid3x3 },
   { to: "/admin/brands", label: "Brands", icon: Building2 },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
