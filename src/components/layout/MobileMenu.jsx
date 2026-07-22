@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react"
-import { NavLink, Link } from "react-router-dom"
-import { X, Search, Heart, ShoppingCart, User, Sun, Moon } from "lucide-react"
+import { NavLink, Link, useNavigate } from "react-router-dom"
+import { X, Search, Heart, ShoppingCart, User, Sun, Moon, LogOut, Package } from "lucide-react"
 import { navLinks } from "../../data/site"
 import { useCart } from "../../context/CartContext"
+import { useAuth } from "../../context/AuthContext"
 
 export default function MobileMenu({ open, onClose }) {
   const { count } = useCart()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [isDark, setIsDark] = useState(false)
 
   // Sync theme status on component mount
@@ -24,6 +27,12 @@ export default function MobileMenu({ open, onClose }) {
       setIsDark(true)
     }
   };
+
+  function handleLogout() {
+    onClose()
+    logout()
+    navigate("/")
+  }
 
   return (
     <>
@@ -110,12 +119,32 @@ export default function MobileMenu({ open, onClose }) {
             )}
           </button>
 
-          <button
-            type="button"
-            className="flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cloud-400 hover:bg-ink-800 hover:text-cloud-100"
-          >
-            <User size={17} /> Login / Register
-          </button>
+          {user ? (
+            <>
+              <Link
+                to="/account/orders"
+                onClick={onClose}
+                className="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cloud-400 hover:bg-ink-800 hover:text-cloud-100"
+              >
+                <Package size={17} /> My Orders
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cloud-400 hover:bg-ink-800 hover:text-cloud-100"
+              >
+                <LogOut size={17} /> Log Out
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              onClick={onClose}
+              className="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cloud-400 hover:bg-ink-800 hover:text-cloud-100"
+            >
+              <User size={17} /> Login / Register
+            </Link>
+          )}
         </div>
       </div>
     </>

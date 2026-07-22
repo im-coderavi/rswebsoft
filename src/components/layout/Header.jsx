@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { Search, Heart, ShoppingCart, ChevronDown, Menu, User, Sun, Moon } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { Search, Heart, ShoppingCart, ChevronDown, Menu, User, Sun, Moon, LogOut, Package } from "lucide-react"
 import Logo from "../ui/Logo"
 import { useCart } from "../../context/CartContext"
+import { useAuth } from "../../context/AuthContext"
 
 function ActionIcon({ icon: Icon, count, to }) {
   return (
@@ -21,8 +22,57 @@ function ActionIcon({ icon: Icon, count, to }) {
   )
 }
 
+function AccountMenu({ user, onLogout }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="ml-0.5 flex shrink-0 items-center gap-2 rounded-xl bg-brand-gradient px-2.5 py-2 text-sm font-semibold text-white transition hover:opacity-95 glow-shadow sm:ml-1 sm:px-5 sm:py-2.5"
+      >
+        <User size={16} />
+        <span className="hidden sm:inline">{user.name.split(" ")[0]}</span>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-xl border border-white/10 bg-ink-800 py-1.5 shadow-xl">
+          <Link
+            to="/account/orders"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3.5 py-2 text-sm text-cloud-200 hover:bg-ink-700 hover:text-cloud-100"
+          >
+            <Package size={15} /> My Orders
+          </Link>
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false)
+              onLogout()
+            }}
+            className="flex w-full items-center gap-2 px-3.5 py-2 text-left text-sm text-cloud-200 hover:bg-ink-700 hover:text-cloud-100"
+          >
+            <LogOut size={15} /> Log Out
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Header({ onMenuClick }) {
   const { count } = useCart()
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [isDark, setIsDark] = useState(false)
 
   // Sync theme status on component mount
@@ -40,6 +90,11 @@ export default function Header({ onMenuClick }) {
       localStorage.setItem("theme", "dark")
       setIsDark(true)
     }
+  }
+
+  function handleLogout() {
+    logout()
+    navigate("/")
   }
 
   return (
@@ -85,14 +140,17 @@ export default function Header({ onMenuClick }) {
             {isDark ? <Sun size={19} /> : <Moon size={19} />}
           </button>
 
-          <button
-            type="button"
-            title="Guest checkout only for now — no account needed to buy"
-            className="ml-0.5 flex shrink-0 items-center gap-2 rounded-xl bg-brand-gradient px-2.5 py-2 text-sm font-semibold text-white transition hover:opacity-95 glow-shadow sm:ml-1 sm:px-5 sm:py-2.5"
-          >
-            <User size={16} className="sm:hidden" />
-            <span className="hidden sm:inline">Login / Register</span>
-          </button>
+          {user ? (
+            <AccountMenu user={user} onLogout={handleLogout} />
+          ) : (
+            <Link
+              to="/login"
+              className="ml-0.5 flex shrink-0 items-center gap-2 rounded-xl bg-brand-gradient px-2.5 py-2 text-sm font-semibold text-white transition hover:opacity-95 glow-shadow sm:ml-1 sm:px-5 sm:py-2.5"
+            >
+              <User size={16} className="sm:hidden" />
+              <span className="hidden sm:inline">Login / Register</span>
+            </Link>
+          )}
         </div>
       </div>
     </div>
