@@ -4,7 +4,12 @@ import Order from "../models/Order.js"
 import Product from "../models/Product.js"
 
 export const listOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 })
+  const orders = await Order.find().sort({ createdAt: -1 }).populate("user", "name email")
+  res.json(orders)
+})
+
+export const myOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 })
   res.json(orders)
 })
 
@@ -18,8 +23,8 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   res.json(order)
 })
 
-// Public: guest checkout. Prices are always recomputed from the live product
-// record — the client-sent price is never trusted.
+// Requires login (see orderRoutes.js). Prices are always recomputed from the
+// live product record — the client-sent price is never trusted.
 export const createOrder = asyncHandler(async (req, res) => {
   const { customer, items, paymentReference } = req.body
 
@@ -52,6 +57,7 @@ export const createOrder = asyncHandler(async (req, res) => {
   const total = orderItems.reduce((sum, i) => sum + i.price * i.qty, 0)
 
   const order = await Order.create({
+    user: req.user._id,
     customer,
     items: orderItems,
     total,
@@ -61,9 +67,10 @@ export const createOrder = asyncHandler(async (req, res) => {
   res.status(201).json(order)
 })
 
-// Public: order status lookup by id (the id itself acts as the bearer secret
-// for guest checkout — no accounts this phase). Download links only reveal
-// once the order has been manually marked fulfilled by an admin.
+// Public: order status lookup by id (the id itself acts as the bearer secret,
+// so this works right after checkout without requiring a fresh login).
+// Download links only reveal once the order has been manually marked
+// fulfilled by an admin.
 export const trackOrder = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id).populate("items.product", "downloadUrl")
   if (!order) throw new ApiError(404, "Order not found")
