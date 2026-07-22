@@ -13,6 +13,10 @@ import Categories from "./pages/Categories"
 import Resources from "./pages/Resources"
 import Support from "./pages/Support"
 import Tools from "./pages/Tools"
+import CustomerLogin from "./pages/Login"
+import Register from "./pages/Register"
+import AccountOrders from "./pages/AccountOrders"
+import RequireAuth from "./components/RequireAuth"
 import { AuthProvider } from "./context/AuthContext"
 import { CartProvider } from "./context/CartContext"
 import ProtectedAdminRoute from "./admin/ProtectedAdminRoute"
@@ -25,6 +29,8 @@ import CategoryList from "./admin/pages/categories/CategoryList"
 import BrandList from "./admin/pages/brands/BrandList"
 import OrderList from "./admin/pages/orders/OrderList"
 import Settings from "./admin/pages/Settings"
+import CustomerList from "./admin/pages/customers/CustomerList"
+import CustomerDetail from "./admin/pages/customers/CustomerDetail"
 
 const queryClient = new QueryClient()
 
@@ -39,7 +45,6 @@ function App() {
               <Route path="/products" element={<ProductsListing />} />
               <Route path="/products/:slug" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
               <Route path="/order/:id" element={<OrderTrack />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/tools" element={<Tools />} />
@@ -48,6 +53,14 @@ function App() {
               <Route path="/demos" element={<Placeholder title="Demo Center" />} />
               <Route path="/resources" element={<Resources />} />
               <Route path="/support" element={<Support />} />
+
+              <Route element={<RequireAuth />}>
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/account/orders" element={<AccountOrders />} />
+              </Route>
+
+              <Route path="/login" element={<CustomerLogin />} />
+              <Route path="/register" element={<Register />} />
               <Route path="*" element={<Placeholder title="Page Not Found" />} />
             </Route>
 
@@ -61,6 +74,8 @@ function App() {
                 <Route path="categories" element={<CategoryList />} />
                 <Route path="brands" element={<BrandList />} />
                 <Route path="orders" element={<OrderList />} />
+                <Route path="customers" element={<CustomerList />} />
+                <Route path="customers/:id" element={<CustomerDetail />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
             </Route>
