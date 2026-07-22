@@ -4,18 +4,10 @@ import { AnimatePresence, motion } from "framer-motion"
 import { Toaster } from "react-hot-toast"
 import AdminSidebar from "./AdminSidebar"
 import AdminTopbar from "./AdminTopbar"
-
-const TITLES = [
-  { prefix: "/admin/products", title: "Products" },
-  { prefix: "/admin/categories", title: "Categories" },
-  { prefix: "/admin/brands", title: "Brands" },
-  { prefix: "/admin/orders", title: "Orders" },
-  { prefix: "/admin/settings", title: "Payment Settings" },
-  { prefix: "/admin", title: "Dashboard" },
-]
+import { ADMIN_TITLES } from "../navConfig"
 
 function titleFor(pathname) {
-  return TITLES.find((t) => pathname.startsWith(t.prefix))?.title || "Admin"
+  return ADMIN_TITLES.find((t) => pathname.startsWith(t.prefix))?.title || "Admin"
 }
 
 export default function AdminLayout() {

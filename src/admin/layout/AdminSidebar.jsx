@@ -1,20 +1,7 @@
 import { NavLink } from "react-router-dom"
-import { LayoutDashboard, Package, Grid3x3, Building2, ShoppingCart, Users, Monitor, Mail, CreditCard, X, Globe, Tags } from "lucide-react"
+import { X } from "lucide-react"
 import Logo from "../../components/ui/Logo"
-
-const links = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/admin/products", label: "Products", icon: Package },
-  { to: "/admin/delivered-websites", label: "Delivered Websites", icon: Globe },
-  { to: "/admin/packages", label: "Packages & Pricing", icon: Tags },
-  { to: "/admin/categories", label: "Categories", icon: Grid3x3 },
-  { to: "/admin/brands", label: "Brands", icon: Building2 },
-  { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
-  { to: "/admin/customers", label: "Customers", icon: Users },
-  { to: "/admin/demo-links", label: "Demo Center", icon: Monitor },
-  { to: "/admin/subscribers", label: "Subscribers", icon: Mail },
-  { to: "/admin/settings", label: "Payment Settings", icon: CreditCard },
-]
+import { NAV_SECTIONS } from "../navConfig"
 
 export default function AdminSidebar({ open, onClose }) {
   return (
@@ -43,25 +30,34 @@ export default function AdminSidebar({ open, onClose }) {
             <X size={18} />
           </button>
         </div>
-        <nav className="flex-1 space-y-1 p-3">
-          {links.map(({ to, label, icon: Icon, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              onClick={onClose}
-              className={({ isActive }) =>
-                [
-                  "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition",
-                  isActive
-                    ? "bg-brand-gradient text-white glow-shadow"
-                    : "text-cloud-400 hover:bg-ink-800 hover:text-cloud-100",
-                ].join(" ")
-              }
-            >
-              <Icon size={18} />
-              {label}
-            </NavLink>
+        <nav className="flex-1 space-y-5 overflow-y-auto p-3 py-4">
+          {NAV_SECTIONS.map((section) => (
+            <div key={section.label}>
+              <p className="mb-1.5 px-3.5 text-[10px] font-bold uppercase tracking-widest text-cloud-600">
+                {section.label}
+              </p>
+              <div className="space-y-1">
+                {section.links.map(({ to, label, icon: Icon, end }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    end={end}
+                    onClick={onClose}
+                    className={({ isActive }) =>
+                      [
+                        "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition",
+                        isActive
+                          ? "bg-brand-gradient text-white glow-shadow"
+                          : "text-cloud-400 hover:bg-ink-800 hover:text-cloud-100",
+                      ].join(" ")
+                    }
+                  >
+                    <Icon size={18} />
+                    {label}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
         <div className="border-t border-white/8 p-4 text-xs text-cloud-500">
