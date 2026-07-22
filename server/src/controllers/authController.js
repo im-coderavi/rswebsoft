@@ -23,3 +23,17 @@ export const login = asyncHandler(async (req, res) => {
 export const me = asyncHandler(async (req, res) => {
   res.json({ user: toPublicUser(req.user) })
 })
+
+export const register = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body
+  if (!name || !email || !password) {
+    throw new ApiError(400, "Name, email and password are required")
+  }
+
+  const existing = await User.findOne({ email: email.toLowerCase() })
+  if (existing) throw new ApiError(409, "Email already registered")
+
+  const user = await User.create({ name, email: email.toLowerCase(), password })
+  const token = generateToken(user)
+  res.status(201).json({ token, user: toPublicUser(user) })
+})
