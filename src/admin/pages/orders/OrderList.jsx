@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import toast from "react-hot-toast"
 import { useOrders, useUpdateOrderStatus } from "../../../hooks/useOrders"
 import { apiErrorMessage } from "../../../lib/api"
@@ -36,6 +37,18 @@ export default function OrderList() {
           <div className="text-xs text-cloud-500">{o.customer?.email}</div>
         </div>
       ),
+    },
+    {
+      key: "account",
+      label: "Account",
+      render: (o) =>
+        o.user ? (
+          <Link to={`/admin/customers/${o.user._id}`} className="text-brand-300 hover:underline">
+            {o.user.name}
+          </Link>
+        ) : (
+          <span className="text-cloud-600">Guest</span>
+        ),
     },
     { key: "items", label: "Items", render: (o) => o.items.length },
     { key: "total", label: "Total", render: (o) => `$${o.total.toFixed(2)}` },
