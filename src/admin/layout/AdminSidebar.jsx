@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom"
-import { LayoutDashboard, Package, Grid3x3, Building2, ShoppingCart, CreditCard, X } from "lucide-react"
+import { LayoutDashboard, Package, Grid3x3, Building2, ShoppingCart, Users, CreditCard, X } from "lucide-react"
 import Logo from "../../components/ui/Logo"
 
 const links = [
@@ -8,6 +8,7 @@ const links = [
   { to: "/admin/categories", label: "Categories", icon: Grid3x3 },
   { to: "/admin/brands", label: "Brands", icon: Building2 },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
+  { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/settings", label: "Payment Settings", icon: CreditCard },
 ]
 
