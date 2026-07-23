@@ -16,7 +16,9 @@ import Newsletter from "../components/home/Newsletter"
 import { useProducts } from "../hooks/useProducts"
 
 function TypeCarousel({ title, type }) {
-  const { data, isLoading } = useProducts({ type, status: "published", limit: 6 })
+  // High limit so every published product of this type shows up here —
+  // the admin panel is the only thing controlling how many actually exist.
+  const { data, isLoading } = useProducts({ type, status: "published", limit: 100 })
   const products = data?.items || []
 
   if (!isLoading && products.length === 0) return null

@@ -152,12 +152,12 @@ export default function PricingPlans() {
 
   if (!isLoading && packages.length === 0) return null
 
-  // Shows every published "package" product, cheapest first — admin controls
-  // how many plans exist and what's in them entirely through the Products
-  // admin panel, no fixed slot count here.
-  const displayPackages = [...packages].sort(
-    (a, b) => (a.salePrice ?? a.price) - (b.salePrice ?? b.price)
-  )
+  // Only the 3 cheapest published "package" products show here — admin
+  // controls which 3 plans these are (and what's in them) through the
+  // Products admin panel.
+  const displayPackages = [...packages]
+    .sort((a, b) => (a.salePrice ?? a.price) - (b.salePrice ?? b.price))
+    .slice(0, 3)
 
   return (
     <section className="scroll-mt-32 py-16 sm:py-20 bg-ink-950/20">

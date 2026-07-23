@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom"
 import { ExternalLink, ArrowRight, Rocket } from "lucide-react"
 import { motion } from "framer-motion"
-import Icon from "../ui/Icon"
-import { toneGradient } from "../../lib/tones"
+import BrandLogo from "../ui/BrandLogo"
 import { useBrands } from "../../hooks/useBrands"
 import { cleanText } from "../../lib/text"
 
@@ -54,18 +53,7 @@ export default function BrandsSection() {
             >
               {/* Logo Row */}
               <div className="mb-4 flex min-w-0 max-w-full items-center gap-2">
-                {brand.logo?.url ? (
-                  <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-ink-800">
-                    <img src={brand.logo.url} alt="" className="h-full w-full object-contain p-1" />
-                  </span>
-                ) : (
-                  <span
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-white"
-                    style={toneGradient(brand.tone)}
-                  >
-                    <Icon name={brand.icon} size={20} />
-                  </span>
-                )}
+                <BrandLogo brand={brand} />
                 <span className="truncate font-display text-lg font-extrabold tracking-tight text-slate-800 dark:text-cloud-100">
                   {cleanText(brand.name)}
                 </span>
