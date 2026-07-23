@@ -2,10 +2,29 @@ import { useState } from "react"
 import SectionHeader from "../ui/SectionHeader"
 import ProductCard from "./ProductCard"
 
+// Below this many unique products, duplicating the list for the seamless
+// loop just reads as "the same product shown twice" — too thin to loop.
+const MIN_PRODUCTS_TO_LOOP = 4
+
 export default function ProductCarousel({ title, to, products }) {
   const [paused, setPaused] = useState(false)
 
   if (!products || products.length === 0) return null
+
+  if (products.length < MIN_PRODUCTS_TO_LOOP) {
+    return (
+      <section className="container-rs py-8">
+        <SectionHeader title={title} to={to} />
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+          {products.map((p) => (
+            <div key={p._id} className="w-[260px] shrink-0 sm:w-[310px]">
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
 
   // Duplicate the product items to enable seamless, infinite loop scrolling
   const track = [...products, ...products]
