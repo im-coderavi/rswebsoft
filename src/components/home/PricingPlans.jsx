@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { Check } from "lucide-react"
 import { useProducts } from "../../hooks/useProducts"
+import { cleanText } from "../../lib/text"
 
 function PricingCard({ product }) {
   const isMostPopular = product.tags?.some(t => t.toLowerCase() === "most popular")
@@ -22,9 +23,12 @@ function PricingCard({ product }) {
 
   const hasDemoUrl = Boolean(product.demoUrl)
 
+  const shortDescription = cleanText(product.shortDescription) || "Tailored solution for your business"
+  const ctaSubtext = cleanText(product.description) || "Talk to a web expert"
+
   return (
-    <div className={`relative flex flex-col justify-between rounded-3xl bg-white text-slate-800 p-8 shadow-md border transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${isMostPopular ? "border-emerald-500 ring-4 ring-emerald-500/10 scale-102 z-10" : "border-slate-100"}`}>
-      
+    <div className={`relative flex min-w-0 flex-col justify-between overflow-hidden rounded-3xl bg-white text-slate-800 p-8 shadow-md border transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${isMostPopular ? "border-emerald-500 ring-4 ring-emerald-500/10 scale-102 z-10" : "border-slate-100"}`}>
+
       {/* Most Popular Top Badge */}
       {isMostPopular && (
         <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-md">
@@ -33,13 +37,13 @@ function PricingCard({ product }) {
       )}
 
       {/* Plan Details */}
-      <div>
+      <div className="min-w-0">
         <div className="text-left mb-4">
-          <h3 className="font-display text-xl font-extrabold text-slate-900 sm:text-2xl">
+          <h3 className="font-display text-xl font-extrabold text-slate-900 break-words sm:text-2xl">
             {product.name}
           </h3>
-          <p className="mt-1.5 text-xs text-slate-500 font-medium">
-            {product.shortDescription || "Tailored solution for your business"}
+          <p className="mt-1.5 line-clamp-2 text-xs text-slate-500 font-medium break-words">
+            {shortDescription}
           </p>
         </div>
 
@@ -83,7 +87,7 @@ function PricingCard({ product }) {
           {product.features?.map((feature, idx) => (
             <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-600 font-medium leading-tight">
               <Check size={16} className="text-emerald-500 shrink-0 mt-0.5" strokeWidth={3} />
-              <span>{feature}</span>
+              <span className="line-clamp-2 break-words">{cleanText(feature)}</span>
             </li>
           ))}
         </ul>
@@ -117,8 +121,8 @@ function PricingCard({ product }) {
             className="block w-full rounded-xl bg-emerald-600 py-3 text-xs font-bold text-white transition hover:bg-emerald-700 shadow-md shadow-emerald-700/10 text-center"
           >
             <div className="font-extrabold text-sm">Get Started</div>
-            <div className="text-[9px] font-medium text-emerald-100/90 tracking-wide mt-0.5 uppercase">
-              {product.description || "Talk to a web expert"}
+            <div className="line-clamp-1 break-words text-[9px] font-medium text-emerald-100/90 tracking-wide mt-0.5 uppercase">
+              {ctaSubtext}
             </div>
           </a>
         ) : (
@@ -127,8 +131,8 @@ function PricingCard({ product }) {
             className="block w-full rounded-xl bg-emerald-600 py-3 text-xs font-bold text-white transition hover:bg-emerald-700 shadow-md shadow-emerald-700/10 text-center"
           >
             <div className="font-extrabold text-sm">Get Started</div>
-            <div className="text-[9px] font-medium text-emerald-100/90 tracking-wide mt-0.5 uppercase">
-              {product.description || "Talk to a web expert"}
+            <div className="line-clamp-1 break-words text-[9px] font-medium text-emerald-100/90 tracking-wide mt-0.5 uppercase">
+              {ctaSubtext}
             </div>
           </Link>
         )}

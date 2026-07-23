@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, ExternalLink, CheckCircle2, Eye, Globe } from "lucide-react"
 import { useProducts } from "../../hooks/useProducts"
 import { useNavigate } from "react-router-dom"
+import { cleanText } from "../../lib/text"
 
 function DeliveredWebsiteCard({ product }) {
   const navigate = useNavigate()
@@ -92,7 +93,7 @@ function DeliveredWebsiteCard({ product }) {
             {highlights.map((highlight, idx) => (
               <li key={idx} className="flex items-center gap-2 text-xs text-cloud-300 font-medium leading-tight">
                 <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
-                <span className="line-clamp-1">{highlight}</span>
+                <span className="line-clamp-1 break-words">{cleanText(highlight)}</span>
               </li>
             ))}
           </ul>

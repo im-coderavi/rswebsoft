@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import Icon from "../ui/Icon"
 import { toneGradient } from "../../lib/tones"
 import { useBrands } from "../../hooks/useBrands"
+import { cleanText } from "../../lib/text"
 
 function hostnameOf(url) {
   try {
@@ -49,10 +50,10 @@ export default function BrandsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5, delay: i * 0.05, ease: [0.21, 0.47, 0.32, 0.98] }}
-              className="group flex flex-col items-center rounded-2xl border border-slate-100 bg-white p-5 text-center shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-slate-200 hover:shadow-xl dark:border-white/5 dark:bg-ink-850 dark:hover:border-white/10 dark:hover:shadow-black/30"
+              className="group flex min-w-0 flex-col items-center overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 text-center shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-slate-200 hover:shadow-xl dark:border-white/5 dark:bg-ink-850 dark:hover:border-white/10 dark:hover:shadow-black/30"
             >
               {/* Logo Row */}
-              <div className="mb-4 flex items-center gap-2">
+              <div className="mb-4 flex min-w-0 max-w-full items-center gap-2">
                 {brand.logo?.url ? (
                   <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-ink-800">
                     <img src={brand.logo.url} alt="" className="h-full w-full object-contain p-1" />
@@ -65,22 +66,22 @@ export default function BrandsSection() {
                     <Icon name={brand.icon} size={20} />
                   </span>
                 )}
-                <span className="font-display text-lg font-extrabold tracking-tight text-slate-800 dark:text-cloud-100">
-                  {brand.name}
+                <span className="truncate font-display text-lg font-extrabold tracking-tight text-slate-800 dark:text-cloud-100">
+                  {cleanText(brand.name)}
                 </span>
               </div>
 
               {/* Tag/Badge */}
               {brand.tag && (
-                <div className="mb-3.5 rounded-full border border-brand-500/20 bg-brand-500/10 px-3 py-0.5 text-[10px] font-bold tracking-wide uppercase text-brand-400">
-                  {brand.tag}
+                <div className="mb-3.5 max-w-full truncate rounded-full border border-brand-500/20 bg-brand-500/10 px-3 py-0.5 text-[10px] font-bold tracking-wide uppercase text-brand-400">
+                  {cleanText(brand.tag)}
                 </div>
               )}
 
               {/* Description */}
               {brand.description && (
-                <p className="mb-5 text-[13px] leading-relaxed text-slate-500 dark:text-cloud-400">
-                  {brand.description}
+                <p className="mb-5 line-clamp-3 break-words text-[13px] leading-relaxed text-slate-500 dark:text-cloud-400">
+                  {cleanText(brand.description)}
                 </p>
               )}
 
@@ -90,10 +91,10 @@ export default function BrandsSection() {
                   href={brand.website}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-auto flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500/10 py-2.5 text-[13px] font-semibold text-brand-400 transition-all duration-200 hover:bg-brand-500/20"
+                  className="mt-auto flex w-full min-w-0 items-center justify-center gap-2 rounded-xl bg-brand-500/10 py-2.5 text-[13px] font-semibold text-brand-400 transition-all duration-200 hover:bg-brand-500/20"
                 >
-                  {hostnameOf(brand.website)}
-                  <ExternalLink size={13} strokeWidth={2.5} className="opacity-85" />
+                  <span className="truncate">{hostnameOf(brand.website)}</span>
+                  <ExternalLink size={13} strokeWidth={2.5} className="shrink-0 opacity-85" />
                 </a>
               )}
             </motion.div>

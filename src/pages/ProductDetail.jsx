@@ -21,6 +21,7 @@ import { useProduct } from "../hooks/useProducts"
 import { useCart } from "../context/CartContext"
 import { toneGradient } from "../lib/tones"
 import { formatINR } from "../lib/currency"
+import { cleanText, cleanRichText } from "../lib/text"
 import RelatedProducts from "../components/product/RelatedProducts"
 import ProductPreviewModal from "../components/product/ProductPreviewModal"
 
@@ -369,11 +370,11 @@ export default function ProductDetail() {
               {product.description ? (
                 <div>
                   <p
-                    className={`text-xs sm:text-sm text-cloud-300 leading-relaxed whitespace-pre-line transition-all duration-300 ${
+                    className={`text-xs sm:text-sm text-cloud-300 leading-relaxed whitespace-pre-line break-words transition-all duration-300 ${
                       showFullDesc ? "" : "line-clamp-4 overflow-hidden"
                     }`}
                   >
-                    {product.description}
+                    {cleanRichText(product.description)}
                   </p>
 
                   {/* Toggle Full Description */}
@@ -409,11 +410,11 @@ export default function ProductDetail() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {product.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-start gap-2.5 rounded-xl border border-white/5 bg-ink-850/60 p-3 text-xs font-medium text-cloud-200">
+                    <div key={idx} className="flex min-w-0 items-start gap-2.5 rounded-xl border border-white/5 bg-ink-850/60 p-3 text-xs font-medium text-cloud-200">
                       <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-500/10 text-emerald-400 mt-0.5">
                         <Check size={11} strokeWidth={3} />
                       </span>
-                      <span>{feature}</span>
+                      <span className="break-words">{cleanText(feature)}</span>
                     </div>
                   ))}
                 </div>

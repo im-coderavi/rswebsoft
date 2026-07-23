@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 import StarRating from "../ui/StarRating"
 import { toneGradient } from "../../lib/tones"
 import { formatINR } from "../../lib/currency"
+import { cleanText } from "../../lib/text"
 import { useCart } from "../../context/CartContext"
 
 function initialsOf(name) {
@@ -123,12 +124,12 @@ export default function ProductCard({ product }) {
             product.features.slice(0, 3).map((feat, idx) => (
               <li key={idx} className="flex items-start gap-2 text-[11px] leading-tight text-cloud-400 sm:text-xs">
                 <span className="text-emerald-400 font-bold select-none mt-0.5">•</span>
-                <span className="line-clamp-1">{feat}</span>
+                <span className="line-clamp-1 break-words">{cleanText(feat)}</span>
               </li>
             ))
           ) : (
-            <li className="text-[11px] leading-normal text-cloud-500 sm:text-xs line-clamp-3">
-              {(product.shortDescription || product.description || "").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").trim()}
+            <li className="text-[11px] leading-normal text-cloud-500 sm:text-xs line-clamp-3 break-words">
+              {cleanText(product.shortDescription || product.description)}
             </li>
           )}
         </ul>
