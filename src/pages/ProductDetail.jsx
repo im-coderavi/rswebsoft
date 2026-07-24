@@ -130,23 +130,25 @@ export default function ProductDetail() {
   const images = product.images || []
   const tone = product.category?.tone || "violet"
 
-  function cartItem() {
+  function cartItem(pkg) {
     return {
       productId: product._id,
       slug: product.slug,
       name: product.name,
       image: images[0]?.url || "",
-      price: effectivePrice,
+      price: pkg ? pkg.price : effectivePrice,
+      packageId: pkg ? pkg._id : undefined,
+      packageName: pkg ? pkg.name : undefined,
     }
   }
 
-  function handleAddToCart() {
-    add(cartItem(), 1)
-    toast.success(`${product.name} added to cart`)
+  function handleAddToCart(pkg) {
+    add(cartItem(pkg), 1)
+    toast.success(`${pkg ? pkg.name : product.name} added to cart`)
   }
 
-  function handleBuyNow() {
-    add(cartItem(), 1)
+  function handleBuyNow(pkg) {
+    add(cartItem(pkg), 1)
     navigate("/checkout")
   }
 
@@ -319,7 +321,7 @@ export default function ProductDetail() {
               {/* Action Buttons: Buy Now, Add to Cart, Live Preview */}
               <div className="space-y-3 pt-1">
                 <button
-                  onClick={handleBuyNow}
+                  onClick={() => handleBuyNow()}
                   className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-gradient py-3.5 px-6 text-sm font-extrabold text-white transition hover:opacity-95 shadow-lg shadow-brand-500/20 cursor-pointer"
                 >
                   <Zap size={16} fill="currentColor" /> Buy Now
@@ -327,7 +329,7 @@ export default function ProductDetail() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={handleAddToCart}
+                    onClick={() => handleAddToCart()}
                     className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 px-4 text-xs font-bold text-cloud-100 transition hover:bg-white/10 cursor-pointer"
                   >
                     <ShoppingCart size={15} /> Add to Cart
@@ -436,7 +438,7 @@ export default function ProductDetail() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {product.packages.map((pkg, idx) => (
-                    <div key={idx} className="rounded-xl border border-white/5 bg-ink-850/60 p-4">
+                    <div key={idx} className="flex flex-col rounded-xl border border-white/5 bg-ink-850/60 p-4">
                       <div className="flex items-baseline justify-between gap-2">
                         <span className="text-sm font-bold text-cloud-100">{pkg.name}</span>
                         <span className="text-sm font-extrabold text-brand-300">{formatINR(pkg.price)}</span>
@@ -444,6 +446,32 @@ export default function ProductDetail() {
                       {pkg.description && (
                         <p className="mt-1.5 text-xs text-cloud-400 leading-relaxed">{pkg.description}</p>
                       )}
+
+                      {pkg.features?.length > 0 && (
+                        <ul className="mt-2.5 space-y-1.5 flex-1">
+                          {pkg.features.map((feature, fi) => (
+                            <li key={fi} className="flex items-start gap-1.5 text-[11px] text-cloud-300">
+                              <Check size={11} strokeWidth={3} className="mt-0.5 shrink-0 text-emerald-400" />
+                              <span className="break-words">{cleanText(feature)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          onClick={() => handleBuyNow(pkg)}
+                          className="flex-1 rounded-lg bg-brand-gradient px-3 py-2 text-xs font-bold text-white transition hover:opacity-95 cursor-pointer"
+                        >
+                          Buy Now
+                        </button>
+                        <button
+                          onClick={() => handleAddToCart(pkg)}
+                          className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-cloud-100 transition hover:bg-white/10 cursor-pointer"
+                        >
+                          Add to Cart
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
