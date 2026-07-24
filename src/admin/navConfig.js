@@ -10,6 +10,7 @@ import {
   Monitor,
   Mail,
   CreditCard,
+  Rows3,
 } from "lucide-react"
 
 // Single source of truth for admin navigation. AdminSidebar renders these
@@ -29,6 +30,10 @@ export const NAV_SECTIONS = [
       { to: "/admin/categories", label: "Categories", icon: Grid3x3 },
       { to: "/admin/brands", label: "Brands", icon: Building2 },
     ],
+  },
+  {
+    label: "Homepage",
+    links: [{ to: "/admin/sections", label: "Homepage Sections", icon: Rows3 }],
   },
   {
     label: "Sales",

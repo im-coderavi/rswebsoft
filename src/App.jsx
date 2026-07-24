@@ -29,6 +29,7 @@ import ProductForm from "./admin/pages/products/ProductForm"
 import DeliveredWebsiteList from "./admin/pages/products/DeliveredWebsiteList"
 import PackageList from "./admin/pages/products/PackageList"
 import CategoryList from "./admin/pages/categories/CategoryList"
+import HomeSectionList from "./admin/pages/sections/HomeSectionList"
 import BrandList from "./admin/pages/brands/BrandList"
 import OrderList from "./admin/pages/orders/OrderList"
 import Settings from "./admin/pages/Settings"
@@ -79,6 +80,7 @@ function App() {
                 <Route path="delivered-websites" element={<DeliveredWebsiteList />} />
                 <Route path="packages" element={<PackageList />} />
                 <Route path="categories" element={<CategoryList />} />
+                <Route path="sections" element={<HomeSectionList />} />
                 <Route path="brands" element={<BrandList />} />
                 <Route path="orders" element={<OrderList />} />
                 <Route path="customers" element={<CustomerList />} />
