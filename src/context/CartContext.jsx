@@ -21,23 +21,23 @@ export function CartProvider({ children }) {
 
   const add = useCallback((product, qty = 1) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.productId === product.productId && i.packageId === product.packageId)
+      const existing = prev.find((i) => i.productId === product.productId)
       if (existing) {
         return prev.map((i) =>
-          i.productId === product.productId && i.packageId === product.packageId ? { ...i, qty: i.qty + qty } : i
+          i.productId === product.productId ? { ...i, qty: i.qty + qty } : i
         )
       }
       return [...prev, { ...product, qty }]
     })
   }, [])
 
-  const remove = useCallback((productId, packageId) => {
-    setItems((prev) => prev.filter((i) => !(i.productId === productId && i.packageId === packageId)))
+  const remove = useCallback((productId) => {
+    setItems((prev) => prev.filter((i) => i.productId !== productId))
   }, [])
 
-  const updateQty = useCallback((productId, qty, packageId) => {
+  const updateQty = useCallback((productId, qty) => {
     setItems((prev) =>
-      prev.map((i) => (i.productId === productId && i.packageId === packageId ? { ...i, qty: Math.max(1, qty) } : i))
+      prev.map((i) => (i.productId === productId ? { ...i, qty: Math.max(1, qty) } : i))
     )
   }, [])
 
