@@ -14,7 +14,8 @@ import {
   FileText,
   ExternalLink,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Package
 } from "lucide-react"
 import toast from "react-hot-toast"
 import { useProduct } from "../hooks/useProducts"
@@ -415,6 +416,34 @@ export default function ProductDetail() {
                         <Check size={11} strokeWidth={3} />
                       </span>
                       <span className="break-words">{cleanText(feature)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Packages Card (If present) — informational only, no purchase action */}
+            {product.packages?.length > 0 && (
+              <div className="rounded-2xl border border-white/8 bg-ink-900/60 p-6 space-y-4">
+                <div className="flex items-center gap-3 border-b border-white/5 pb-3">
+                  <span className="grid h-8 w-8 place-items-center rounded-lg bg-sky-500/10 text-sky-400">
+                    <Package size={16} />
+                  </span>
+                  <h2 className="font-display text-lg font-bold text-cloud-100">
+                    Available Packages
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {product.packages.map((pkg, idx) => (
+                    <div key={idx} className="rounded-xl border border-white/5 bg-ink-850/60 p-4">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="text-sm font-bold text-cloud-100">{pkg.name}</span>
+                        <span className="text-sm font-extrabold text-brand-300">{formatINR(pkg.price)}</span>
+                      </div>
+                      {pkg.description && (
+                        <p className="mt-1.5 text-xs text-cloud-400 leading-relaxed">{pkg.description}</p>
+                      )}
                     </div>
                   ))}
                 </div>
