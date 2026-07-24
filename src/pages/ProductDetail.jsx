@@ -15,11 +15,13 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
-  Package
+  Package,
+  MessageCircle
 } from "lucide-react"
 import toast from "react-hot-toast"
 import { useProduct } from "../hooks/useProducts"
 import { useCart } from "../context/CartContext"
+import { usePaymentSettings } from "../hooks/usePaymentSettings"
 import { toneGradient } from "../lib/tones"
 import { formatINR } from "../lib/currency"
 import { cleanText, cleanRichText } from "../lib/text"
@@ -84,6 +86,7 @@ export default function ProductDetail() {
   const [searchParams] = useSearchParams()
   const { data: product, isLoading } = useProduct(slug)
   const { add } = useCart()
+  const { data: paymentSettings } = usePaymentSettings()
   const [selectedImgIndex, setSelectedImgIndex] = useState(0)
   const [showFullDesc, setShowFullDesc] = useState(false)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
@@ -130,26 +133,31 @@ export default function ProductDetail() {
   const images = product.images || []
   const tone = product.category?.tone || "violet"
 
-  function cartItem(pkg) {
+  function cartItem() {
     return {
       productId: product._id,
       slug: product.slug,
       name: product.name,
       image: images[0]?.url || "",
-      price: pkg ? pkg.price : effectivePrice,
-      packageId: pkg ? pkg._id : undefined,
-      packageName: pkg ? pkg.name : undefined,
+      price: effectivePrice,
     }
   }
 
-  function handleAddToCart(pkg) {
-    add(cartItem(pkg), 1)
-    toast.success(`${pkg ? pkg.name : product.name} added to cart`)
+  function handleAddToCart() {
+    add(cartItem(), 1)
+    toast.success(`${product.name} added to cart`)
   }
 
-  function handleBuyNow(pkg) {
-    add(cartItem(pkg), 1)
+  function handleBuyNow() {
+    add(cartItem(), 1)
     navigate("/checkout")
+  }
+
+  function whatsappLinkFor(pkg) {
+    const number = (paymentSettings?.whatsappNumber || "").replace(/\D/g, "")
+    if (!number) return null
+    const message = `Hi! I'm interested in buying "${pkg.name}" for "${product.name}" (${formatINR(pkg.price)}).\n${window.location.href}`
+    return `https://wa.me/${number}?text=${encodeURIComponent(message)}`
   }
 
 
@@ -321,7 +329,7 @@ export default function ProductDetail() {
               {/* Action Buttons: Buy Now, Add to Cart, Live Preview */}
               <div className="space-y-3 pt-1">
                 <button
-                  onClick={() => handleBuyNow()}
+                  onClick={handleBuyNow}
                   className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-gradient py-3.5 px-6 text-sm font-extrabold text-white transition hover:opacity-95 shadow-lg shadow-brand-500/20 cursor-pointer"
                 >
                   <Zap size={16} fill="currentColor" /> Buy Now
@@ -329,7 +337,7 @@ export default function ProductDetail() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => handleAddToCart()}
+                    onClick={handleAddToCart}
                     className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3 px-4 text-xs font-bold text-cloud-100 transition hover:bg-white/10 cursor-pointer"
                   >
                     <ShoppingCart size={15} /> Add to Cart
@@ -458,20 +466,16 @@ export default function ProductDetail() {
                         </ul>
                       )}
 
-                      <div className="mt-3 flex gap-2">
-                        <button
-                          onClick={() => handleBuyNow(pkg)}
-                          className="flex-1 rounded-lg bg-brand-gradient px-3 py-2 text-xs font-bold text-white transition hover:opacity-95 cursor-pointer"
+                      {whatsappLinkFor(pkg) && (
+                        <a
+                          href={whatsappLinkFor(pkg)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-3 flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-500 cursor-pointer"
                         >
-                          Buy Now
-                        </button>
-                        <button
-                          onClick={() => handleAddToCart(pkg)}
-                          className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-cloud-100 transition hover:bg-white/10 cursor-pointer"
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
+                          <MessageCircle size={14} /> Buy on WhatsApp
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
