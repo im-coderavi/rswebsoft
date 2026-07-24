@@ -1,4 +1,5 @@
 import { motion } from "framer-motion"
+import { useNavigate } from "react-router-dom"
 import {
   Package,
   CheckCircle2,
@@ -8,9 +9,15 @@ import {
   Users,
   Monitor,
   Mail,
+  ArrowUp,
+  ArrowDown,
+  Plus,
+  Rows3,
 } from "lucide-react"
 import { useDashboardStats } from "../../hooks/useDashboardStats"
 import AnimatedCounter from "../../components/ui/AnimatedCounter"
+import PageHeader from "../components/PageHeader"
+import Button from "../components/Button"
 
 // Same grouping as the sidebar (Catalog / Sales / Site Content) so the
 // dashboard teaches the same mental model of the business at a glance.
@@ -40,7 +47,25 @@ const CLUSTERS = [
   },
 ]
 
-function StatCard({ label, icon: Icon, tone, bg, value, isLoading, delay }) {
+const QUICK_ACTIONS = [
+  { label: "Add Product", to: "/admin/products/new", icon: Plus },
+  { label: "New Homepage Section", to: "/admin/sections", icon: Rows3 },
+  { label: "New Category", to: "/admin/categories", icon: Grid3x3 },
+]
+
+function TrendIndicator({ trend }) {
+  if (trend == null) return null
+  const isUp = trend >= 0
+  const ArrowIcon = isUp ? ArrowUp : ArrowDown
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-xs font-semibold ${isUp ? "text-emerald-400" : "text-rose-400"}`}>
+      <ArrowIcon size={12} />
+      {Math.abs(trend)}%
+    </span>
+  )
+}
+
+function StatCard({ label, icon: Icon, tone, bg, value, trend, isLoading, delay }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -53,11 +78,14 @@ function StatCard({ label, icon: Icon, tone, bg, value, isLoading, delay }) {
           <Icon size={20} />
         </span>
         <div>
-          {isLoading ? (
-            <div className="font-display text-2xl font-bold text-cloud-100">…</div>
-          ) : (
-            <AnimatedCounter value={String(value ?? 0)} className="font-display text-2xl font-bold text-cloud-100" />
-          )}
+          <div className="flex items-center gap-2">
+            {isLoading ? (
+              <div className="font-display text-2xl font-bold text-cloud-100">…</div>
+            ) : (
+              <AnimatedCounter value={String(value ?? 0)} className="font-display text-2xl font-bold text-cloud-100" />
+            )}
+            {!isLoading && <TrendIndicator trend={trend} />}
+          </div>
           <div className="text-xs text-cloud-400">{label}</div>
         </div>
       </div>
@@ -67,12 +95,13 @@ function StatCard({ label, icon: Icon, tone, bg, value, isLoading, delay }) {
 
 export default function Dashboard() {
   const { data, isLoading } = useDashboardStats()
+  const navigate = useNavigate()
 
   let cardIndex = 0
 
   return (
     <div className="space-y-8">
-      <p className="text-sm text-cloud-400">Overview of your catalog and activity.</p>
+      <PageHeader title="Dashboard" description="Overview of your catalog and activity." />
 
       {CLUSTERS.map((cluster) => (
         <div key={cluster.label}>
@@ -89,6 +118,7 @@ export default function Dashboard() {
                   tone={card.tone}
                   bg={card.bg}
                   value={data?.[card.key]}
+                  trend={data?.[`${card.key}Trend`]}
                   isLoading={isLoading}
                   delay={delay}
                 />
@@ -97,6 +127,23 @@ export default function Dashboard() {
           </div>
         </div>
       ))}
+
+      <div>
+        <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-cloud-600">Quick Actions</p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {QUICK_ACTIONS.map((action) => (
+            <Button
+              key={action.to}
+              variant="secondary"
+              icon={action.icon}
+              onClick={() => navigate(action.to)}
+              className="w-full justify-center"
+            >
+              {action.label}
+            </Button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
