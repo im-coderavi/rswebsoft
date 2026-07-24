@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Search, Heart, ShoppingCart, ChevronDown, Menu, User, Sun, Moon, LogOut, Package } from "lucide-react"
+import { Heart, ShoppingCart, Menu, User, Sun, Moon, LogOut, Package } from "lucide-react"
 import Logo from "../ui/Logo"
+import HeaderSearch from "./HeaderSearch"
 import { useCart } from "../../context/CartContext"
 import { useAuth } from "../../context/AuthContext"
 
@@ -110,20 +111,7 @@ export default function Header({ onMenuClick }) {
 
         <Logo />
 
-        {/* Search with category selector */}
-        <div className="ml-2 hidden max-w-[560px] flex-1 items-center rounded-xl border border-white/10 bg-ink-800 focus-within:border-brand-500/60 lg:flex">
-          <button className="flex shrink-0 items-center gap-1.5 border-r border-white/10 px-4 py-2.5 text-sm font-medium text-cloud-300 transition hover:text-cloud-100">
-            All Categories <ChevronDown size={15} />
-          </button>
-          <input
-            type="text"
-            placeholder="Search for products, themes, plugins, tools..."
-            className="flex-1 bg-transparent px-4 py-2.5 text-sm text-cloud-100 placeholder:text-cloud-500 focus:outline-none"
-          />
-          <button className="m-1 grid h-9 w-10 shrink-0 place-items-center rounded-lg bg-brand-gradient text-white">
-            <Search size={18} />
-          </button>
-        </div>
+        <HeaderSearch />
 
         <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
           <ActionIcon icon={Heart} count={3} to="/wishlist" />

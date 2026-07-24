@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { NavLink, Link, useNavigate } from "react-router-dom"
-import { X, Search, Heart, ShoppingCart, User, Sun, Moon, LogOut, Package } from "lucide-react"
+import { X, Heart, ShoppingCart, User, Sun, Moon, LogOut, Package } from "lucide-react"
 import { navLinks } from "../../data/site"
 import { useCart } from "../../context/CartContext"
 import { useAuth } from "../../context/AuthContext"
@@ -10,6 +10,7 @@ export default function MobileMenu({ open, onClose }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [isDark, setIsDark] = useState(false)
+  const [search, setSearch] = useState("")
 
   // Sync theme status on component mount
   useEffect(() => {
@@ -34,6 +35,15 @@ export default function MobileMenu({ open, onClose }) {
     navigate("/")
   }
 
+  function handleSearchSubmit(e) {
+    e.preventDefault()
+    const q = search.trim()
+    if (!q) return
+    onClose()
+    navigate(`/products?search=${encodeURIComponent(q)}`)
+    setSearch("")
+  }
+
   return (
     <>
       {open && (
@@ -56,16 +66,25 @@ export default function MobileMenu({ open, onClose }) {
           </button>
         </div>
 
-        <div className="border-b border-white/8 p-4">
-          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-ink-800 px-3 py-2.5">
-            <Search size={16} className="text-cloud-500" />
-            <input
-              type="text"
-              placeholder="Search products…"
-              className="flex-1 bg-transparent text-sm text-cloud-100 placeholder:text-cloud-500 focus:outline-none"
-            />
-          </div>
-        </div>
+        <form
+          onSubmit={handleSearchSubmit}
+          className="flex items-center gap-2 border-b border-white/8 px-4 py-3"
+        >
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search products…"
+            className="flex-1 rounded-lg border border-white/10 bg-ink-800 px-3 py-2.5 text-sm text-cloud-100 placeholder:text-cloud-500 focus:border-brand-500/60 focus:outline-none"
+          />
+          <Link
+            to="/products"
+            onClick={onClose}
+            className="rounded-lg border border-white/10 bg-ink-800 px-3 py-2.5 text-xs font-semibold text-cloud-200 hover:bg-ink-700"
+          >
+            All
+          </Link>
+        </form>
 
         <nav className="flex-1 space-y-1 overflow-y-auto p-4">
           {navLinks.map((link) => (
