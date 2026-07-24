@@ -34,7 +34,7 @@ export default function Cart() {
         <div className="space-y-3 lg:col-span-2">
           {items.map((item) => (
             <div
-              key={item.productId}
+              key={`${item.productId}:${item.packageId || "base"}`}
               className="flex items-center gap-4 rounded-xl border border-white/8 bg-ink-850 p-4"
             >
               <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg" style={item.image ? undefined : toneGradient("violet")}>
@@ -49,14 +49,14 @@ export default function Cart() {
 
               <div className="min-w-0 flex-1">
                 <Link to={`/products/${item.slug}`} className="block truncate text-sm font-semibold text-cloud-100 hover:text-brand-300">
-                  {item.name}
+                  {item.name}{item.packageName ? ` — ${item.packageName}` : ""}
                 </Link>
                 <div className="mt-1 text-sm text-cloud-400">{formatINR(item.price)} each</div>
               </div>
 
               <div className="flex items-center gap-2 rounded-lg border border-white/10">
                 <button
-                  onClick={() => updateQty(item.productId, item.qty - 1)}
+                  onClick={() => updateQty(item.productId, item.qty - 1, item.packageId)}
                   className="grid h-8 w-8 place-items-center text-cloud-300 hover:text-cloud-100"
                   aria-label="Decrease quantity"
                 >
@@ -64,7 +64,7 @@ export default function Cart() {
                 </button>
                 <span className="w-6 text-center text-sm text-cloud-100">{item.qty}</span>
                 <button
-                  onClick={() => updateQty(item.productId, item.qty + 1)}
+                  onClick={() => updateQty(item.productId, item.qty + 1, item.packageId)}
                   className="grid h-8 w-8 place-items-center text-cloud-300 hover:text-cloud-100"
                   aria-label="Increase quantity"
                 >
@@ -77,7 +77,7 @@ export default function Cart() {
               </div>
 
               <button
-                onClick={() => remove(item.productId)}
+                onClick={() => remove(item.productId, item.packageId)}
                 className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-cloud-500 transition hover:bg-rose-500/15 hover:text-rose-400"
                 aria-label="Remove item"
               >

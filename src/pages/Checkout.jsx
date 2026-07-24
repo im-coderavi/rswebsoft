@@ -44,7 +44,7 @@ export default function Checkout() {
     try {
       const order = await createOrder.mutateAsync({
         customer: form,
-        items: items.map((i) => ({ productId: i.productId, qty: i.qty })),
+        items: items.map((i) => ({ productId: i.productId, qty: i.qty, packageId: i.packageId })),
         paymentReference,
       })
       setSubmitted(true)
@@ -163,8 +163,8 @@ export default function Checkout() {
           <h2 className="font-display text-lg font-bold text-cloud-100">Order Summary</h2>
           <div className="space-y-2.5">
             {items.map((item) => (
-              <div key={item.productId} className="flex justify-between text-sm text-cloud-400">
-                <span className="min-w-0 truncate pr-3">{item.name} × {item.qty}</span>
+              <div key={`${item.productId}:${item.packageId || "base"}`} className="flex justify-between text-sm text-cloud-400">
+                <span className="min-w-0 truncate pr-3">{item.name}{item.packageName ? ` — ${item.packageName}` : ""} × {item.qty}</span>
                 <span className="shrink-0 text-cloud-100">{formatINR(item.price * item.qty)}</span>
               </div>
             ))}
