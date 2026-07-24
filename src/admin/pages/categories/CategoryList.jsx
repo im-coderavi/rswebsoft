@@ -13,6 +13,8 @@ import Icon from "../../../components/ui/Icon"
 import DataTable from "../../components/DataTable"
 import ConfirmDialog from "../../components/ConfirmDialog"
 import ImageUploader from "../../components/ImageUploader"
+import PageHeader from "../../components/PageHeader"
+import Button from "../../components/Button"
 
 const emptyForm = { name: "", icon: "Box", tone: "violet", image: null }
 
@@ -92,41 +94,28 @@ export default function CategoryList() {
       ),
     },
     { key: "slug", label: "Slug" },
-    { key: "productCount", label: "Products" },
+    { key: "productCount", label: "Products", sortable: true },
   ]
 
   return (
     <div>
-      <div className="mb-5 flex justify-end">
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 rounded-xl bg-brand-gradient px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
-        >
-          <Plus size={16} /> New Category
-        </button>
-      </div>
+      <PageHeader
+        title="Categories"
+        description="Organize your catalog into browsable categories."
+        action={{ label: "New Category", icon: Plus, onClick: openCreate }}
+      />
 
       <DataTable
         columns={columns}
         rows={categories || []}
         loading={isLoading}
         emptyMessage="No categories yet."
+        searchable
+        searchKeys={["name", "slug"]}
         actions={(c) => (
           <>
-            <button
-              onClick={() => openEdit(c)}
-              className="grid h-8 w-8 place-items-center rounded-lg text-cloud-400 transition hover:bg-ink-800 hover:text-cloud-100"
-              aria-label="Edit"
-            >
-              <Pencil size={15} />
-            </button>
-            <button
-              onClick={() => setPendingDelete(c)}
-              className="grid h-8 w-8 place-items-center rounded-lg text-cloud-400 transition hover:bg-rose-500/15 hover:text-rose-400"
-              aria-label="Delete"
-            >
-              <Trash2 size={15} />
-            </button>
+            <Button variant="ghost" iconOnly icon={Pencil} onClick={() => openEdit(c)} aria-label="Edit" />
+            <Button variant="danger" iconOnly icon={Trash2} onClick={() => setPendingDelete(c)} aria-label="Delete" />
           </>
         )}
       />
