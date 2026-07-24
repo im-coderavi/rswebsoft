@@ -23,6 +23,7 @@ const emptyForm = {
   type: "plugin",
   tags: "",
   features: [],
+  packages: [],
   demoUrl: "",
   downloadUrl: "",
   featured: false,
@@ -94,6 +95,7 @@ export default function ProductForm() {
       type: existing.type || "plugin",
       tags: (existing.tags || []).join(", "),
       features: existing.features || [],
+      packages: existing.packages || [],
       demoUrl: existing.demoUrl || "",
       downloadUrl: existing.downloadUrl || "",
       featured: Boolean(existing.featured),
@@ -126,6 +128,34 @@ export default function ProductForm() {
       if (swapWith < 0 || swapWith >= list.length) return f
       ;[list[index], list[swapWith]] = [list[swapWith], list[index]]
       return { ...f, features: list }
+    })
+  }
+
+  const [packageName, setPackageName] = useState("")
+  const [packagePrice, setPackagePrice] = useState("")
+  const [packageDescription, setPackageDescription] = useState("")
+
+  function addPackage() {
+    const name = packageName.trim()
+    const price = Number(packagePrice)
+    if (!name || !packagePrice || Number.isNaN(price) || price < 0) return
+    setForm((f) => ({ ...f, packages: [...f.packages, { name, price, description: packageDescription.trim() }] }))
+    setPackageName("")
+    setPackagePrice("")
+    setPackageDescription("")
+  }
+
+  function removePackage(index) {
+    setForm((f) => ({ ...f, packages: f.packages.filter((_, i) => i !== index) }))
+  }
+
+  function movePackage(index, direction) {
+    setForm((f) => {
+      const list = [...f.packages]
+      const swapWith = direction === "up" ? index - 1 : index + 1
+      if (swapWith < 0 || swapWith >= list.length) return f
+      ;[list[index], list[swapWith]] = [list[swapWith], list[index]]
+      return { ...f, packages: list }
     })
   }
 
@@ -168,6 +198,7 @@ export default function ProductForm() {
       type: form.type,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
       features: form.features,
+      packages: form.packages,
       demoUrl: form.demoUrl,
       downloadUrl: form.downloadUrl,
       featured: form.featured,
@@ -416,6 +447,66 @@ export default function ProductForm() {
             ))}
             {form.features.length === 0 && (
               <p className="text-xs text-cloud-500">No features added yet.</p>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+            Packages <span className="text-cloud-500">(shown as an info section on the product page — doesn't affect Buy Now/Cart)</span>
+          </label>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-[2fr_1fr_2fr_auto]">
+            <input
+              value={packageName}
+              onChange={(e) => setPackageName(e.target.value)}
+              placeholder="e.g. Installation"
+              className="rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+            />
+            <input
+              type="number"
+              min="0"
+              value={packagePrice}
+              onChange={(e) => setPackagePrice(e.target.value)}
+              placeholder="Price"
+              className="rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+            />
+            <input
+              value={packageDescription}
+              onChange={(e) => setPackageDescription(e.target.value)}
+              placeholder="Description (optional)"
+              className="rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={addPackage}
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 px-3.5 py-2.5 text-sm font-medium text-cloud-300 transition hover:bg-white/5"
+            >
+              <Plus size={15} /> Add
+            </button>
+          </div>
+          <div className="mt-2.5 space-y-1.5">
+            {form.packages.map((pkg, i) => (
+              <div key={i} className="flex items-center justify-between gap-3 rounded-lg bg-ink-800 px-3 py-2 text-sm text-cloud-200">
+                <div className="min-w-0 truncate">
+                  <span className="font-semibold">{pkg.name}</span>
+                  <span className="text-cloud-400"> — ₹{Number(pkg.price).toLocaleString("en-IN")}</span>
+                  {pkg.description && <span className="text-cloud-500"> — {pkg.description}</span>}
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  <button type="button" onClick={() => movePackage(i, "up")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
+                    <ArrowUp size={13} />
+                  </button>
+                  <button type="button" onClick={() => movePackage(i, "down")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
+                    <ArrowDown size={13} />
+                  </button>
+                  <button type="button" onClick={() => removePackage(i)} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-rose-500/15 hover:text-rose-400">
+                    <X size={13} />
+                  </button>
+                </div>
+              </div>
+            ))}
+            {form.packages.length === 0 && (
+              <p className="text-xs text-cloud-500">No packages added yet.</p>
             )}
           </div>
         </div>
