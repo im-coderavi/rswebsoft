@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
-import { ArrowLeft, Save } from "lucide-react"
+import { ArrowLeft, Save, Plus, X, ArrowUp, ArrowDown } from "lucide-react"
 import toast from "react-hot-toast"
 import { useCategories } from "../../../hooks/useCategories"
 import { useBrands } from "../../../hooks/useBrands"
@@ -22,7 +22,7 @@ const emptyForm = {
   brand: "",
   type: "plugin",
   tags: "",
-  features: "",
+  features: [],
   demoUrl: "",
   downloadUrl: "",
   featured: false,
@@ -93,7 +93,7 @@ export default function ProductForm() {
       brand: existing.brand?._id || "",
       type: existing.type || "plugin",
       tags: (existing.tags || []).join(", "),
-      features: (existing.features || []).join("\n"),
+      features: existing.features || [],
       demoUrl: existing.demoUrl || "",
       downloadUrl: existing.downloadUrl || "",
       featured: Boolean(existing.featured),
@@ -104,6 +104,29 @@ export default function ProductForm() {
 
   function setField(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
+  }
+
+  const [featureInput, setFeatureInput] = useState("")
+
+  function addFeature() {
+    const value = featureInput.trim()
+    if (!value) return
+    setForm((f) => ({ ...f, features: [...f.features, value] }))
+    setFeatureInput("")
+  }
+
+  function removeFeature(index) {
+    setForm((f) => ({ ...f, features: f.features.filter((_, i) => i !== index) }))
+  }
+
+  function moveFeature(index, direction) {
+    setForm((f) => {
+      const list = [...f.features]
+      const swapWith = direction === "up" ? index - 1 : index + 1
+      if (swapWith < 0 || swapWith >= list.length) return f
+      ;[list[index], list[swapWith]] = [list[swapWith], list[index]]
+      return { ...f, features: list }
+    })
   }
 
   function cleanField(field) {
@@ -144,7 +167,7 @@ export default function ProductForm() {
       brand: form.brand || undefined,
       type: form.type,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-      features: form.features.split("\n").map((t) => t.trim()).filter(Boolean),
+      features: form.features,
       demoUrl: form.demoUrl,
       downloadUrl: form.downloadUrl,
       featured: form.featured,
@@ -351,15 +374,50 @@ export default function ProductForm() {
 
         <div>
           <label className="mb-1.5 block text-xs font-medium text-cloud-400">
-            Features <span className="text-cloud-500">(one per line — shown as a checklist)</span>
+            Features <span className="text-cloud-500">(shown as a checklist on the product page)</span>
           </label>
-          <textarea
-            rows={4}
-            value={form.features}
-            onChange={(e) => setField("features", e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-            placeholder={"Lifetime updates\nPremium support included\nWorks with WooCommerce"}
-          />
+          <div className="flex gap-2">
+            <input
+              value={featureInput}
+              onChange={(e) => setFeatureInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  addFeature()
+                }
+              }}
+              placeholder="e.g. Lifetime updates"
+              className="flex-1 rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={addFeature}
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3.5 py-2.5 text-sm font-medium text-cloud-300 transition hover:bg-white/5"
+            >
+              <Plus size={15} /> Add
+            </button>
+          </div>
+          <div className="mt-2.5 space-y-1.5">
+            {form.features.map((feature, i) => (
+              <div key={i} className="flex items-center justify-between rounded-lg bg-ink-800 px-3 py-2 text-sm text-cloud-200">
+                <span className="truncate">{feature}</span>
+                <div className="flex items-center gap-1">
+                  <button type="button" onClick={() => moveFeature(i, "up")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
+                    <ArrowUp size={13} />
+                  </button>
+                  <button type="button" onClick={() => moveFeature(i, "down")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
+                    <ArrowDown size={13} />
+                  </button>
+                  <button type="button" onClick={() => removeFeature(i)} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-rose-500/15 hover:text-rose-400">
+                    <X size={13} />
+                  </button>
+                </div>
+              </div>
+            ))}
+            {form.features.length === 0 && (
+              <p className="text-xs text-cloud-500">No features added yet.</p>
+            )}
+          </div>
         </div>
 
         <div>
