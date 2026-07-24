@@ -46,6 +46,18 @@ export const createOrder = asyncHandler(async (req, res) => {
   const orderItems = items.map((i) => {
     const product = productById.get(i.productId)
     const qty = Math.max(1, Number(i.qty) || 1)
+
+    if (i.packageId) {
+      const pkg = product.packages.id(i.packageId)
+      if (!pkg) throw new ApiError(400, "One or more items are no longer available")
+      return {
+        product: product._id,
+        name: `${product.name} — ${pkg.name}`,
+        price: pkg.price,
+        qty,
+      }
+    }
+
     return {
       product: product._id,
       name: product.name,
