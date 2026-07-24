@@ -131,18 +131,16 @@ export default function ProductForm() {
     })
   }
 
-  const [packageName, setPackageName] = useState("")
-  const [packagePrice, setPackagePrice] = useState("")
-  const [packageDescription, setPackageDescription] = useState("")
+  function addPackageBlock() {
+    setForm((f) => ({ ...f, packages: [...f.packages, { name: "", price: 0, description: "", features: [] }] }))
+  }
 
-  function addPackage() {
-    const name = packageName.trim()
-    const price = Number(packagePrice)
-    if (!name || !packagePrice || Number.isNaN(price) || price < 0) return
-    setForm((f) => ({ ...f, packages: [...f.packages, { name, price, description: packageDescription.trim() }] }))
-    setPackageName("")
-    setPackagePrice("")
-    setPackageDescription("")
+  function updatePackageField(index, field, value) {
+    setForm((f) => {
+      const packages = [...f.packages]
+      packages[index] = { ...packages[index], [field]: value }
+      return { ...f, packages }
+    })
   }
 
   function removePackage(index) {
@@ -156,6 +154,46 @@ export default function ProductForm() {
       if (swapWith < 0 || swapWith >= list.length) return f
       ;[list[index], list[swapWith]] = [list[swapWith], list[index]]
       return { ...f, packages: list }
+    })
+  }
+
+  const [packageFeatureInput, setPackageFeatureInput] = useState({})
+
+  function setPackageFeatureInputValue(index, value) {
+    setPackageFeatureInput((m) => ({ ...m, [index]: value }))
+  }
+
+  function addPackageFeature(index) {
+    const value = (packageFeatureInput[index] || "").trim()
+    if (!value) return
+    setForm((f) => {
+      const packages = [...f.packages]
+      packages[index] = { ...packages[index], features: [...(packages[index].features || []), value] }
+      return { ...f, packages }
+    })
+    setPackageFeatureInputValue(index, "")
+  }
+
+  function removePackageFeature(packageIndex, featureIndex) {
+    setForm((f) => {
+      const packages = [...f.packages]
+      packages[packageIndex] = {
+        ...packages[packageIndex],
+        features: packages[packageIndex].features.filter((_, i) => i !== featureIndex),
+      }
+      return { ...f, packages }
+    })
+  }
+
+  function movePackageFeature(packageIndex, featureIndex, direction) {
+    setForm((f) => {
+      const packages = [...f.packages]
+      const features = [...(packages[packageIndex].features || [])]
+      const swapWith = direction === "up" ? featureIndex - 1 : featureIndex + 1
+      if (swapWith < 0 || swapWith >= features.length) return f
+      ;[features[featureIndex], features[swapWith]] = [features[swapWith], features[featureIndex]]
+      packages[packageIndex] = { ...packages[packageIndex], features }
+      return { ...f, packages }
     })
   }
 
@@ -198,7 +236,9 @@ export default function ProductForm() {
       type: form.type,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
       features: form.features,
-      packages: form.packages,
+      packages: form.packages
+        .filter((p) => p.name.trim())
+        .map((p) => ({ ...p, price: Number(p.price) || 0 })),
       demoUrl: form.demoUrl,
       downloadUrl: form.downloadUrl,
       featured: form.featured,
@@ -452,56 +492,103 @@ export default function ProductForm() {
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-cloud-400">
-            Packages <span className="text-cloud-500">(shown as an info section on the product page — doesn't affect Buy Now/Cart)</span>
-          </label>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-[2fr_1fr_2fr_auto]">
-            <input
-              value={packageName}
-              onChange={(e) => setPackageName(e.target.value)}
-              placeholder="e.g. Installation"
-              className="rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-            />
-            <input
-              type="number"
-              min="0"
-              value={packagePrice}
-              onChange={(e) => setPackagePrice(e.target.value)}
-              placeholder="Price"
-              className="rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-            />
-            <input
-              value={packageDescription}
-              onChange={(e) => setPackageDescription(e.target.value)}
-              placeholder="Description (optional)"
-              className="rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-            />
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="block text-xs font-medium text-cloud-400">
+              Packages <span className="text-cloud-500">(each gets its own "Buy on WhatsApp" button and feature checklist on the product page)</span>
+            </label>
             <button
               type="button"
-              onClick={addPackage}
-              className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 px-3.5 py-2.5 text-sm font-medium text-cloud-300 transition hover:bg-white/5"
+              onClick={addPackageBlock}
+              className="flex items-center gap-1.5 text-xs font-medium text-brand-300 hover:underline"
             >
-              <Plus size={15} /> Add
+              <Plus size={14} /> Add Package
             </button>
           </div>
-          <div className="mt-2.5 space-y-1.5">
+
+          <div className="space-y-3">
             {form.packages.map((pkg, i) => (
-              <div key={i} className="flex items-center justify-between gap-3 rounded-lg bg-ink-800 px-3 py-2 text-sm text-cloud-200">
-                <div className="min-w-0 truncate">
-                  <span className="font-semibold">{pkg.name}</span>
-                  <span className="text-cloud-400"> — ₹{Number(pkg.price).toLocaleString("en-IN")}</span>
-                  {pkg.description && <span className="text-cloud-500"> — {pkg.description}</span>}
+              <div key={i} className="space-y-3 rounded-xl border border-white/10 bg-ink-800 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
+                    <input
+                      value={pkg.name}
+                      onChange={(e) => updatePackageField(i, "name", e.target.value)}
+                      placeholder="Package name, e.g. Installation"
+                      className="rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+                    />
+                    <input
+                      type="number"
+                      min="0"
+                      value={pkg.price}
+                      onChange={(e) => updatePackageField(i, "price", e.target.value)}
+                      placeholder="Price"
+                      className="rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1 pt-1">
+                    <button type="button" onClick={() => movePackage(i, "up")} className="grid h-7 w-7 place-items-center rounded text-cloud-400 hover:bg-white/5">
+                      <ArrowUp size={14} />
+                    </button>
+                    <button type="button" onClick={() => movePackage(i, "down")} className="grid h-7 w-7 place-items-center rounded text-cloud-400 hover:bg-white/5">
+                      <ArrowDown size={14} />
+                    </button>
+                    <button type="button" onClick={() => removePackage(i)} className="grid h-7 w-7 place-items-center rounded text-cloud-400 hover:bg-rose-500/15 hover:text-rose-400">
+                      <X size={14} />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-1">
-                  <button type="button" onClick={() => movePackage(i, "up")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
-                    <ArrowUp size={13} />
-                  </button>
-                  <button type="button" onClick={() => movePackage(i, "down")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
-                    <ArrowDown size={13} />
-                  </button>
-                  <button type="button" onClick={() => removePackage(i)} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-rose-500/15 hover:text-rose-400">
-                    <X size={13} />
-                  </button>
+
+                <input
+                  value={pkg.description}
+                  onChange={(e) => updatePackageField(i, "description", e.target.value)}
+                  placeholder="Description (optional)"
+                  className="w-full rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+                />
+
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-cloud-500">Feature bullet points for this package</label>
+                  <div className="flex gap-2">
+                    <input
+                      value={packageFeatureInput[i] || ""}
+                      onChange={(e) => setPackageFeatureInputValue(i, e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault()
+                          addPackageFeature(i)
+                        }
+                      }}
+                      placeholder="e.g. Free lifetime updates"
+                      className="flex-1 rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => addPackageFeature(i)}
+                      className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3.5 py-2.5 text-sm font-medium text-cloud-300 transition hover:bg-white/5"
+                    >
+                      <Plus size={15} /> Add
+                    </button>
+                  </div>
+                  <div className="mt-2 space-y-1.5">
+                    {(pkg.features || []).map((feature, fi) => (
+                      <div key={fi} className="flex items-center justify-between rounded-lg bg-ink-850 px-3 py-2 text-sm text-cloud-200">
+                        <span className="truncate">{feature}</span>
+                        <div className="flex items-center gap-1">
+                          <button type="button" onClick={() => movePackageFeature(i, fi, "up")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
+                            <ArrowUp size={13} />
+                          </button>
+                          <button type="button" onClick={() => movePackageFeature(i, fi, "down")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
+                            <ArrowDown size={13} />
+                          </button>
+                          <button type="button" onClick={() => removePackageFeature(i, fi)} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-rose-500/15 hover:text-rose-400">
+                            <X size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {(!pkg.features || pkg.features.length === 0) && (
+                      <p className="text-xs text-cloud-500">No feature bullets yet.</p>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
