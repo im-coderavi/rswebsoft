@@ -20,6 +20,13 @@ const productSchema = new mongoose.Schema(
     salePrice: { type: Number, min: 0 },
     saleEndsAt: { type: Date },
     features: [{ type: String, trim: true }],
+    packages: [
+      {
+        name: { type: String, required: true, trim: true },
+        price: { type: Number, required: true, min: 0 },
+        description: { type: String, default: "" },
+      },
+    ],
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
     brand: { type: mongoose.Schema.Types.ObjectId, ref: "Brand" },
     type: {
