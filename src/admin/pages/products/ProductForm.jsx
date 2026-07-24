@@ -267,12 +267,12 @@ export default function ProductForm() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="w-full">
       <Link to="/admin/products" className="mb-4 inline-flex items-center gap-1.5 text-sm text-cloud-400 hover:text-cloud-100">
         <ArrowLeft size={15} /> Back to products
       </Link>
 
-      <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-white/8 bg-ink-850 p-6">
+      <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-white/8 bg-ink-850 p-8">
         <div>
           <label className="mb-1.5 block text-xs font-medium text-cloud-400">Product Name</label>
           <input

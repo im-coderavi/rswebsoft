@@ -68,26 +68,32 @@ function TrendIndicator({ trend }) {
 function StatCard({ label, icon: Icon, tone, bg, value, trend, isLoading, delay }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className="rounded-2xl border border-white/8 bg-ink-850 p-5"
+      transition={{ duration: 0.5, delay, ease: [0.21, 0.47, 0.32, 0.98] }}
+      className="group relative rounded-xl border border-white/10 bg-gradient-to-br from-ink-850 to-ink-900 p-6 transition-all duration-300 hover:border-white/20 hover:shadow-lg hover:shadow-ink-950/50"
     >
-      <div className="flex items-center gap-3">
-        <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${bg} ${tone}`}>
-          <Icon size={20} />
-        </span>
-        <div>
-          <div className="flex items-center gap-2">
+      <div className="absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{
+        background: `radial-gradient(circle at top right, ${bg.replace('bg-', 'rgba(').split('/')[0]}20), transparent)`
+      }} />
+
+      <div className="relative flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
             {isLoading ? (
-              <div className="font-display text-2xl font-bold text-cloud-100">…</div>
+              <div className="font-display text-3xl font-bold text-cloud-100">…</div>
             ) : (
-              <AnimatedCounter value={String(value ?? 0)} className="font-display text-2xl font-bold text-cloud-100" />
+              <>
+                <AnimatedCounter value={String(value ?? 0)} className="font-display text-3xl font-bold text-cloud-100" />
+                {!isLoading && trend != null && <TrendIndicator trend={trend} />}
+              </>
             )}
-            {!isLoading && <TrendIndicator trend={trend} />}
           </div>
-          <div className="text-xs text-cloud-400">{label}</div>
+          <div className="text-xs font-medium text-cloud-500">{label}</div>
         </div>
+        <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-lg ${bg} ${tone} transition-transform duration-300 group-hover:scale-110`}>
+          <Icon size={24} />
+        </span>
       </div>
     </motion.div>
   )
@@ -100,12 +106,28 @@ export default function Dashboard() {
   let cardIndex = 0
 
   return (
-    <div className="space-y-8">
-      <PageHeader title="Dashboard" description="Overview of your catalog and activity." />
+    <div className="space-y-10">
+      <div>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <PageHeader title="Dashboard" description="Real-time overview of your catalog, sales, and site content." />
+        </motion.div>
+      </div>
 
-      {CLUSTERS.map((cluster) => (
-        <div key={cluster.label}>
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-cloud-600">{cluster.label}</p>
+      {CLUSTERS.map((cluster, clusterIndex) => (
+        <motion.div
+          key={cluster.label}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: clusterIndex * 0.1 }}
+        >
+          <div className="mb-4 flex items-center gap-2">
+            <div className="h-1 w-1 rounded-full bg-emerald-500" />
+            <p className="text-xs font-bold uppercase tracking-widest text-cloud-500">{cluster.label}</p>
+          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {cluster.cards.map((card) => {
               const delay = cardIndex * 0.06
@@ -125,11 +147,19 @@ export default function Dashboard() {
               )
             })}
           </div>
-        </div>
+        </motion.div>
       ))}
 
-      <div>
-        <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-cloud-600">Quick Actions</p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="rounded-xl border border-white/10 bg-gradient-to-r from-emerald-500/5 to-transparent p-6"
+      >
+        <div className="mb-4 flex items-center gap-2">
+          <div className="h-1 w-1 rounded-full bg-emerald-500" />
+          <p className="text-xs font-bold uppercase tracking-widest text-cloud-500">Quick Actions</p>
+        </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {QUICK_ACTIONS.map((action) => (
             <Button
@@ -137,13 +167,13 @@ export default function Dashboard() {
               variant="secondary"
               icon={action.icon}
               onClick={() => navigate(action.to)}
-              className="w-full justify-center"
+              className="w-full justify-center transition-all duration-300 hover:bg-emerald-500/20"
             >
               {action.label}
             </Button>
           ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

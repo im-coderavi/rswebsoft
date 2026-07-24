@@ -25,7 +25,7 @@ export default function TypedProductList({ type, newLabel, emptyMessage }) {
     type,
     search: search || undefined,
     status: status || undefined,
-    limit: 100,
+    limit: 50,
   })
   const deleteProduct = useDeleteProduct()
 

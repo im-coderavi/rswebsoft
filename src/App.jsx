@@ -26,6 +26,7 @@ import Login from "./admin/pages/Login"
 import Dashboard from "./admin/pages/Dashboard"
 import ProductList from "./admin/pages/products/ProductList"
 import ProductForm from "./admin/pages/products/ProductForm"
+import PackageForm from "./admin/pages/products/PackageForm"
 import DeliveredWebsiteList from "./admin/pages/products/DeliveredWebsiteList"
 import PackageList from "./admin/pages/products/PackageList"
 import CategoryList from "./admin/pages/categories/CategoryList"
@@ -79,6 +80,8 @@ function App() {
                 <Route path="products/:id/edit" element={<ProductForm />} />
                 <Route path="delivered-websites" element={<DeliveredWebsiteList />} />
                 <Route path="packages" element={<PackageList />} />
+                <Route path="packages/new" element={<PackageForm />} />
+                <Route path="packages/:id/edit" element={<PackageForm />} />
                 <Route path="categories" element={<CategoryList />} />
                 <Route path="sections" element={<HomeSectionList />} />
                 <Route path="brands" element={<BrandList />} />
