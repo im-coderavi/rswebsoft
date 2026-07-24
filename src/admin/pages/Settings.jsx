@@ -9,7 +9,7 @@ export default function Settings() {
   const { data: settings, isLoading } = usePaymentSettings()
   const updateSettings = useUpdatePaymentSettings()
 
-  const [form, setForm] = useState({ upiId: "", payeeName: "", note: "" })
+  const [form, setForm] = useState({ upiId: "", payeeName: "", note: "", whatsappNumber: "" })
   const [qrImages, setQrImages] = useState([])
 
   useEffect(() => {
@@ -18,6 +18,7 @@ export default function Settings() {
       upiId: settings.upiId || "",
       payeeName: settings.payeeName || "",
       note: settings.note || "",
+      whatsappNumber: settings.whatsappNumber || "",
     })
     setQrImages(settings.qrImage?.url ? [settings.qrImage] : [])
   }, [settings])
@@ -64,6 +65,17 @@ export default function Settings() {
             value={form.payeeName}
             onChange={(e) => setField("payeeName", e.target.value)}
             placeholder="e.g. RSWebSoft"
+            className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+            WhatsApp Number <span className="text-cloud-500">(with country code, e.g. 919876543210 — used for the "Buy on WhatsApp" button on package cards)</span>
+          </label>
+          <input
+            value={form.whatsappNumber}
+            onChange={(e) => setField("whatsappNumber", e.target.value)}
+            placeholder="919876543210"
             className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
           />
         </div>

@@ -5,6 +5,7 @@ const paymentSettingSchema = new mongoose.Schema(
   {
     upiId: { type: String, default: "" },
     payeeName: { type: String, default: "" },
+    whatsappNumber: { type: String, default: "" },
     qrImage: {
       url: { type: String, default: "" },
       publicId: { type: String, default: "" },
