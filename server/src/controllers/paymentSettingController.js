@@ -7,10 +7,10 @@ export const getPaymentSettings = asyncHandler(async (req, res) => {
 })
 
 export const updatePaymentSettings = asyncHandler(async (req, res) => {
-  const { upiId, payeeName, qrImage, note, whatsappNumber } = req.body
+  const { upiId, payeeName, qrImage, note, whatsappNumber, autoSendOnVerify } = req.body
   const settings = await PaymentSetting.findOneAndUpdate(
     {},
-    { upiId, payeeName, qrImage, note, whatsappNumber },
+    { upiId, payeeName, qrImage, note, whatsappNumber, autoSendOnVerify },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   )
   res.json(settings)
