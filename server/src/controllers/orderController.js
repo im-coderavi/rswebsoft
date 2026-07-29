@@ -2,9 +2,14 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/apiError.js"
 import Order from "../models/Order.js"
 import Product from "../models/Product.js"
+import PaymentSetting from "../models/PaymentSetting.js"
+import { sendAdminNewOrderEmail, sendCustomerDeliveryEmail } from "../services/mailService.js"
 
 export const listOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 }).populate("user", "name email")
+  const orders = await Order.find()
+    .sort({ createdAt: -1 })
+    .populate("user", "name email")
+    .populate("items.product", "name slug downloadUrl")
   res.json(orders)
 })
 
@@ -19,6 +24,55 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   if (!order) throw new ApiError(404, "Order not found")
 
   order.status = status
+  await order.save()
+  res.json(order)
+})
+
+// Admin action: confirms the UPI payment reference was checked and is valid.
+// If auto-send is enabled, immediately delivers the product too.
+export const verifyPayment = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id)
+  if (!order) throw new ApiError(404, "Order not found")
+  if (order.status !== "pending") {
+    throw new ApiError(400, `Cannot verify payment for an order in "${order.status}" status`)
+  }
+
+  order.status = "paid"
+  await order.save()
+
+  const settings = await PaymentSetting.findOne()
+  if (settings?.autoSendOnVerify) {
+    const populated = await Order.findById(order._id).populate("items.product", "name slug downloadUrl")
+    const result = await sendCustomerDeliveryEmail(populated)
+    if (result.ok) {
+      populated.status = "fulfilled"
+      populated.productSentAt = new Date()
+      await populated.save()
+      return res.json(populated)
+    }
+    // Payment is still verified even if the auto-send email failed; admin can retry via "Send Product".
+    return res.json(order)
+  }
+
+  res.json(order)
+})
+
+// Admin action: manually deliver the product to the customer (used when
+// auto-send is off, or to retry a failed auto-send).
+export const sendProduct = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id).populate("items.product", "name slug downloadUrl")
+  if (!order) throw new ApiError(404, "Order not found")
+  if (order.status !== "paid") {
+    throw new ApiError(400, `Cannot send product for an order in "${order.status}" status — payment must be verified first`)
+  }
+
+  const result = await sendCustomerDeliveryEmail(order)
+  if (!result.ok) {
+    throw new ApiError(502, `Failed to send delivery email: ${result.error}`)
+  }
+
+  order.status = "fulfilled"
+  order.productSentAt = new Date()
   await order.save()
   res.json(order)
 })
@@ -63,6 +117,10 @@ export const createOrder = asyncHandler(async (req, res) => {
     total,
     paymentReference: paymentReference || "",
   })
+
+  const emailResult = await sendAdminNewOrderEmail(order)
+  order.orderNotified = emailResult.ok
+  await order.save()
 
   res.status(201).json(order)
 })
