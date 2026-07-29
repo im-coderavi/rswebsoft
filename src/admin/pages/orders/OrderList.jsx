@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import toast from "react-hot-toast"
-import { useOrders, useUpdateOrderStatus } from "../../../hooks/useOrders"
+import { CheckCircle2, Send } from "lucide-react"
+import { useOrders, useUpdateOrderStatus, useVerifyOrderPayment, useSendOrderProduct } from "../../../hooks/useOrders"
 import { apiErrorMessage } from "../../../lib/api"
 import DataTable from "../../components/DataTable"
 
@@ -16,11 +17,31 @@ const STATUS_STYLES = {
 export default function OrderList() {
   const { data: orders, isLoading } = useOrders()
   const updateStatus = useUpdateOrderStatus()
+  const verifyPayment = useVerifyOrderPayment()
+  const sendProduct = useSendOrderProduct()
 
   async function handleStatusChange(id, status) {
     try {
       await updateStatus.mutateAsync({ id, status })
       toast.success("Order status updated")
+    } catch (err) {
+      toast.error(apiErrorMessage(err))
+    }
+  }
+
+  async function handleVerifyPayment(id) {
+    try {
+      const updated = await verifyPayment.mutateAsync(id)
+      toast.success(updated.status === "fulfilled" ? "Payment verified and product auto-sent" : "Payment verified")
+    } catch (err) {
+      toast.error(apiErrorMessage(err))
+    }
+  }
+
+  async function handleSendProduct(id) {
+    try {
+      await sendProduct.mutateAsync(id)
+      toast.success("Product sent to customer")
     } catch (err) {
       toast.error(apiErrorMessage(err))
     }
@@ -50,8 +71,31 @@ export default function OrderList() {
           <span className="text-cloud-600">Guest</span>
         ),
     },
-    { key: "items", label: "Items", render: (o) => o.items.length },
-    { key: "total", label: "Total", render: (o) => `$${o.total.toFixed(2)}` },
+    {
+      key: "items",
+      label: "Products",
+      render: (o) => (
+        <div className="space-y-1">
+          {o.items.map((item, idx) => (
+            <div key={idx} className="text-xs">
+              <span className="text-cloud-200">{item.name}</span>
+              <span className="text-cloud-600"> ×{item.qty}</span>
+              {item.product?.downloadUrl && o.status === "fulfilled" && (
+                <a
+                  href={item.product.downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-1.5 text-brand-300 hover:underline"
+                >
+                  link
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    { key: "total", label: "Total", render: (o) => `₹${o.total.toLocaleString("en-IN")}` },
     {
       key: "paymentReference",
       label: "UPI Ref",
@@ -83,6 +127,31 @@ export default function OrderList() {
       rows={orders || []}
       loading={isLoading}
       emptyMessage="No orders yet — this fills up once the storefront checkout is live."
+      actions={(o) => (
+        <>
+          {o.status === "pending" && (
+            <button
+              onClick={() => handleVerifyPayment(o._id)}
+              disabled={verifyPayment.isPending}
+              className="flex items-center gap-1 rounded-lg bg-sky-500/15 px-2.5 py-1.5 text-xs font-medium text-sky-400 transition hover:bg-sky-500/25 disabled:opacity-60"
+            >
+              <CheckCircle2 size={13} /> Verify Payment
+            </button>
+          )}
+          {o.status === "paid" && (
+            <button
+              onClick={() => handleSendProduct(o._id)}
+              disabled={sendProduct.isPending}
+              className="flex items-center gap-1 rounded-lg bg-emerald-500/15 px-2.5 py-1.5 text-xs font-medium text-emerald-400 transition hover:bg-emerald-500/25 disabled:opacity-60"
+            >
+              <Send size={13} /> Send Product
+            </button>
+          )}
+          {o.status === "fulfilled" && o.productSentAt && (
+            <span className="text-xs text-cloud-500">Sent {new Date(o.productSentAt).toLocaleDateString()}</span>
+          )}
+        </>
+      )}
     />
   )
 }
