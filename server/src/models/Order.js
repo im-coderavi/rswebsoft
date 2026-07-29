@@ -32,6 +32,8 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "paid", "fulfilled", "cancelled"],
       default: "pending",
     },
+    orderNotified: { type: Boolean, default: false },
+    productSentAt: { type: Date, default: null },
   },
   { timestamps: true }
 )

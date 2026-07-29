@@ -11,6 +11,7 @@ const paymentSettingSchema = new mongoose.Schema(
       publicId: { type: String, default: "" },
     },
     note: { type: String, default: "" },
+    autoSendOnVerify: { type: Boolean, default: false },
   },
   { timestamps: true }
 )
