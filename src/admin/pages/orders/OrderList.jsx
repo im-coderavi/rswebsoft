@@ -32,7 +32,11 @@ export default function OrderList() {
   async function handleVerifyPayment(id) {
     try {
       const updated = await verifyPayment.mutateAsync(id)
-      toast.success(updated.status === "fulfilled" ? "Payment verified and product auto-sent" : "Payment verified")
+      if (updated.autoSendFailed) {
+        toast.error("Payment verified, but auto-send email failed — use Send Product to retry")
+      } else {
+        toast.success(updated.status === "fulfilled" ? "Payment verified and product auto-sent" : "Payment verified")
+      }
     } catch (err) {
       toast.error(apiErrorMessage(err))
     }

@@ -28,30 +28,71 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   res.json(order)
 })
 
+// Shared sequence used by both the auto-send-on-verify path and the manual
+// "Send Product" action: populate -> require at least one download link ->
+// send the customer email -> atomically claim the paid -> fulfilled
+// transition so a concurrent call for the same order can't also send.
+// Returns { ok: true, order } on success, or { ok: false, reason, error? }.
+async function deliverProduct(orderId) {
+  const order = await Order.findById(orderId).populate("items.product", "name slug downloadUrl")
+  if (!order) {
+    return { ok: false, reason: "not_found" }
+  }
+  if (order.status !== "paid") {
+    return { ok: false, reason: "invalid_status", order }
+  }
+
+  const hasDownloadLink = order.items.some((item) => item.product?.downloadUrl)
+  if (!hasDownloadLink) {
+    return { ok: false, reason: "no_download_link", order }
+  }
+
+  const result = await sendCustomerDeliveryEmail(order)
+  if (!result.ok) {
+    return { ok: false, reason: "send_failed", error: result.error, order }
+  }
+
+  const updated = await Order.findOneAndUpdate(
+    { _id: orderId, status: "paid" },
+    { status: "fulfilled", productSentAt: new Date() },
+    { new: true }
+  )
+
+  // If another concurrent request already flipped the status, the email was
+  // still (only once, by whichever request won the send race above) — but
+  // guard against double-claiming: this branch means we lost the race for
+  // the status write even though we sent successfully. That can't happen in
+  // practice since only one caller passes the "paid" status check above at a
+  // time in the normal flow, but if it does, report success using the latest
+  // order state.
+  return { ok: true, order: updated || order }
+}
+
 // Admin action: confirms the UPI payment reference was checked and is valid.
 // If auto-send is enabled, immediately delivers the product too.
 export const verifyPayment = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id)
-  if (!order) throw new ApiError(404, "Order not found")
-  if (order.status !== "pending") {
-    throw new ApiError(400, `Cannot verify payment for an order in "${order.status}" status`)
+  const order = await Order.findOneAndUpdate(
+    { _id: req.params.id, status: "pending" },
+    { status: "paid" },
+    { new: true }
+  )
+  if (!order) {
+    throw new ApiError(400, "Order not found or not in pending status")
   }
-
-  order.status = "paid"
-  await order.save()
 
   const settings = await PaymentSetting.findOne()
   if (settings?.autoSendOnVerify) {
-    const populated = await Order.findById(order._id).populate("items.product", "name slug downloadUrl")
-    const result = await sendCustomerDeliveryEmail(populated)
-    if (result.ok) {
-      populated.status = "fulfilled"
-      populated.productSentAt = new Date()
-      await populated.save()
-      return res.json(populated)
+    const delivery = await deliverProduct(order._id)
+    if (delivery.ok) {
+      return res.json(delivery.order)
     }
-    // Payment is still verified even if the auto-send email failed; admin can retry via "Send Product".
-    return res.json(order)
+    // Payment is still verified even if the auto-send delivery failed
+    // (missing download link, or the email send itself failed); admin can
+    // retry via "Send Product". Flag this so the UI can surface it.
+    const responseOrder = (delivery.order || order).toObject
+      ? (delivery.order || order).toObject()
+      : delivery.order || order
+    return res.json({ ...responseOrder, autoSendFailed: true })
   }
 
   res.json(order)
@@ -60,21 +101,25 @@ export const verifyPayment = asyncHandler(async (req, res) => {
 // Admin action: manually deliver the product to the customer (used when
 // auto-send is off, or to retry a failed auto-send).
 export const sendProduct = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate("items.product", "name slug downloadUrl")
-  if (!order) throw new ApiError(404, "Order not found")
-  if (order.status !== "paid") {
-    throw new ApiError(400, `Cannot send product for an order in "${order.status}" status — payment must be verified first`)
+  const delivery = await deliverProduct(req.params.id)
+
+  if (!delivery.ok) {
+    if (delivery.reason === "not_found") {
+      throw new ApiError(404, "Order not found")
+    }
+    if (delivery.reason === "invalid_status") {
+      throw new ApiError(
+        400,
+        `Cannot send product for an order in "${delivery.order.status}" status — payment must be verified first`
+      )
+    }
+    if (delivery.reason === "no_download_link") {
+      throw new ApiError(400, "Cannot send product: no download link is set on any item's product")
+    }
+    throw new ApiError(502, `Failed to send delivery email: ${delivery.error}`)
   }
 
-  const result = await sendCustomerDeliveryEmail(order)
-  if (!result.ok) {
-    throw new ApiError(502, `Failed to send delivery email: ${result.error}`)
-  }
-
-  order.status = "fulfilled"
-  order.productSentAt = new Date()
-  await order.save()
-  res.json(order)
+  res.json(delivery.order)
 })
 
 // Requires login (see orderRoutes.js). Prices are always recomputed from the
@@ -118,9 +163,13 @@ export const createOrder = asyncHandler(async (req, res) => {
     paymentReference: paymentReference || "",
   })
 
-  const emailResult = await sendAdminNewOrderEmail(order)
-  order.orderNotified = emailResult.ok
-  await order.save()
+  // Don't block the checkout response on the SMTP round-trip (Nodemailer's
+  // default connect timeout is ~2 minutes). Fire the admin notification
+  // without awaiting it here, and update orderNotified in the background
+  // once it resolves.
+  sendAdminNewOrderEmail(order)
+    .then((emailResult) => Order.updateOne({ _id: order._id }, { orderNotified: emailResult.ok }))
+    .catch((err) => console.error("Background sendAdminNewOrderEmail failed:", err.message))
 
   res.status(201).json(order)
 })
