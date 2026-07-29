@@ -51,19 +51,19 @@ ADMIN_NOTIFY_EMAIL=
 
 - [ ] **Step 3: Add real SMTP keys to `server/.env`**
 
-Append to the end of `server/.env` (this file is git-ignored, confirmed in Global Constraints):
+Append to the end of `server/.env` (this file is git-ignored, confirmed in Global Constraints). Use the real Gmail address and app password provided out-of-band (never write real credentials into this plan document or any other committed file):
 
 ```
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_SECURE=true
-SMTP_USER=avishekgiri31@gmail.com
-SMTP_PASS=rkajfdrbkvsplymv
-SMTP_FROM=avishekgiri31@gmail.com
-ADMIN_NOTIFY_EMAIL=avishekgiri31@gmail.com
+SMTP_USER=<redacted — see server/.env>
+SMTP_PASS=<redacted — see server/.env>
+SMTP_FROM=<redacted — see server/.env>
+ADMIN_NOTIFY_EMAIL=<redacted — see server/.env>
 ```
 
-Note: Gmail app passwords are shown with spaces for readability but must be stored without spaces — `rkaj fdrb kvsp lymv` becomes `rkajfdrbkvsplymv`.
+Note: Gmail app passwords are shown by Google with spaces for readability but must be stored without spaces when pasted into `.env`.
 
 - [ ] **Step 4: Create the transporter config**
 
