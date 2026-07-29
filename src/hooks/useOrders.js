@@ -16,6 +16,22 @@ export function useUpdateOrderStatus() {
   })
 }
 
+export function useVerifyOrderPayment() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id) => (await api.put(`/orders/${id}/verify-payment`)).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["orders"] }),
+  })
+}
+
+export function useSendOrderProduct() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id) => (await api.post(`/orders/${id}/send-product`)).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["orders"] }),
+  })
+}
+
 // Requires login — the auth token is attached automatically by the axios interceptor.
 export function useCreateOrder() {
   return useMutation({
