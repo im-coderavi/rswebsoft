@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <body style="margin:0;padding:0;background:#f4f4f7;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f7;padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;">
+            <tr>
+              <td style="background:#0f172a;padding:20px 28px;">
+                <span style="color:#ffffff;font-size:18px;font-weight:bold;">New Order — Payment Verification Needed</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px 28px;">
+                <p style="margin:0 0 12px;color:#334155;font-size:14px;">Order <strong>#{{orderId}}</strong> was placed on {{createdAt}}.</p>
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px;font-size:14px;color:#334155;">
+                  <tr><td style="padding:4px 0;width:140px;color:#64748b;">Customer</td><td style="padding:4px 0;">{{customerName}}</td></tr>
+                  <tr><td style="padding:4px 0;color:#64748b;">Email</td><td style="padding:4px 0;">{{customerEmail}}</td></tr>
+                  <tr><td style="padding:4px 0;color:#64748b;">Phone</td><td style="padding:4px 0;">{{customerPhone}}</td></tr>
+                  <tr><td style="padding:4px 0;color:#64748b;">Payment Reference</td><td style="padding:4px 0;">{{paymentReference}}</td></tr>
+                </table>
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;">
+                  <thead>
+                    <tr style="background:#f1f5f9;">
+                      <th align="left" style="padding:8px;border:1px solid #e2e8f0;">Product</th>
+                      <th align="right" style="padding:8px;border:1px solid #e2e8f0;">Qty</th>
+                      <th align="right" style="padding:8px;border:1px solid #e2e8f0;">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{itemsRows}}
+                  </tbody>
+                </table>
+
+                <p style="margin:16px 0 0;font-size:15px;color:#0f172a;"><strong>Total: ₹{{total}}</strong></p>
+
+                <p style="margin:20px 0 0;font-size:13px;color:#64748b;">Log in to the admin panel → Orders to verify this payment and deliver the product.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
