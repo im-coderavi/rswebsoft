@@ -9,7 +9,7 @@ export default function Settings() {
   const { data: settings, isLoading } = usePaymentSettings()
   const updateSettings = useUpdatePaymentSettings()
 
-  const [form, setForm] = useState({ upiId: "", payeeName: "", note: "", whatsappNumber: "" })
+  const [form, setForm] = useState({ upiId: "", payeeName: "", note: "", whatsappNumber: "", autoSendOnVerify: false })
   const [qrImages, setQrImages] = useState([])
 
   useEffect(() => {
@@ -19,6 +19,7 @@ export default function Settings() {
       payeeName: settings.payeeName || "",
       note: settings.note || "",
       whatsappNumber: settings.whatsappNumber || "",
+      autoSendOnVerify: Boolean(settings.autoSendOnVerify),
     })
     setQrImages(settings.qrImage?.url ? [settings.qrImage] : [])
   }, [settings])
@@ -92,6 +93,29 @@ export default function Settings() {
         <div>
           <label className="mb-1.5 block text-xs font-medium text-cloud-400">UPI QR Code</label>
           <ImageUploader images={qrImages} onChange={setQrImages} max={1} />
+        </div>
+
+        <div className="flex items-center justify-between rounded-xl border border-white/10 bg-ink-800 px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-cloud-100">Auto-send product on payment verification</p>
+            <p className="mt-0.5 text-xs text-cloud-500">
+              When on, verifying a payment immediately emails the customer their invoice and download
+              link. When off, you'll click "Send Product" manually in Orders after verifying.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setField("autoSendOnVerify", !form.autoSendOnVerify)}
+            className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+              form.autoSendOnVerify ? "bg-emerald-500" : "bg-ink-700"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition ${
+                form.autoSendOnVerify ? "left-5" : "left-0.5"
+              }`}
+            />
+          </button>
         </div>
 
         <div className="flex justify-end border-t border-white/8 pt-5">
