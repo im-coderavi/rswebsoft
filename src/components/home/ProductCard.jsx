@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { Eye, ShoppingCart } from "lucide-react"
 import toast from "react-hot-toast"
 import StarRating from "../ui/StarRating"
@@ -19,7 +19,6 @@ function initialsOf(name) {
 
 export default function ProductCard({ product }) {
   const { add } = useCart()
-  const navigate = useNavigate()
   const [showPreview, setShowPreview] = useState(false)
   const image = product.images?.[0]?.url
   const tone = product.category?.tone || "violet"
@@ -55,7 +54,7 @@ export default function ProductCard({ product }) {
     if (product.demoUrl && (product.demoUrl.startsWith("http://") || product.demoUrl.startsWith("https://"))) {
       window.open(product.demoUrl, "_blank", "noopener,noreferrer")
     } else {
-      navigate(`/products/${product.slug}?preview=true`)
+      window.open(`/products/${product.slug}?preview=true`, "_blank", "noopener,noreferrer")
     }
   }
 

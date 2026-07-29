@@ -1,9 +1,7 @@
 import { ExternalLink, CheckCircle2, Eye, Globe } from "lucide-react"
-import { useNavigate } from "react-router-dom"
 import { cleanText } from "../../lib/text"
 
 export default function DeliveredWebsiteCard({ product }) {
-  const navigate = useNavigate()
   const demoUrl = product.demoUrl || (product.slug ? `/products/${product.slug}?preview=true` : "#")
   const isExternal = demoUrl.startsWith("http://") || demoUrl.startsWith("https://")
 
@@ -51,7 +49,7 @@ export default function DeliveredWebsiteCard({ product }) {
             />
           ) : (
             <button
-              onClick={() => navigate(demoUrl)}
+              onClick={() => window.open(demoUrl, "_blank", "noopener,noreferrer")}
               className="absolute inset-0 z-10 cursor-pointer"
               aria-label={`Visit ${product.name}`}
             />
@@ -109,7 +107,7 @@ export default function DeliveredWebsiteCard({ product }) {
             </a>
           ) : (
             <button
-              onClick={() => navigate(demoUrl)}
+              onClick={() => window.open(demoUrl, "_blank", "noopener,noreferrer")}
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-500/10 border border-brand-500/20 py-2.5 px-4 text-xs font-bold text-brand-300 transition hover:bg-brand-500/20 hover:text-white cursor-pointer"
             >
               <Eye size={14} /> View Website <ExternalLink size={12} />
