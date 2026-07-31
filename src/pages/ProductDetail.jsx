@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useParams, useNavigate, useSearchParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { 
   ShoppingCart, 
   Zap, 
@@ -26,7 +26,6 @@ import { toneGradient } from "../lib/tones"
 import { formatINR } from "../lib/currency"
 import { cleanText, cleanRichText } from "../lib/text"
 import RelatedProducts from "../components/product/RelatedProducts"
-import ProductPreviewModal from "../components/product/ProductPreviewModal"
 
 function initialsOf(name) {
   return name ? name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase() : "RS"
@@ -83,26 +82,20 @@ function ScarcityTimer() {
 export default function ProductDetail() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
   const { data: product, isLoading } = useProduct(slug)
   const { add } = useCart()
   const { data: paymentSettings } = usePaymentSettings()
   const [selectedImgIndex, setSelectedImgIndex] = useState(0)
   const [showFullDesc, setShowFullDesc] = useState(false)
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
-
-  useEffect(() => {
-    if (searchParams.get("preview") === "true") {
-      setIsPreviewOpen(true)
-    }
-  }, [searchParams])
 
   function handleOpenPreview(e) {
     if (e) {
       e.preventDefault()
       e.stopPropagation()
     }
-    setIsPreviewOpen(true)
+    if (product?.demoUrl) {
+      window.open(product.demoUrl, "_blank", "noopener,noreferrer")
+    }
   }
 
   if (isLoading) {
@@ -529,13 +522,6 @@ export default function ProductDetail() {
       <section className="container-rs pt-6">
         <RelatedProducts categoryId={product.category?._id} excludeId={product._id} />
       </section>
-
-      {/* FULL-SCREEN LIVE TEMPLATE PREVIEW MODAL */}
-      <ProductPreviewModal 
-        product={product} 
-        isOpen={isPreviewOpen} 
-        onClose={() => setIsPreviewOpen(false)} 
-      />
 
     </div>
   )

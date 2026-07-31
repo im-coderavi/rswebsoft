@@ -2,7 +2,10 @@ import { ExternalLink, CheckCircle2, Eye, Globe } from "lucide-react"
 import { cleanText } from "../../lib/text"
 
 export default function DeliveredWebsiteCard({ product }) {
-  const demoUrl = product.demoUrl || (product.slug ? `/products/${product.slug}?preview=true` : "#")
+  // Delivered showcase items are not for sale, so they must never link to
+  // an internal /products/:slug page. Real sites open directly; anything
+  // without a live demo URL falls back to the screenshot image instead.
+  const demoUrl = product.demoUrl || product.images?.[0]?.url || "#"
   const isExternal = demoUrl.startsWith("http://") || demoUrl.startsWith("https://")
 
   // Show max 3-4 points max as requested
