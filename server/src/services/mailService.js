@@ -61,10 +61,15 @@ export async function sendCustomerDeliveryEmail(order) {
       })
       .join("")
 
+    const discountRow = order.discountAmount > 0
+      ? `<p style="margin:16px 0 0;font-size:13px;color:#059669;">Coupon ${escapeHtml(order.couponCode)} applied: −₹${formatMoney(order.discountAmount)}</p>`
+      : ""
+
     const html = await renderTemplate(path.join(TEMPLATES_DIR, "customerDelivery.html"), {
       orderId: String(order._id).slice(-8),
       customerName: escapeHtml(order.customer.name),
       itemsRows,
+      discountRow,
       total: formatMoney(order.total),
       createdAt: formatDate(order.createdAt),
     })
