@@ -89,6 +89,12 @@ export default function OrderTrack() {
             </div>
           ))}
         </div>
+        {order.discountAmount > 0 && (
+          <div className="mt-4 flex items-center justify-between text-sm text-emerald-400">
+            <span>Coupon {order.couponCode}</span>
+            <span>−{formatINR(order.discountAmount)}</span>
+          </div>
+        )}
         <div className="mt-4 flex items-center justify-between border-t border-white/8 pt-4 font-display text-base font-bold text-cloud-100">
           <span>Total</span>
           <span>{formatINR(order.total)}</span>

@@ -99,7 +99,20 @@ export default function OrderList() {
         </div>
       ),
     },
-    { key: "total", label: "Total", render: (o) => `₹${o.total.toLocaleString("en-IN")}` },
+    {
+      key: "total",
+      label: "Total",
+      render: (o) => (
+        <div>
+          <div>₹{o.total.toLocaleString("en-IN")}</div>
+          {o.discountAmount > 0 && (
+            <div className="text-xs text-emerald-400">
+              {o.couponCode} (−₹{o.discountAmount.toLocaleString("en-IN")})
+            </div>
+          )}
+        </div>
+      ),
+    },
     {
       key: "paymentReference",
       label: "UPI Ref",
