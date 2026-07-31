@@ -1,9 +1,9 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/apiError.js"
 import Order from "../models/Order.js"
-import Product from "../models/Product.js"
 import PaymentSetting from "../models/PaymentSetting.js"
 import { sendAdminNewOrderEmail, sendCustomerDeliveryEmail } from "../services/mailService.js"
+import { buildPricedItems } from "../services/pricingService.js"
 
 export const listOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find()
@@ -134,24 +134,7 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Cart is empty")
   }
 
-  const productIds = items.map((i) => i.productId)
-  const products = await Product.find({ _id: { $in: productIds }, status: "published" })
-
-  if (products.length !== new Set(productIds).size) {
-    throw new ApiError(400, "One or more items are no longer available")
-  }
-
-  const productById = new Map(products.map((p) => [String(p._id), p]))
-  const orderItems = items.map((i) => {
-    const product = productById.get(i.productId)
-    const qty = Math.max(1, Number(i.qty) || 1)
-    return {
-      product: product._id,
-      name: product.name,
-      price: product.salePrice ?? product.price,
-      qty,
-    }
-  })
+  const orderItems = await buildPricedItems(items)
 
   const total = orderItems.reduce((sum, i) => sum + i.price * i.qty, 0)
 
