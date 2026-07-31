@@ -8,9 +8,10 @@ import { usePaymentSettings } from "../hooks/usePaymentSettings"
 import { useCreateOrder } from "../hooks/useOrders"
 import { apiErrorMessage } from "../lib/api"
 import { formatINR } from "../lib/currency"
+import CouponBox from "../components/cart/CouponBox"
 
 export default function Checkout() {
-  const { items, subtotal, clear } = useCart()
+  const { items, subtotal, discountAmount, total, coupon, clear } = useCart()
   const { user } = useAuth()
   const { data: settings, isLoading: loadingSettings } = usePaymentSettings()
   const createOrder = useCreateOrder()
@@ -46,6 +47,7 @@ export default function Checkout() {
         customer: form,
         items: items.map((i) => ({ productId: i.productId, qty: i.qty })),
         paymentReference,
+        couponCode: coupon?.code || "",
       })
       setSubmitted(true)
       clear()
@@ -161,6 +163,7 @@ export default function Checkout() {
         {/* summary */}
         <div className="h-fit space-y-4 rounded-2xl border border-white/8 bg-ink-850 p-6">
           <h2 className="font-display text-lg font-bold text-cloud-100">Order Summary</h2>
+          <CouponBox />
           <div className="space-y-2.5">
             {items.map((item) => (
               <div key={item.productId} className="flex justify-between text-sm text-cloud-400">
@@ -169,10 +172,20 @@ export default function Checkout() {
               </div>
             ))}
           </div>
-          <div className="border-t border-white/8 pt-4">
-            <div className="flex items-center justify-between font-display text-base font-bold text-cloud-100">
+          <div className="border-t border-white/8 pt-4 space-y-1.5">
+            <div className="flex items-center justify-between text-sm text-cloud-400">
+              <span>Subtotal</span>
+              <span className="text-cloud-100">{formatINR(subtotal)}</span>
+            </div>
+            {discountAmount > 0 && (
+              <div className="flex items-center justify-between text-sm text-emerald-400">
+                <span>Discount</span>
+                <span>−{formatINR(discountAmount)}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between pt-1.5 font-display text-base font-bold text-cloud-100">
               <span>Total</span>
-              <span>{formatINR(subtotal)}</span>
+              <span>{formatINR(total)}</span>
             </div>
           </div>
           <button
