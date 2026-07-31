@@ -3,13 +3,14 @@ import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
 import { useCart } from "../context/CartContext"
 import { toneGradient } from "../lib/tones"
 import { formatINR } from "../lib/currency"
+import CouponBox from "../components/cart/CouponBox"
 
 function initialsOf(name) {
   return name.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase()
 }
 
 export default function Cart() {
-  const { items, remove, updateQty, subtotal } = useCart()
+  const { items, remove, updateQty, subtotal, discountAmount, total } = useCart()
 
   if (items.length === 0) {
     return (
@@ -90,14 +91,23 @@ export default function Cart() {
         {/* summary */}
         <div className="h-fit rounded-2xl border border-white/8 bg-ink-850 p-6">
           <h2 className="mb-4 font-display text-lg font-bold text-cloud-100">Order Summary</h2>
+          <div className="mb-4">
+            <CouponBox />
+          </div>
           <div className="flex items-center justify-between text-sm text-cloud-400">
             <span>Subtotal</span>
             <span className="text-cloud-100">{formatINR(subtotal)}</span>
           </div>
+          {discountAmount > 0 && (
+            <div className="mt-2 flex items-center justify-between text-sm text-emerald-400">
+              <span>Discount</span>
+              <span>−{formatINR(discountAmount)}</span>
+            </div>
+          )}
           <div className="my-4 border-t border-white/8" />
           <div className="flex items-center justify-between font-display text-base font-bold text-cloud-100">
             <span>Total</span>
-            <span>{formatINR(subtotal)}</span>
+            <span>{formatINR(total)}</span>
           </div>
           <Link
             to="/checkout"
