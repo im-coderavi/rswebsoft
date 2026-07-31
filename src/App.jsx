@@ -33,6 +33,7 @@ import CategoryList from "./admin/pages/categories/CategoryList"
 import HomeSectionList from "./admin/pages/sections/HomeSectionList"
 import BrandList from "./admin/pages/brands/BrandList"
 import OrderList from "./admin/pages/orders/OrderList"
+import CouponList from "./admin/pages/coupons/CouponList"
 import Settings from "./admin/pages/Settings"
 import CustomerList from "./admin/pages/customers/CustomerList"
 import CustomerDetail from "./admin/pages/customers/CustomerDetail"
@@ -86,6 +87,7 @@ function App() {
                 <Route path="sections" element={<HomeSectionList />} />
                 <Route path="brands" element={<BrandList />} />
                 <Route path="orders" element={<OrderList />} />
+                <Route path="coupons" element={<CouponList />} />
                 <Route path="customers" element={<CustomerList />} />
                 <Route path="customers/:id" element={<CustomerDetail />} />
                 <Route path="demo-links" element={<DemoLinkList />} />
