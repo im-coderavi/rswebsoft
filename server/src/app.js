@@ -14,6 +14,7 @@ import userRoutes from "./routes/userRoutes.js"
 import demoLinkRoutes from "./routes/demoLinkRoutes.js"
 import subscriberRoutes from "./routes/subscriberRoutes.js"
 import homeSectionRoutes from "./routes/homeSectionRoutes.js"
+import couponRoutes from "./routes/couponRoutes.js"
 import { notFound, errorHandler } from "./middleware/errorHandler.js"
 
 const app = express()
@@ -36,6 +37,7 @@ app.use("/api/users", userRoutes)
 app.use("/api/demo-links", demoLinkRoutes)
 app.use("/api/subscribers", subscriberRoutes)
 app.use("/api/home-sections", homeSectionRoutes)
+app.use("/api/coupons", couponRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
