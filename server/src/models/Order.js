@@ -27,6 +27,8 @@ const orderSchema = new mongoose.Schema(
     total: { type: Number, required: true, min: 0 },
     paymentMethod: { type: String, enum: ["upi"], default: "upi" },
     paymentReference: { type: String, default: "", trim: true },
+    couponCode: { type: String, default: "", trim: true, uppercase: true },
+    discountAmount: { type: Number, default: 0, min: 0 },
     status: {
       type: String,
       enum: ["pending", "paid", "fulfilled", "cancelled"],

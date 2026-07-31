@@ -4,6 +4,8 @@ import Order from "../models/Order.js"
 import PaymentSetting from "../models/PaymentSetting.js"
 import { sendAdminNewOrderEmail, sendCustomerDeliveryEmail } from "../services/mailService.js"
 import { buildPricedItems } from "../services/pricingService.js"
+import { resolveCoupon } from "../services/couponService.js"
+import Coupon from "../models/Coupon.js"
 
 export const listOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find()
@@ -136,15 +138,30 @@ export const createOrder = asyncHandler(async (req, res) => {
 
   const orderItems = await buildPricedItems(items)
 
-  const total = orderItems.reduce((sum, i) => sum + i.price * i.qty, 0)
+  const { couponCode } = req.body
+  const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.qty, 0)
+
+  let discountAmount = 0
+  let appliedCoupon = null
+  if (couponCode) {
+    const resolved = await resolveCoupon(couponCode, orderItems, req.user._id)
+    appliedCoupon = resolved.coupon
+    discountAmount = resolved.discountAmount
+  }
 
   const order = await Order.create({
     user: req.user._id,
     customer,
     items: orderItems,
-    total,
+    total: subtotal - discountAmount,
+    couponCode: appliedCoupon?.code || "",
+    discountAmount,
     paymentReference: paymentReference || "",
   })
+
+  if (appliedCoupon) {
+    await Coupon.updateOne({ _id: appliedCoupon._id }, { $inc: { usedCount: 1 } })
+  }
 
   // Don't block the checkout response on the SMTP round-trip (Nodemailer's
   // default connect timeout is ~2 minutes). Fire the admin notification
