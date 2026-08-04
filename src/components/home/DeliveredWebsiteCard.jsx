@@ -1,7 +1,19 @@
-import { ExternalLink, CheckCircle2, Eye, Globe } from "lucide-react"
+import { ExternalLink, CheckCircle2, Eye, Globe, MessageCircle } from "lucide-react"
 import { cleanText } from "../../lib/text"
+import { useDeliveredWebsiteSettings } from "../../hooks/useDeliveredWebsiteSettings"
 
 export default function DeliveredWebsiteCard({ product }) {
+  const { data: settings } = useDeliveredWebsiteSettings()
+
+  // Admin leaves the number blank when they don't want to be contacted this
+  // way, so the button simply isn't rendered.
+  const whatsappNumber = settings?.whatsappNumber
+  const enquiryUrl = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+        `Hi! I'm interested in a website like "${product.name}". Can you tell me more?`
+      )}`
+    : null
+
   // Delivered showcase items are not for sale, so they must never link to
   // an internal /products/:slug page. Real sites open directly; anything
   // without a live demo URL falls back to the screenshot image instead.
@@ -58,13 +70,11 @@ export default function DeliveredWebsiteCard({ product }) {
             />
           )}
 
-          {/* Badges Overlay */}
-          {product.displayTag ? (
-            <span className="absolute left-2.5 top-2.5 z-20 rounded-md bg-emerald-500/90 backdrop-blur-sm px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm pointer-events-none">
-              {product.displayTag}
-            </span>
-          ) : null}
-
+          {/* No displayTag badge here on purpose. It is free text that is
+              usually pasted in as a whole feature list, so any badge built
+              from it covers the screenshot — and the same points are already
+              listed under the card. The screenshot is the point of this card;
+              nothing should sit on top of it but the price. */}
           {product.price && (
             <span className="absolute right-2.5 top-2.5 z-20 rounded-full bg-ink-950/90 backdrop-blur-sm px-2.5 py-0.5 text-xs font-extrabold text-cloud-100 shadow-sm border border-white/10 pointer-events-none">
               Starting ₹{product.price.toLocaleString("en-IN")}
@@ -97,8 +107,19 @@ export default function DeliveredWebsiteCard({ product }) {
           </ul>
         </div>
 
-        {/* Action Button: ALWAYS View Website */}
-        <div className="mt-5 pt-3 border-t border-white/5 relative z-20">
+        {/* Actions: Contact sits above View Website — a prospect asking for a
+            site like this one is the outcome this showcase exists for. */}
+        <div className="mt-5 space-y-2 pt-3 border-t border-white/5 relative z-20">
+          {enquiryUrl && (
+            <a
+              href={enquiryUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/25 py-2.5 px-4 text-xs font-bold text-emerald-400 transition hover:bg-emerald-500/20 hover:text-emerald-300 cursor-pointer"
+            >
+              <MessageCircle size={14} /> Contact Us
+            </a>
+          )}
           {isExternal ? (
             <a
               href={demoUrl}
