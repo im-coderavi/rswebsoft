@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import toast from "react-hot-toast"
 import { CheckCircle2, Send } from "lucide-react"
 import { useOrders, useUpdateOrderStatus, useVerifyOrderPayment, useSendOrderProduct } from "../../../hooks/useOrders"
@@ -16,6 +16,11 @@ const STATUS_STYLES = {
 }
 
 export default function OrderList() {
+  // The WhatsApp new-order alert links here as ?order=<last 8 of the id>, so
+  // the admin lands on that one order instead of hunting for it in the list.
+  const [searchParams] = useSearchParams()
+  const orderFromLink = searchParams.get("order") ?? ""
+
   const { data: orders, isLoading } = useOrders()
   const updateStatus = useUpdateOrderStatus()
   const verifyPayment = useVerifyOrderPayment()
@@ -162,6 +167,7 @@ export default function OrderList() {
       rows={orders || []}
       loading={isLoading}
       searchable
+      initialQuery={orderFromLink}
       searchKeys={[
         (o) => o.customer?.name,
         (o) => o.customer?.email,

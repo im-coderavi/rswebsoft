@@ -74,21 +74,63 @@ async function send(text) {
   return result
 }
 
+// Keeps the message short enough to survive being carried in a GET query
+// string, which is how CallMeBot takes it.
+const MAX_ITEMS_LISTED = 5
+
+// Cut down to a name that still reads on a phone. Product names here run to
+// 60+ characters, which wraps into a wall of text on a small screen.
+function shortName(name = "") {
+  const clean = String(name).trim()
+  return clean.length > 38 ? `${clean.slice(0, 37)}…` : clean
+}
+
 export async function sendNewOrderWhatsapp(order) {
-  const itemCount = order.items?.reduce((sum, i) => sum + (i.qty || 1), 0) ?? 0
-  const first = order.items?.[0]?.name ?? "an item"
-  const extra = order.items?.length > 1 ? ` +${order.items.length - 1} more` : ""
+  const shortId = String(order._id).slice(-8)
+  const items = order.items ?? []
+  const admin = clientUrl()
 
-  const text = [
-    `*New order* #${String(order._id).slice(-8)}`,
-    `₹${formatMoney(order.total)} · ${order.customer?.name ?? "Unknown"}`,
-    `${itemCount} item${itemCount === 1 ? "" : "s"}: ${first}${extra}`,
-    order.paymentReference ? `UPI ref: ${order.paymentReference}` : "No UPI ref given",
+  const itemLines = items
+    .slice(0, MAX_ITEMS_LISTED)
+    .map((i) => `• ${shortName(i.name)} ×${i.qty} — ₹${formatMoney(i.price * i.qty)}`)
+  if (items.length > MAX_ITEMS_LISTED) {
+    itemLines.push(`• _+${items.length - MAX_ITEMS_LISTED} more_`)
+  }
+
+  const customerNumber = toWhatsappNumber(order.customer?.phone ?? "")
+
+  const lines = [
+    `🛒 *New order · ₹${formatMoney(order.total)}*`,
+    `_#${shortId}_`,
     "",
-    `Verify: ${clientUrl()}/admin/orders`,
-  ].join("\n")
+    `*${order.customer?.name ?? "Unknown"}*`,
+    order.customer?.phone ? `📞 ${order.customer.phone}` : null,
+    order.customer?.email ? `✉️ ${order.customer.email}` : null,
+    "",
+    ...itemLines,
+  ]
 
-  return send(text)
+  if (order.discountAmount > 0) {
+    lines.push("", `🏷️ ${order.couponCode} · −₹${formatMoney(order.discountAmount)}`)
+  }
+
+  lines.push(
+    "",
+    order.paymentReference
+      ? `💳 UPI ref *${order.paymentReference}*`
+      : "⚠️ *No UPI reference given*",
+    "",
+    "*Verify this order*",
+    // Lands on the Orders table already filtered to this one — see the
+    // ?order= handling in the admin OrderList.
+    `${admin}/admin/orders?order=${shortId}`
+  )
+
+  if (customerNumber) {
+    lines.push("", `*Message ${order.customer.name?.split(" ")[0] ?? "the buyer"}*`, `https://wa.me/${customerNumber}`)
+  }
+
+  return send(lines.filter((l) => l !== null).join("\n"))
 }
 
 export async function sendTestWhatsapp() {

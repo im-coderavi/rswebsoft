@@ -13,12 +13,16 @@ export default function DataTable({
   actions,
   searchable = false,
   searchKeys = [],
+  initialQuery = "",
   filters = [],
   selectable = false,
   selectedIds,
   onSelectionChange,
 }) {
-  const [query, setQuery] = useState("")
+  // Seeded once so a link can open the table already filtered — the WhatsApp
+  // order alert points at ?order=<id>. It stays editable afterwards; this is a
+  // starting value, not a controlled prop.
+  const [query, setQuery] = useState(initialQuery)
   const [activeFilters, setActiveFilters] = useState({})
   const [sort, setSort] = useState({ key: null, direction: "asc" })
 
