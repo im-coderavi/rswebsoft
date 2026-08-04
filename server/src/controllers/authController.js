@@ -79,7 +79,6 @@ export const login = asyncHandler(async (req, res) => {
 })
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000 // 1 hour
-const RENEW_TOKEN_AFTER_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
 
 function hashResetToken(raw) {
   return crypto.createHash("sha256").update(raw).digest("hex")
@@ -89,11 +88,19 @@ export const me = asyncHandler(async (req, res) => {
   const body = { user: toPublicUser(req.user) }
 
   // Slide the session forward for anyone still using the site, so an active
-  // customer is never forced to sign in again. `req.tokenIssuedAt` is set by
-  // `protect`.
-  const issuedAtMs = (req.tokenIssuedAt ?? 0) * 1000
-  if (issuedAtMs && Date.now() - issuedAtMs > RENEW_TOKEN_AFTER_MS) {
-    body.token = generateToken(req.user)
+  // customer is never forced to sign in again.
+  //
+  // The threshold is half the token's OWN lifetime rather than a fixed number
+  // of days, so it stays correct whatever JWT_EXPIRES_IN is set to. A fixed
+  // "renew after 7 days" silently never fires when the configured lifetime is
+  // also 7 days — the token expires exactly as it becomes eligible.
+  const { tokenIssuedAt: iat, tokenExpiresAt: exp } = req
+  if (iat && exp) {
+    const lifetimeSeconds = exp - iat
+    const ageSeconds = Math.floor(Date.now() / 1000) - iat
+    if (ageSeconds > lifetimeSeconds / 2) {
+      body.token = generateToken(req.user)
+    }
   }
 
   res.json(body)

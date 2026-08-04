@@ -28,6 +28,7 @@ export const protect = asyncHandler(async (req, res, next) => {
   }
 
   req.tokenIssuedAt = payload.iat
+  req.tokenExpiresAt = payload.exp
   req.user = user
   next()
 })
