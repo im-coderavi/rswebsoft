@@ -16,20 +16,44 @@ export function AuthProvider({ children }) {
     }
     api
       .get("/auth/me")
-      .then(({ data }) => setUser(data.user))
+      .then(({ data }) => {
+        // The server slides the session forward once the token is a week old,
+        // so an active customer never gets signed out.
+        if (data.token) localStorage.setItem(TOKEN_KEY, data.token)
+        setUser(data.user)
+      })
       .catch(() => localStorage.removeItem(TOKEN_KEY))
       .finally(() => setLoading(false))
   }, [])
 
-  const login = useCallback(async (email, password) => {
-    const { data } = await api.post("/auth/login", { email, password })
+  const login = useCallback(async (identifier, password) => {
+    const { data } = await api.post("/auth/login", { identifier, password })
     localStorage.setItem(TOKEN_KEY, data.token)
     setUser(data.user)
     return data.user
   }, [])
 
-  const register = useCallback(async (name, email, password) => {
-    const { data } = await api.post("/auth/register", { name, email, password })
+  const register = useCallback(async ({ name, email, phone, password }) => {
+    const { data } = await api.post("/auth/register", { name, email, phone, password })
+    localStorage.setItem(TOKEN_KEY, data.token)
+    setUser(data.user)
+    return data.user
+  }, [])
+
+  const forgotPassword = useCallback(async (identifier) => {
+    const { data } = await api.post("/auth/forgot-password", { identifier })
+    return data
+  }, [])
+
+  const resetPassword = useCallback(async (token, password) => {
+    const { data } = await api.post("/auth/reset-password", { token, password })
+    localStorage.setItem(TOKEN_KEY, data.token)
+    setUser(data.user)
+    return data.user
+  }, [])
+
+  const changePassword = useCallback(async (currentPassword, password) => {
+    const { data } = await api.post("/auth/change-password", { currentPassword, password })
     localStorage.setItem(TOKEN_KEY, data.token)
     setUser(data.user)
     return data.user
@@ -41,7 +65,11 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, forgotPassword, resetPassword, changePassword, logout }}
+    >
+      {children}
+    </AuthContext.Provider>
   )
 }
 
