@@ -3,6 +3,7 @@ import { fileURLToPath } from "url"
 import transporter, { mailFrom, adminNotifyEmail } from "../config/mail.js"
 import { renderTemplate } from "../utils/renderTemplate.js"
 import { escapeHtml } from "../utils/escapeHtml.js"
+import { clientUrl } from "../utils/clientUrl.js"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const TEMPLATES_DIR = path.join(__dirname, "..", "templates", "emails")
@@ -72,7 +73,6 @@ export async function sendCustomerDeliveryEmail(order, licences = []) {
       ? `<p style="margin:16px 0 0;font-size:13px;color:#059669;">Coupon ${escapeHtml(order.couponCode)} applied: −₹${formatMoney(order.discountAmount)}</p>`
       : ""
 
-    const clientUrl = (process.env.CLIENT_URL || "").replace(/\/$/, "")
 
     const html = await renderTemplate(path.join(TEMPLATES_DIR, "customerDelivery.html"), {
       orderId: String(order._id).slice(-8),
@@ -80,7 +80,7 @@ export async function sendCustomerDeliveryEmail(order, licences = []) {
       itemsRows,
       licenceRows,
       licenceWord: licences.length === 1 ? "key" : "keys",
-      downloadsUrl: `${clientUrl}/account/downloads`,
+      downloadsUrl: `${clientUrl()}/account/downloads`,
       discountRow,
       total: formatMoney(order.total),
       createdAt: formatDate(order.createdAt),
@@ -102,13 +102,12 @@ export async function sendCustomerDeliveryEmail(order, licences = []) {
 
 export async function sendWelcomeEmail(user) {
   try {
-    const clientUrl = (process.env.CLIENT_URL || "").replace(/\/$/, "")
 
     const html = await renderTemplate(path.join(TEMPLATES_DIR, "welcome.html"), {
       customerName: escapeHtml(user.name),
       customerEmail: escapeHtml(user.email),
       userId: escapeHtml(user.userId),
-      loginUrl: `${clientUrl}/login`,
+      loginUrl: `${clientUrl()}/login`,
     })
 
     await transporter.sendMail({
@@ -127,8 +126,7 @@ export async function sendWelcomeEmail(user) {
 
 export async function sendPasswordResetEmail(user, rawToken) {
   try {
-    const clientUrl = (process.env.CLIENT_URL || "").replace(/\/$/, "")
-    const resetUrl = `${clientUrl}/reset-password/${rawToken}`
+    const resetUrl = `${clientUrl()}/reset-password/${rawToken}`
 
     const html = await renderTemplate(path.join(TEMPLATES_DIR, "passwordReset.html"), {
       customerName: escapeHtml(user.name),
