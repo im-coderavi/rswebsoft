@@ -36,6 +36,13 @@
   --color-cloud-500: var(--cloud-500);
 
   --color-star: #fbbf24;
+
+  /* Status mapping — theme-aware so state text stays legible on both the
+     near-black and the white card surface. */
+  --color-status-ok: var(--status-ok);
+  --color-status-warn: var(--status-warn);
+  --color-status-bad: var(--status-bad);
+  --color-status-info: var(--status-info);
 }
 
 :root {
@@ -65,6 +72,11 @@
   --cloud-300: #cbd5e1;
   --cloud-400: #94a3b8;
   --cloud-500: #64748b;
+
+  --status-ok: #34d399;
+  --status-warn: #fbbf24;
+  --status-bad: #fb7185;
+  --status-info: #a5b4fc;
 }
 
 /* ------------------------------------------------------------------ */
@@ -94,6 +106,11 @@
   --cloud-300: #334155;
   --cloud-400: #475569;
   --cloud-500: #64748b;
+
+  --status-ok: #047857;
+  --status-warn: #b45309;
+  --status-bad: #be123c;
+  --status-info: #4338ca;
 }
 
 @layer base {
@@ -209,6 +226,48 @@
     box-shadow: 0 20px 40px -12px rgba(79, 70, 229, 0.15), 0 0 0 1px rgba(79, 70, 229, 0.04);
   }
   
+  /* Native checkboxes render as opaque white boxes on the dark admin
+     surfaces, so the row-selection control is drawn from theme tokens
+     instead — and keeps a visible keyboard focus ring. */
+  .checkbox-rs {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    border-radius: 0.25rem;
+    border: 1px solid var(--color-ink-600);
+    background-color: var(--color-ink-800);
+    cursor: pointer;
+    display: inline-grid;
+    place-content: center;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .checkbox-rs:hover {
+    border-color: var(--color-brand-400);
+  }
+  .checkbox-rs:checked,
+  .checkbox-rs:indeterminate {
+    background-color: var(--color-brand-500);
+    border-color: var(--color-brand-500);
+  }
+  .checkbox-rs:checked::after {
+    content: "✓";
+  }
+  .checkbox-rs:indeterminate::after {
+    content: "–";
+  }
+  .checkbox-rs:checked::after,
+  .checkbox-rs:indeterminate::after {
+    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+  }
+  .checkbox-rs:focus-visible {
+    outline: 2px solid var(--color-brand-400);
+    outline-offset: 2px;
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }

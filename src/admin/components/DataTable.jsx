@@ -14,6 +14,9 @@ export default function DataTable({
   searchable = false,
   searchKeys = [],
   filters = [],
+  selectable = false,
+  selectedIds,
+  onSelectionChange,
 }) {
   const [query, setQuery] = useState("")
   const [activeFilters, setActiveFilters] = useState({})
@@ -24,8 +27,13 @@ export default function DataTable({
 
     if (searchable && query.trim()) {
       const q = query.trim().toLowerCase()
+      // A search key may be a plain field name or a getter, so nested values
+      // (order.customer.email) are searchable too.
       result = result.filter((row) =>
-        searchKeys.some((key) => String(row[key] ?? "").toLowerCase().includes(q))
+        searchKeys.some((key) => {
+          const value = typeof key === "function" ? key(row) : row[key]
+          return String(value ?? "").toLowerCase().includes(q)
+        })
       )
     }
 
@@ -61,8 +69,30 @@ export default function DataTable({
     )
   }
 
-  const columnCount = columns.length + (actions ? 1 : 0)
+  const columnCount = columns.length + (actions ? 1 : 0) + (selectable ? 1 : 0)
   const hasToolbar = searchable || filters.length > 0
+
+  const pageIds = filteredRows.map((row) => row[keyField])
+  const selectedOnPage = selectable ? pageIds.filter((id) => selectedIds?.has(id)).length : 0
+  const allOnPageSelected = selectable && pageIds.length > 0 && selectedOnPage === pageIds.length
+  const someOnPageSelected = selectable && selectedOnPage > 0 && !allOnPageSelected
+
+  function toggleSelectAll() {
+    const next = new Set(selectedIds)
+    if (allOnPageSelected) {
+      pageIds.forEach((id) => next.delete(id))
+    } else {
+      pageIds.forEach((id) => next.add(id))
+    }
+    onSelectionChange(next)
+  }
+
+  function toggleRow(id) {
+    const next = new Set(selectedIds)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    onSelectionChange(next)
+  }
 
   return (
     <div className="overflow-hidden rounded-2xl border border-white/8 bg-ink-850">
@@ -98,6 +128,18 @@ export default function DataTable({
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-white/8 text-xs uppercase tracking-wide text-cloud-500">
+              {selectable && (
+                <th className="w-10 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={allOnPageSelected}
+                    ref={(el) => { if (el) el.indeterminate = someOnPageSelected }}
+                    onChange={toggleSelectAll}
+                    className="checkbox-rs"
+                    aria-label="Select all on page"
+                  />
+                </th>
+              )}
               {columns.map((col) => (
                 <th key={col.key} className="whitespace-nowrap px-4 py-3 font-semibold">
                   {col.sortable ? (
@@ -115,7 +157,13 @@ export default function DataTable({
                   )}
                 </th>
               ))}
-              {actions && <th className="px-4 py-3 text-right font-semibold">Actions</th>}
+              {/* Pinned to the right edge so the row's actions stay reachable
+                  no matter how wide the data columns get. */}
+              {actions && (
+                <th className="sticky right-0 z-20 border-l border-ink-800 bg-ink-850 px-4 py-3 text-right font-semibold">
+                  Actions
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -129,14 +177,28 @@ export default function DataTable({
             )}
             {!loading &&
               filteredRows.map((row) => (
-                <tr key={row[keyField]} className="transition hover:bg-ink-800/60">
+                <tr key={row[keyField]} className="group transition hover:bg-ink-800">
+                  {selectable && (
+                    <td className="px-4 py-3.5">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds?.has(row[keyField]) ?? false}
+                        onChange={() => toggleRow(row[keyField])}
+                        className="checkbox-rs"
+                        aria-label="Select row"
+                      />
+                    </td>
+                  )}
                   {columns.map((col) => (
-                    <td key={col.key} className="whitespace-nowrap px-4 py-3.5 text-cloud-200">
+                    <td
+                      key={col.key}
+                      className={`px-4 py-3.5 align-middle text-cloud-200 ${col.cellClassName || "whitespace-nowrap"}`}
+                    >
                       {col.render ? col.render(row) : row[col.key]}
                     </td>
                   ))}
                   {actions && (
-                    <td className="whitespace-nowrap px-4 py-3.5 text-right">
+                    <td className="sticky right-0 z-10 whitespace-nowrap border-l border-ink-800 bg-ink-850 px-4 py-3.5 text-right transition group-hover:bg-ink-800">
                       <div className="flex justify-end gap-1.5">{actions(row)}</div>
                     </td>
                   )}

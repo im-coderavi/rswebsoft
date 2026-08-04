@@ -43,16 +43,22 @@ export default function TypedProductList({ type, newLabel, emptyMessage }) {
     {
       key: "name",
       label: "Name",
+      // The whole cell is width-capped: displayTag is free text that can run to
+      // hundreds of characters, and unbounded it pushes every other column
+      // (and the actions) off-screen.
+      cellClassName: "max-w-0 w-full",
       render: (p) => (
         <div className="flex items-center gap-3">
           {p.images?.[0] ? (
-            <img src={p.images[0].url} alt="" className="h-9 w-9 rounded-lg object-cover" />
+            <img src={p.images[0].url} alt="" className="h-9 w-9 shrink-0 rounded-lg object-cover" />
           ) : (
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-ink-700 text-xs text-cloud-500">—</span>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-ink-700 text-xs text-cloud-500">—</span>
           )}
-          <div className="min-w-0">
-            <div className="max-w-[220px] truncate font-medium text-cloud-100">{p.name}</div>
-            {p.displayTag && <div className="text-xs text-cloud-500">{p.displayTag}</div>}
+          <div className="min-w-0 flex-1">
+            <div className="truncate font-medium text-cloud-100" title={p.name}>{p.name}</div>
+            {p.displayTag && (
+              <div className="truncate text-xs text-cloud-500" title={p.displayTag}>{p.displayTag}</div>
+            )}
           </div>
         </div>
       ),
