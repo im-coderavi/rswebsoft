@@ -66,6 +66,19 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   res.json({ message: "Product deleted" })
 })
 
+// Admin-only. The delivered file and its password live behind this route
+// rather than on GET /products/:id, so a public product response can never
+// carry them by accident — the storefront endpoints simply don't select them.
+export const getProductDownloadConfig = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id).select("+downloadUrl +downloadPassword")
+  if (!product) throw new ApiError(404, "Product not found")
+
+  res.json({
+    downloadUrl: product.downloadUrl || "",
+    downloadPassword: product.downloadPassword || "",
+  })
+})
+
 export const bulkDeleteProducts = asyncHandler(async (req, res) => {
   const { ids } = req.body
   if (!Array.isArray(ids) || ids.length === 0) throw new ApiError(400, "No product ids provided")

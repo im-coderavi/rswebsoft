@@ -49,26 +49,38 @@ export async function sendAdminNewOrderEmail(order) {
   }
 }
 
-export async function sendCustomerDeliveryEmail(order) {
+// `licences` are the keys issued for this order. The email carries the keys and
+// a link to the account page — never the download URL or its password. That is
+// the whole point: forwarding this message must not hand over the files.
+export async function sendCustomerDeliveryEmail(order, licences = []) {
   try {
     const itemsRows = order.items
-      .map((item) => {
-        const downloadUrl = item.product?.downloadUrl || ""
-        const link = downloadUrl
-          ? `<a href="${downloadUrl}" style="color:#059669;">Download</a>`
-          : "—"
-        return `<tr><td style="padding:8px;border:1px solid #e2e8f0;">${escapeHtml(item.name)}</td><td align="right" style="padding:8px;border:1px solid #e2e8f0;">${item.qty}</td><td align="right" style="padding:8px;border:1px solid #e2e8f0;">₹${formatMoney(item.price)}</td><td style="padding:8px;border:1px solid #e2e8f0;">${link}</td></tr>`
-      })
+      .map(
+        (item) =>
+          `<tr><td style="padding:8px;border:1px solid #e2e8f0;">${escapeHtml(item.name)}</td><td align="right" style="padding:8px;border:1px solid #e2e8f0;">${item.qty}</td><td align="right" style="padding:8px;border:1px solid #e2e8f0;">₹${formatMoney(item.price)}</td></tr>`
+      )
+      .join("")
+
+    const licenceRows = licences
+      .map(
+        (l) =>
+          `<div style="margin-top:10px;"><div style="font-size:12px;color:#64748b;">${escapeHtml(l.productName)}</div><div style="font-size:19px;font-weight:bold;color:#0f172a;letter-spacing:1.5px;font-family:monospace;">${escapeHtml(l.key)}</div></div>`
+      )
       .join("")
 
     const discountRow = order.discountAmount > 0
       ? `<p style="margin:16px 0 0;font-size:13px;color:#059669;">Coupon ${escapeHtml(order.couponCode)} applied: −₹${formatMoney(order.discountAmount)}</p>`
       : ""
 
+    const clientUrl = (process.env.CLIENT_URL || "").replace(/\/$/, "")
+
     const html = await renderTemplate(path.join(TEMPLATES_DIR, "customerDelivery.html"), {
       orderId: String(order._id).slice(-8),
       customerName: escapeHtml(order.customer.name),
       itemsRows,
+      licenceRows,
+      licenceWord: licences.length === 1 ? "key" : "keys",
+      downloadsUrl: `${clientUrl}/account/downloads`,
       discountRow,
       total: formatMoney(order.total),
       createdAt: formatDate(order.createdAt),

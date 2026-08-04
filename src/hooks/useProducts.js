@@ -17,6 +17,17 @@ export function useProduct(id) {
   })
 }
 
+// The delivered file and its password are not part of the product payload —
+// they live behind an admin-only route so they can never leak into a
+// storefront response. The product form fetches them separately.
+export function useProductDownloadConfig(id) {
+  return useQuery({
+    queryKey: ["product-download-config", id],
+    queryFn: async () => (await api.get(`/products/${id}/download-config`)).data,
+    enabled: Boolean(id),
+  })
+}
+
 export function useCreateProduct() {
   const qc = useQueryClient()
   return useMutation({

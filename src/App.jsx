@@ -21,6 +21,7 @@ import ResetPassword from "./pages/ResetPassword"
 import AccountLayout from "./pages/account/AccountLayout"
 import AccountProfile from "./pages/account/Profile"
 import AccountOrders from "./pages/account/Orders"
+import AccountDownloads from "./pages/account/Downloads"
 import RequireAuth from "./components/RequireAuth"
 import { AuthProvider } from "./context/AuthContext"
 import { CartProvider } from "./context/CartContext"
@@ -38,6 +39,8 @@ import HomeSectionList from "./admin/pages/sections/HomeSectionList"
 import BrandList from "./admin/pages/brands/BrandList"
 import OrderList from "./admin/pages/orders/OrderList"
 import CouponList from "./admin/pages/coupons/CouponList"
+import LicenceList from "./admin/pages/licences/LicenceList"
+import LicenceDetail from "./admin/pages/licences/LicenceDetail"
 import Settings from "./admin/pages/Settings"
 import CustomerList from "./admin/pages/customers/CustomerList"
 import CustomerDetail from "./admin/pages/customers/CustomerDetail"
@@ -72,6 +75,7 @@ function App() {
                   <Route index element={<Navigate to="/account/profile" replace />} />
                   <Route path="profile" element={<AccountProfile />} />
                   <Route path="orders" element={<AccountOrders />} />
+                  <Route path="downloads" element={<AccountDownloads />} />
                 </Route>
               </Route>
 
@@ -98,6 +102,8 @@ function App() {
                 <Route path="brands" element={<BrandList />} />
                 <Route path="orders" element={<OrderList />} />
                 <Route path="coupons" element={<CouponList />} />
+                <Route path="licences" element={<LicenceList />} />
+                <Route path="licences/:id" element={<LicenceDetail />} />
                 <Route path="customers" element={<CustomerList />} />
                 <Route path="customers/:id" element={<CustomerDetail />} />
                 <Route path="demo-links" element={<DemoLinkList />} />

@@ -5,13 +5,14 @@ import PaymentSetting from "../models/PaymentSetting.js"
 import { sendAdminNewOrderEmail, sendCustomerDeliveryEmail } from "../services/mailService.js"
 import { buildPricedItems } from "../services/pricingService.js"
 import { resolveCoupon } from "../services/couponService.js"
+import { issueLicencesForOrder } from "../services/licenceService.js"
 import Coupon from "../models/Coupon.js"
 
 export const listOrders = asyncHandler(async (req, res) => {
   const orders = await Order.find()
     .sort({ createdAt: -1 })
     .populate("user", "name email")
-    .populate("items.product", "name slug downloadUrl")
+    .populate("items.product", "name slug")
   res.json(orders)
 })
 
@@ -36,7 +37,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 // transition so a concurrent call for the same order can't also send.
 // Returns { ok: true, order } on success, or { ok: false, reason, error? }.
 async function deliverProduct(orderId) {
-  const order = await Order.findById(orderId).populate("items.product", "name slug downloadUrl")
+  const order = await Order.findById(orderId).populate("items.product", "name slug")
   if (!order) {
     return { ok: false, reason: "not_found" }
   }
@@ -44,12 +45,16 @@ async function deliverProduct(orderId) {
     return { ok: false, reason: "invalid_status", order }
   }
 
-  const hasDownloadLink = order.items.some((item) => item.product?.downloadUrl)
-  if (!hasDownloadLink) {
+  // Minting the licences is also the check for "is there anything to deliver" —
+  // issueLicencesForOrder only issues for items that actually have a file.
+  // It's idempotent, so re-sending a delivery reuses the customer's existing
+  // keys instead of invalidating what they already have.
+  const licences = await issueLicencesForOrder(order)
+  if (licences.length === 0) {
     return { ok: false, reason: "no_download_link", order }
   }
 
-  const result = await sendCustomerDeliveryEmail(order)
+  const result = await sendCustomerDeliveryEmail(order, licences)
   if (!result.ok) {
     return { ok: false, reason: "send_failed", error: result.error, order }
   }
@@ -176,10 +181,13 @@ export const createOrder = asyncHandler(async (req, res) => {
 
 // Public: order status lookup by id (the id itself acts as the bearer secret,
 // so this works right after checkout without requiring a fresh login).
-// Download links only reveal once the order has been manually marked
-// fulfilled by an admin.
+//
+// This route deliberately carries NO download link. It used to return one for
+// any fulfilled order, which meant forwarding the tracking URL handed over the
+// file. Downloads now live behind the customer's licence, which requires a
+// signed-in owner and records every reveal.
 export const trackOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate("items.product", "downloadUrl")
+  const order = await Order.findById(req.params.id)
   if (!order) throw new ApiError(404, "Order not found")
 
   const payload = order.toObject()
@@ -187,7 +195,6 @@ export const trackOrder = asyncHandler(async (req, res) => {
     name: item.name,
     price: item.price,
     qty: item.qty,
-    downloadUrl: order.status === "fulfilled" ? item.product?.downloadUrl || "" : "",
   }))
 
   res.json(payload)

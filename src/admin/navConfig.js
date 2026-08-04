@@ -12,6 +12,7 @@ import {
   CreditCard,
   Rows3,
   Ticket,
+  KeyRound,
 } from "lucide-react"
 
 // Single source of truth for admin navigation. AdminSidebar renders these
@@ -41,6 +42,7 @@ export const NAV_SECTIONS = [
     links: [
       { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
       { to: "/admin/coupons", label: "Coupons", icon: Ticket },
+      { to: "/admin/licences", label: "Licences", icon: KeyRound },
       { to: "/admin/customers", label: "Customers", icon: Users },
     ],
   },

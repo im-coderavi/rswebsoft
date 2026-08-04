@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom"
-import { User, Package, LogOut } from "lucide-react"
+import { User, Package, Download, LogOut } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
 
 // Sidebar on desktop, a scrollable tab strip on mobile. Wishlist, coupons and
@@ -7,6 +7,7 @@ import { useAuth } from "../../context/AuthContext"
 const NAV_ITEMS = [
   { to: "/account/profile", label: "Profile", icon: User },
   { to: "/account/orders", label: "Orders", icon: Package },
+  { to: "/account/downloads", label: "Downloads", icon: Download },
 ]
 
 function initialsOf(name = "") {

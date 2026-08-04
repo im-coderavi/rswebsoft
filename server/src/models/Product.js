@@ -38,7 +38,18 @@ const productSchema = new mongoose.Schema(
     tags: [{ type: String, trim: true }],
     images: [imageSchema],
     demoUrl: { type: String, default: "" },
-    downloadUrl: { type: String, default: "" },
+
+    // The delivered file and the password that opens it. Both are `select:
+    // false` so they can never ride along in a public product response —
+    // GET /products used to return downloadUrl for the whole catalogue, which
+    // meant anyone could read every download link without buying anything.
+    //
+    // Read them only through:
+    //   - GET /products/:id/download-config  (admin, for the product form)
+    //   - the licence reveal endpoint         (the buyer, logged and revocable)
+    // Never add them to a query that serves the storefront.
+    downloadUrl: { type: String, default: "", select: false },
+    downloadPassword: { type: String, default: "", select: false },
     rating: { type: Number, default: 0, min: 0, max: 5 },
     numReviews: { type: Number, default: 0 },
     featured: { type: Boolean, default: false },

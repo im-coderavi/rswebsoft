@@ -11,6 +11,7 @@ import uploadRoutes from "./routes/uploadRoutes.js"
 import dashboardRoutes from "./routes/dashboardRoutes.js"
 import paymentSettingRoutes from "./routes/paymentSettingRoutes.js"
 import deliveredWebsiteSettingRoutes from "./routes/deliveredWebsiteSettingRoutes.js"
+import licenceRoutes from "./routes/licenceRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
 import demoLinkRoutes from "./routes/demoLinkRoutes.js"
 import subscriberRoutes from "./routes/subscriberRoutes.js"
@@ -35,6 +36,7 @@ app.use("/api/upload", uploadRoutes)
 app.use("/api/dashboard", dashboardRoutes)
 app.use("/api/payment-settings", paymentSettingRoutes)
 app.use("/api/delivered-website-settings", deliveredWebsiteSettingRoutes)
+app.use("/api/licences", licenceRoutes)
 app.use("/api/users", userRoutes)
 app.use("/api/demo-links", demoLinkRoutes)
 app.use("/api/subscribers", subscriberRoutes)

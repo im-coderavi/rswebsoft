@@ -4,7 +4,7 @@ import { ArrowLeft, Save, Plus, X, ArrowUp, ArrowDown } from "lucide-react"
 import toast from "react-hot-toast"
 import { useCategories } from "../../../hooks/useCategories"
 import { useBrands } from "../../../hooks/useBrands"
-import { useProduct, useCreateProduct, useUpdateProduct } from "../../../hooks/useProducts"
+import { useProduct, useProductDownloadConfig, useCreateProduct, useUpdateProduct } from "../../../hooks/useProducts"
 import { apiErrorMessage } from "../../../lib/api"
 import ImageUploader from "../../components/ImageUploader"
 
@@ -26,6 +26,7 @@ const emptyForm = {
   packages: [],
   demoUrl: "",
   downloadUrl: "",
+  downloadPassword: "",
   featured: false,
   status: "draft",
   images: [],
@@ -72,6 +73,7 @@ export default function ProductForm() {
   const { data: categories } = useCategories()
   const { data: brands } = useBrands()
   const { data: existing, isLoading: loadingExisting } = useProduct(id)
+  const { data: downloadConfig } = useProductDownloadConfig(id)
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
 
@@ -97,12 +99,22 @@ export default function ProductForm() {
       features: existing.features || [],
       packages: existing.packages || [],
       demoUrl: existing.demoUrl || "",
-      downloadUrl: existing.downloadUrl || "",
+      // downloadUrl / downloadPassword are NOT on the product payload — they
+      // arrive from the admin-only download-config route below.
       featured: Boolean(existing.featured),
       status: existing.status || "draft",
       images: existing.images || [],
     })
   }, [existing])
+
+  useEffect(() => {
+    if (!downloadConfig) return
+    setForm((f) => ({
+      ...f,
+      downloadUrl: downloadConfig.downloadUrl || "",
+      downloadPassword: downloadConfig.downloadPassword || "",
+    }))
+  }, [downloadConfig])
 
   function setField(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -240,10 +252,17 @@ export default function ProductForm() {
         .filter((p) => p.name.trim())
         .map((p) => ({ ...p, price: Number(p.price) || 0 })),
       demoUrl: form.demoUrl,
-      downloadUrl: form.downloadUrl,
       featured: form.featured,
       status: form.status,
       images: form.images,
+    }
+
+    // Only send the delivery secrets once they've actually loaded. On an edit
+    // they arrive from a second request, and submitting before that lands
+    // would post empty strings and wipe the real link and password.
+    if (!isEdit || downloadConfig) {
+      payload.downloadUrl = form.downloadUrl
+      payload.downloadPassword = form.downloadPassword
     }
 
     try {
@@ -608,16 +627,38 @@ export default function ProductForm() {
           />
         </div>
 
-        <div>
-          <label className="mb-1.5 block text-xs font-medium text-cloud-400">
-            Download Link <span className="text-cloud-500">(given to the customer after purchase — Drive, Dropbox, or any link)</span>
-          </label>
-          <input
-            value={form.downloadUrl}
-            onChange={(e) => setField("downloadUrl", e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-            placeholder="https://drive.google.com/…"
-          />
+        <div className="rounded-xl border border-ink-800 bg-ink-850/60 p-4">
+          <h3 className="text-sm font-semibold text-cloud-100">Delivery</h3>
+          <p className="mt-1 text-xs text-cloud-500">
+            Never shown on the storefront and never emailed. A buyer sees these only on their
+            account page, against a licence key you can revoke.
+          </p>
+
+          <div className="mt-4 space-y-4">
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+                Download Link <span className="text-cloud-500">(Drive, Dropbox, or any link)</span>
+              </label>
+              <input
+                value={form.downloadUrl}
+                onChange={(e) => setField("downloadUrl", e.target.value)}
+                className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+                placeholder="https://drive.google.com/…"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+                Download Password <span className="text-cloud-500">(leave empty if the link isn't protected)</span>
+              </label>
+              <input
+                value={form.downloadPassword}
+                onChange={(e) => setField("downloadPassword", e.target.value)}
+                className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+                placeholder="Password that opens the link"
+              />
+            </div>
+          </div>
         </div>
 
         <div>
