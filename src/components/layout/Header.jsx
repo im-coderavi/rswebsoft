@@ -48,6 +48,13 @@ function AccountMenu({ user, onLogout }) {
       {open && (
         <div className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-xl border border-white/10 bg-ink-800 py-1.5 shadow-xl">
           <Link
+            to="/account/profile"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-3.5 py-2 text-sm text-cloud-200 hover:bg-ink-700 hover:text-cloud-100"
+          >
+            <User size={15} /> My Profile
+          </Link>
+          <Link
             to="/account/orders"
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 px-3.5 py-2 text-sm text-cloud-200 hover:bg-ink-700 hover:text-cloud-100"

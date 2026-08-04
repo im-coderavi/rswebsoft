@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom"
+import { Routes, Route, Navigate } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import PublicLayout from "./components/layout/PublicLayout"
 import Home from "./pages/Home"
@@ -18,7 +18,9 @@ import CustomerLogin from "./pages/Login"
 import Register from "./pages/Register"
 import ForgotPassword from "./pages/ForgotPassword"
 import ResetPassword from "./pages/ResetPassword"
-import AccountOrders from "./pages/AccountOrders"
+import AccountLayout from "./pages/account/AccountLayout"
+import AccountProfile from "./pages/account/Profile"
+import AccountOrders from "./pages/account/Orders"
 import RequireAuth from "./components/RequireAuth"
 import { AuthProvider } from "./context/AuthContext"
 import { CartProvider } from "./context/CartContext"
@@ -66,7 +68,11 @@ function App() {
 
               <Route element={<RequireAuth />}>
                 <Route path="/checkout" element={<Checkout />} />
-                <Route path="/account/orders" element={<AccountOrders />} />
+                <Route path="/account" element={<AccountLayout />}>
+                  <Route index element={<Navigate to="/account/profile" replace />} />
+                  <Route path="profile" element={<AccountProfile />} />
+                  <Route path="orders" element={<AccountOrders />} />
+                </Route>
               </Route>
 
               <Route path="/login" element={<CustomerLogin />} />

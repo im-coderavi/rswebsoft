@@ -52,6 +52,12 @@ export function AuthProvider({ children }) {
     return data.user
   }, [])
 
+  const updateProfile = useCallback(async ({ name, phone }) => {
+    const { data } = await api.patch("/auth/profile", { name, phone })
+    setUser(data.user)
+    return data.user
+  }, [])
+
   const changePassword = useCallback(async (currentPassword, password) => {
     const { data } = await api.post("/auth/change-password", { currentPassword, password })
     localStorage.setItem(TOKEN_KEY, data.token)
@@ -66,7 +72,17 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, forgotPassword, resetPassword, changePassword, logout }}
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        forgotPassword,
+        resetPassword,
+        updateProfile,
+        changePassword,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

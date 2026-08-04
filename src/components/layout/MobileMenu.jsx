@@ -141,6 +141,13 @@ export default function MobileMenu({ open, onClose }) {
           {user ? (
             <>
               <Link
+                to="/account/profile"
+                onClick={onClose}
+                className="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cloud-400 hover:bg-ink-800 hover:text-cloud-100"
+              >
+                <User size={17} /> My Profile
+              </Link>
+              <Link
                 to="/account/orders"
                 onClick={onClose}
                 className="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cloud-400 hover:bg-ink-800 hover:text-cloud-100"

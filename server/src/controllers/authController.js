@@ -156,6 +156,35 @@ export const resetPassword = asyncHandler(async (req, res) => {
   res.json({ token: newToken, user: toPublicUser(user) })
 })
 
+export const updateProfile = asyncHandler(async (req, res) => {
+  // Only these two fields are read off the body. Assigning req.body wholesale
+  // would let a crafted request set `role: "admin"` or overwrite `email`,
+  // which is the account's only recovery channel.
+  const { name, phone } = req.body
+
+  const user = await User.findById(req.user._id)
+  if (!user) throw new ApiError(404, "Account not found")
+
+  if (name !== undefined) {
+    if (!String(name).trim()) throw new ApiError(400, "Name cannot be empty")
+    user.name = String(name).trim()
+  }
+
+  if (phone !== undefined) {
+    const normalized = normalizePhone(phone)
+    if (!normalized) throw new ApiError(400, "Enter a valid 10-digit Indian mobile number")
+
+    if (normalized !== user.phone) {
+      const taken = await User.exists({ phone: normalized, _id: { $ne: user._id } })
+      if (taken) throw new ApiError(409, "That phone number is already registered")
+      user.phone = normalized
+    }
+  }
+
+  await user.save()
+  res.json({ user: toPublicUser(user) })
+})
+
 export const changePassword = asyncHandler(async (req, res) => {
   const { currentPassword, password } = req.body
 
