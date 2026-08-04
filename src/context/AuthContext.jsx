@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { api } from "../lib/api"
 
 const AuthContext = createContext(null)
@@ -7,6 +8,16 @@ const TOKEN_KEY = "rs_token"
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
+
+  // Query keys like ["my-licences"] and ["my-orders"] aren't scoped to a user,
+  // so without this the previous account's cached data is served to the next
+  // person to sign in on the same browser — they'd see someone else's licences
+  // and order history until a refetch landed. Wipe the cache on every identity
+  // change rather than trying to remember which keys are per-user.
+  const resetCache = useCallback(() => {
+    queryClient.clear()
+  }, [queryClient])
 
   useEffect(() => {
     const token = localStorage.getItem(TOKEN_KEY)
@@ -28,17 +39,19 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (identifier, password) => {
     const { data } = await api.post("/auth/login", { identifier, password })
+    resetCache()
     localStorage.setItem(TOKEN_KEY, data.token)
     setUser(data.user)
     return data.user
-  }, [])
+  }, [resetCache])
 
   const register = useCallback(async ({ name, email, phone, password }) => {
     const { data } = await api.post("/auth/register", { name, email, phone, password })
+    resetCache()
     localStorage.setItem(TOKEN_KEY, data.token)
     setUser(data.user)
     return data.user
-  }, [])
+  }, [resetCache])
 
   const forgotPassword = useCallback(async (identifier) => {
     const { data } = await api.post("/auth/forgot-password", { identifier })
@@ -47,10 +60,11 @@ export function AuthProvider({ children }) {
 
   const resetPassword = useCallback(async (token, password) => {
     const { data } = await api.post("/auth/reset-password", { token, password })
+    resetCache()
     localStorage.setItem(TOKEN_KEY, data.token)
     setUser(data.user)
     return data.user
-  }, [])
+  }, [resetCache])
 
   const updateProfile = useCallback(async ({ name, phone }) => {
     const { data } = await api.patch("/auth/profile", { name, phone })
@@ -68,7 +82,8 @@ export function AuthProvider({ children }) {
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY)
     setUser(null)
-  }, [])
+    resetCache()
+  }, [resetCache])
 
   return (
     <AuthContext.Provider
