@@ -33,14 +33,46 @@ async function createUserWithUniqueId(fields) {
   throw new ApiError(500, "Could not allocate a user ID, please try again")
 }
 
-export const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body
-  if (!email || !password) throw new ApiError(400, "Email and password are required")
+// Build the narrowest $or that could match what the customer typed. Anything
+// with an "@" is an email; RSW-XXXXXX is a user ID; ten digits is a phone.
+// A typed value that looks like none of those matches nothing, which still
+// falls through to the same generic 401.
+function identifierQuery(identifier) {
+  const trimmed = identifier.trim()
+  const or = []
 
-  const user = await User.findOne({ email: email.toLowerCase() }).select("+password")
-  if (!user || !(await user.comparePassword(password))) {
-    throw new ApiError(401, "Invalid email or password")
+  if (trimmed.includes("@")) {
+    or.push({ email: trimmed.toLowerCase() })
   }
+  if (USER_ID_PATTERN.test(trimmed.toUpperCase())) {
+    or.push({ userId: trimmed.toUpperCase() })
+  }
+  const phone = normalizePhone(trimmed)
+  if (phone) {
+    or.push({ phone })
+  }
+
+  return or
+}
+
+export const login = asyncHandler(async (req, res) => {
+  // `email` is still accepted so the admin login page keeps working until it
+  // is migrated; both map onto the same identifier resolution.
+  const identifier = req.body.identifier ?? req.body.email
+  const { password } = req.body
+
+  if (!identifier || !password) throw new ApiError(400, "Enter your login details and password")
+
+  const or = identifierQuery(String(identifier))
+
+  // Deliberately identical failure for "no such account" and "wrong password".
+  // Distinguishing them tells an attacker which emails and phone numbers are
+  // registered here.
+  const invalid = new ApiError(401, "Invalid credentials")
+  if (or.length === 0) throw invalid
+
+  const user = await User.findOne({ $or: or }).select("+password")
+  if (!user || !(await user.comparePassword(password))) throw invalid
 
   const token = generateToken(user)
   res.json({ token, user: toPublicUser(user) })
