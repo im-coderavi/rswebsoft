@@ -7,6 +7,7 @@ import {
   listLicences,
   getLicence,
   setLicenceStatus,
+  setDeviceStatus,
 } from "../controllers/licenceController.js"
 import { protect, adminOnly } from "../middleware/auth.js"
 
@@ -26,5 +27,6 @@ router.post("/open-token", protect, createOpenToken)
 router.get("/", protect, adminOnly, listLicences)
 router.get("/:id", protect, adminOnly, getLicence)
 router.patch("/:id/status", protect, adminOnly, setLicenceStatus)
+router.patch("/:id/devices/:deviceId", protect, adminOnly, setDeviceStatus)
 
 export default router

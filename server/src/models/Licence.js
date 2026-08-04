@@ -13,6 +13,28 @@ const accessSchema = new mongoose.Schema(
   { _id: false }
 )
 
+// One row per machine that has tried to unlock this licence. The first few are
+// approved automatically — a real buyer moving between their phone and laptop
+// shouldn't have to wait on anyone — and everything after that needs the shop
+// to say yes, which is what stops a key being passed around.
+//
+// deviceId is a random value the browser keeps in localStorage. A technical
+// user can copy it between machines; the ip and userAgent recorded here are
+// what let the admin see that for what it is.
+const deviceSchema = new mongoose.Schema(
+  {
+    deviceId: { type: String, required: true },
+    status: { type: String, enum: ["approved", "pending", "denied"], default: "pending" },
+    label: { type: String, default: "" },
+    ip: { type: String, default: "" },
+    userAgent: { type: String, default: "" },
+    firstSeenAt: { type: Date, default: Date.now },
+    lastSeenAt: { type: Date, default: Date.now },
+    decidedAt: { type: Date, default: null },
+  },
+  { _id: false }
+)
+
 const licenceSchema = new mongoose.Schema(
   {
     key: { type: String, required: true, unique: true, uppercase: true, trim: true },
@@ -41,6 +63,8 @@ const licenceSchema = new mongoose.Schema(
     // Most recent reveals, capped by $slice so the document can't grow without
     // bound on a licence that is hammered.
     accessLog: [accessSchema],
+
+    devices: [deviceSchema],
 
     // Single-use, 60-second ticket for the download redirect. The browser
     // navigates to /licences/open/<token>, which is a plain navigation and so

@@ -10,6 +10,67 @@ const ACCESS_LOG_LIMIT = 50
 // addresses, so a real customer can cross this without doing anything wrong.
 export const SHARING_HINT_IP_COUNT = 5
 
+// Machines a licence may be used on before the shop has to approve the next
+// one. Two covers the ordinary case — a buyer's phone and their laptop —
+// without making them wait on anyone. The third is where sharing starts.
+export const AUTO_APPROVED_DEVICE_LIMIT = 2
+
+// Turns a user agent into something an admin can recognise in a list. Crude on
+// purpose: it only has to answer "is this the same person's machine or not".
+export function describeDevice(userAgent = "") {
+  const ua = String(userAgent)
+  const os =
+    /Windows/i.test(ua) ? "Windows" :
+    /iPhone|iPad|iOS/i.test(ua) ? "iOS" :
+    /Android/i.test(ua) ? "Android" :
+    /Mac OS X|Macintosh/i.test(ua) ? "Mac" :
+    /Linux/i.test(ua) ? "Linux" : "Unknown device"
+  const browser =
+    /Edg\//i.test(ua) ? "Edge" :
+    /OPR\/|Opera/i.test(ua) ? "Opera" :
+    /Firefox\//i.test(ua) ? "Firefox" :
+    /Chrome\//i.test(ua) ? "Chrome" :
+    /Safari\//i.test(ua) ? "Safari" : ""
+  return browser ? `${os} · ${browser}` : os
+}
+
+// Decides whether this machine may use the licence, registering it on first
+// sight. Returns { allowed, status, device }. Never throws — the caller turns
+// a refusal into the right HTTP response.
+export async function authoriseDevice(licence, { deviceId, ip, userAgent }) {
+  if (!deviceId) return { allowed: false, status: "unidentified" }
+
+  const existing = licence.devices?.find((d) => d.deviceId === deviceId)
+
+  if (existing) {
+    existing.lastSeenAt = new Date()
+    existing.ip = ip || existing.ip
+    existing.userAgent = userAgent || existing.userAgent
+    await licence.save()
+    return { allowed: existing.status === "approved", status: existing.status, device: existing }
+  }
+
+  const approvedCount = (licence.devices ?? []).filter((d) => d.status === "approved").length
+  const status = approvedCount < AUTO_APPROVED_DEVICE_LIMIT ? "approved" : "pending"
+
+  licence.devices.push({
+    deviceId,
+    status,
+    label: describeDevice(userAgent),
+    ip: ip || "",
+    userAgent: userAgent || "",
+    firstSeenAt: new Date(),
+    lastSeenAt: new Date(),
+  })
+  await licence.save()
+
+  return {
+    allowed: status === "approved",
+    status,
+    device: licence.devices.at(-1),
+  }
+}
+
 // Issues one licence per order item that actually has a file behind it.
 // Idempotent on (order, product): re-sending a delivery email reuses the key
 // the customer already has rather than invalidating it.

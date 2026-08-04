@@ -9,10 +9,43 @@ import {
   ArrowRight,
   Lock,
   LockOpen,
+  MessageCircle,
+  Clock,
 } from "lucide-react"
 import toast from "react-hot-toast"
 import { useMyLicences, useUnlockLicence, useOpenLicenceFile } from "../../hooks/useLicences"
+import { usePaymentSettings } from "../../hooks/usePaymentSettings"
 import { apiErrorMessage } from "../../lib/api"
+
+// Mirrors AUTO_APPROVED_DEVICE_LIMIT on the server — only used in copy.
+const AUTO_APPROVED_DEVICES = 2
+
+// A refusal from the device gate comes back as a 403; the message is written
+// for the customer, so it's shown as-is rather than as a toast that vanishes.
+function isDeviceBlock(err) {
+  return err?.response?.status === 403 || err?.response?.status === 400
+}
+
+function SupportPrompt({ productName, message }) {
+  const { data: settings } = usePaymentSettings()
+  const number = settings?.whatsappNumber?.replace(/\D/g, "")
+  if (!number) return null
+
+  const href = `https://wa.me/${number.length === 10 ? `91${number}` : number}?text=${encodeURIComponent(
+    `Hi! I'm trying to open "${productName}" from a new device and it needs your approval. ${message}`
+  )}`
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mt-3 inline-flex items-center gap-2 rounded-xl border border-status-ok/30 bg-status-ok/10 px-4 py-2.5 text-xs font-semibold text-status-ok transition hover:bg-status-ok/20"
+    >
+      <MessageCircle size={14} /> Message the shop on WhatsApp
+    </a>
+  )
+}
 
 function CopyButton({ value, label }) {
   const [copied, setCopied] = useState(false)
@@ -43,16 +76,39 @@ function UnlockForm({ licence, onUnlocked }) {
   const unlock = useUnlockLicence()
   const [key, setKey] = useState("")
   const [error, setError] = useState("")
+  const [blocked, setBlocked] = useState("")
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError("")
+    setBlocked("")
     try {
       const result = await unlock.mutateAsync(key.trim())
       onUnlocked({ ...result, key: key.trim().toUpperCase() })
     } catch (err) {
-      setError(apiErrorMessage(err))
+      const message = apiErrorMessage(err)
+      if (isDeviceBlock(err)) setBlocked(message)
+      else setError(message)
     }
+  }
+
+  if (blocked) {
+    return (
+      <div className="mt-4 rounded-xl border border-status-warn/25 bg-status-warn/5 p-4">
+        <div className="flex items-start gap-2.5">
+          <Clock size={16} className="mt-0.5 shrink-0 text-status-warn" />
+          <div className="text-sm text-cloud-300">
+            <p className="font-medium text-status-warn">Waiting on the shop</p>
+            <p className="mt-0.5 text-cloud-400">{blocked}</p>
+            <p className="mt-1.5 text-xs text-cloud-500">
+              You can already use this licence on {AUTO_APPROVED_DEVICES} devices. This one is extra,
+              so it needs approving — usually quick.
+            </p>
+            <SupportPrompt productName={licence.productName} message={blocked} />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

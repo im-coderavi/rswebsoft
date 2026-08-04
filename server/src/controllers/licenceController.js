@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/apiError.js"
 import Licence from "../models/Licence.js"
 import Product from "../models/Product.js"
-import { recordLicenceAccess } from "../services/licenceService.js"
+import { recordLicenceAccess, authoriseDevice } from "../services/licenceService.js"
 
 // The open ticket only has to survive the round trip from clicking the button
 // to the browser following the redirect.
@@ -68,12 +68,41 @@ async function requireOwnedLicence(req, key) {
   return licence
 }
 
+// Runs the device gate and turns a refusal into the response the customer sees.
+// Both unlock and the open ticket go through this, so an approved tab can't be
+// used to keep fetching tickets for a machine that was later denied.
+async function requireApprovedDevice(req, licence) {
+  const { allowed, status } = await authoriseDevice(licence, {
+    deviceId: req.body.deviceId,
+    ip: clientIp(req),
+    userAgent: req.headers["user-agent"] ?? "",
+  })
+
+  if (allowed) return
+
+  if (status === "unidentified") {
+    throw new ApiError(400, "Couldn't identify this device. Enable site data for this browser and try again.")
+  }
+  if (status === "denied") {
+    throw new ApiError(
+      403,
+      "This device isn't allowed to open your download. Contact the shop if you think that's wrong."
+    )
+  }
+  // pending
+  throw new ApiError(
+    403,
+    "This is a new device, so the shop has to approve it first. We've sent them the request."
+  )
+}
+
 // Unlocks a product with the key from the delivery email. Returns the password
 // the customer has to type into the file host — but NOT the download URL. That
 // is only ever reachable through the redirect below, so there is no link in
 // the page to right-click and copy.
 export const unlockLicence = asyncHandler(async (req, res) => {
   const licence = await requireOwnedLicence(req, req.body.key)
+  await requireApprovedDevice(req, licence)
 
   const product = await Product.findById(licence.product).select("+downloadUrl +downloadPassword name")
   if (!product?.downloadUrl?.trim()) {
@@ -97,6 +126,7 @@ export const unlockLicence = asyncHandler(async (req, res) => {
 // full key, so an unlocked tab can keep opening the file without re-entering it.
 export const createOpenToken = asyncHandler(async (req, res) => {
   const licence = await requireOwnedLicence(req, req.body.key)
+  await requireApprovedDevice(req, licence)
 
   const raw = crypto.randomBytes(32).toString("hex")
   licence.openToken = hashToken(raw)
@@ -154,6 +184,8 @@ export const listLicences = asyncHandler(async (req, res) => {
       user: l.user,
       accessCount: l.accessCount,
       distinctIpCount: l.distinctIps?.length ?? 0,
+      pendingDeviceCount: (l.devices ?? []).filter((d) => d.status === "pending").length,
+      approvedDeviceCount: (l.devices ?? []).filter((d) => d.status === "approved").length,
       lastAccessAt: l.lastAccessAt,
       revokedAt: l.revokedAt,
       revokedReason: l.revokedReason,
@@ -165,6 +197,23 @@ export const listLicences = asyncHandler(async (req, res) => {
 export const getLicence = asyncHandler(async (req, res) => {
   const licence = await Licence.findById(req.params.id).populate("user", "name email userId phone")
   if (!licence) throw new ApiError(404, "Licence not found")
+  res.json(licence)
+})
+
+export const setDeviceStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body
+  if (!["approved", "denied"].includes(status)) throw new ApiError(400, "Invalid status")
+
+  const licence = await Licence.findById(req.params.id)
+  if (!licence) throw new ApiError(404, "Licence not found")
+
+  const device = licence.devices?.find((d) => d.deviceId === req.params.deviceId)
+  if (!device) throw new ApiError(404, "Device not found on this licence")
+
+  device.status = status
+  device.decidedAt = new Date()
+  await licence.save()
+
   res.json(licence)
 })
 

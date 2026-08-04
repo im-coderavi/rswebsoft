@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { api } from "../lib/api"
+import { getDeviceId } from "../lib/deviceId"
 
 // --- customer ---------------------------------------------------------------
 
@@ -19,7 +20,7 @@ export function useMyLicences() {
 export function useUnlockLicence() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (key) => (await api.post("/licences/unlock", { key })).data,
+    mutationFn: async (key) => (await api.post("/licences/unlock", { key, deviceId: getDeviceId() })).data,
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-licences"] }),
   })
 }
@@ -31,7 +32,7 @@ export function useOpenLicenceFile() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (key) => {
-      const { data } = await api.post("/licences/open-token", { key })
+      const { data } = await api.post("/licences/open-token", { key, deviceId: getDeviceId() })
       window.open(`/api/licences/open/${data.token}`, "_blank", "noopener,noreferrer")
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-licences"] }),
@@ -52,6 +53,18 @@ export function useLicence(id) {
     queryKey: ["licence", id],
     queryFn: async () => (await api.get(`/licences/${id}`)).data,
     enabled: Boolean(id),
+  })
+}
+
+export function useSetDeviceStatus() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, deviceId, status }) =>
+      (await api.patch(`/licences/${id}/devices/${deviceId}`, { status })).data,
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ["licences"] })
+      qc.invalidateQueries({ queryKey: ["licence", variables.id] })
+    },
   })
 }
 

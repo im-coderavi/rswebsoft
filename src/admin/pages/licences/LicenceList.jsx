@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { ShieldAlert, Undo2 } from "lucide-react"
+import { ShieldAlert, Undo2, Clock } from "lucide-react"
 import toast from "react-hot-toast"
 import { useLicences, useSetLicenceStatus } from "../../../hooks/useLicences"
 import { apiErrorMessage } from "../../../lib/api"
@@ -73,8 +73,23 @@ export default function LicenceList() {
       render: (l) => <span className="text-sm text-cloud-200 tabular-nums">{l.accessCount}</span>,
     },
     {
+      key: "pendingDeviceCount",
+      label: "Waiting",
+      render: (l) =>
+        l.pendingDeviceCount > 0 ? (
+          <Link
+            to={`/admin/licences/${l.id}`}
+            className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-status-warn hover:bg-amber-500/25"
+          >
+            <Clock size={12} /> {l.pendingDeviceCount}
+          </Link>
+        ) : (
+          <span className="text-xs text-cloud-500">—</span>
+        ),
+    },
+    {
       key: "distinctIpCount",
-      label: "Devices",
+      label: "Addresses",
       render: (l) => {
         const noisy = l.distinctIpCount >= SHARING_HINT_IP_COUNT
         return (
