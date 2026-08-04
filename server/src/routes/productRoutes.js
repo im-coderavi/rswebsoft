@@ -5,12 +5,16 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  bulkDeleteProducts,
+  bulkUpdateProductStatus,
 } from "../controllers/productController.js"
 import { protect, adminOnly } from "../middleware/auth.js"
 
 const router = Router()
 
 router.get("/", listProducts)
+router.post("/bulk-delete", protect, adminOnly, bulkDeleteProducts)
+router.patch("/bulk-status", protect, adminOnly, bulkUpdateProductStatus)
 router.get("/:id", getProduct)
 router.post("/", protect, adminOnly, createProduct)
 router.put("/:id", protect, adminOnly, updateProduct)

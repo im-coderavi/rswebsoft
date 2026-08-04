@@ -40,3 +40,19 @@ export function useDeleteProduct() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
   })
 }
+
+export function useBulkDeleteProducts() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (ids) => (await api.post("/products/bulk-delete", { ids })).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
+  })
+}
+
+export function useBulkUpdateProductStatus() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ ids, status }) => (await api.patch("/products/bulk-status", { ids, status })).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["products"] }),
+  })
+}

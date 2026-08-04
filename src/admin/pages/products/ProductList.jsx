@@ -1,13 +1,15 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { Plus, Pencil, Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { Plus, Pencil, Trash2, Search, ChevronLeft, ChevronRight, X, CheckCircle2, FileEdit } from "lucide-react"
 import toast from "react-hot-toast"
-import { useProducts, useDeleteProduct } from "../../../hooks/useProducts"
+import { useProducts, useDeleteProduct, useBulkDeleteProducts, useBulkUpdateProductStatus } from "../../../hooks/useProducts"
 import { useCategories } from "../../../hooks/useCategories"
 import { apiErrorMessage } from "../../../lib/api"
 import { formatINR } from "../../../lib/currency"
 import DataTable from "../../components/DataTable"
 import ConfirmDialog from "../../components/ConfirmDialog"
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
 
 const STATUS_STYLES = {
   published: "bg-emerald-500/15 text-emerald-400",
@@ -19,11 +21,20 @@ export default function ProductList() {
   const [category, setCategory] = useState("")
   const [status, setStatus] = useState("")
   const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
   const [pendingDelete, setPendingDelete] = useState(null)
+  const [selectedIds, setSelectedIds] = useState(new Set())
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
 
-  const { data, isLoading } = useProducts({ search: search || undefined, category: category || undefined, status: status || undefined, page, limit: 10 })
+  const { data, isLoading } = useProducts({ search: search || undefined, category: category || undefined, status: status || undefined, page, limit })
   const { data: categories } = useCategories()
   const deleteProduct = useDeleteProduct()
+  const bulkDeleteProducts = useBulkDeleteProducts()
+  const bulkUpdateStatus = useBulkUpdateProductStatus()
+
+  useEffect(() => {
+    setSelectedIds(new Set())
+  }, [search, category, status, page, limit])
 
   async function confirmDelete() {
     try {
@@ -35,20 +46,44 @@ export default function ProductList() {
     }
   }
 
+  async function confirmBulkDelete() {
+    try {
+      const ids = Array.from(selectedIds)
+      await bulkDeleteProducts.mutateAsync(ids)
+      toast.success(`${ids.length} product${ids.length === 1 ? "" : "s"} deleted`)
+      setSelectedIds(new Set())
+      setBulkDeleteOpen(false)
+    } catch (err) {
+      toast.error(apiErrorMessage(err))
+    }
+  }
+
+  async function handleBulkStatus(newStatus) {
+    try {
+      const ids = Array.from(selectedIds)
+      await bulkUpdateStatus.mutateAsync({ ids, status: newStatus })
+      toast.success(`${ids.length} product${ids.length === 1 ? "" : "s"} marked ${newStatus}`)
+      setSelectedIds(new Set())
+    } catch (err) {
+      toast.error(apiErrorMessage(err))
+    }
+  }
+
   const columns = [
     {
       key: "name",
       label: "Product",
+      cellClassName: "max-w-0 w-full",
       render: (p) => (
         <div className="flex items-center gap-3">
           {p.images?.[0] ? (
-            <img src={p.images[0].url} alt="" className="h-9 w-9 rounded-lg object-cover" />
+            <img src={p.images[0].url} alt="" className="h-9 w-9 shrink-0 rounded-lg object-cover" />
           ) : (
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-ink-700 text-xs text-cloud-500">—</span>
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-ink-700 text-xs text-cloud-500">—</span>
           )}
-          <div className="min-w-0">
-            <div className="max-w-[220px] truncate font-medium text-cloud-100">{p.name}</div>
-            <div className="text-xs text-cloud-500">{p.type}</div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate font-medium text-cloud-100" title={p.name}>{p.name}</div>
+            <div className="truncate text-xs text-cloud-500">{p.type}</div>
           </div>
         </div>
       ),
@@ -136,11 +171,51 @@ export default function ProductList() {
         </Link>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-500/30 bg-brand-500/10 px-4 py-3">
+          <span className="text-sm font-medium text-cloud-100">
+            {selectedIds.size} product{selectedIds.size === 1 ? "" : "s"} selected
+          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => handleBulkStatus("published")}
+              disabled={bulkUpdateStatus.isPending}
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-ink-850 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition hover:bg-ink-800 disabled:opacity-50"
+            >
+              <CheckCircle2 size={14} /> Mark Published
+            </button>
+            <button
+              onClick={() => handleBulkStatus("draft")}
+              disabled={bulkUpdateStatus.isPending}
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-ink-850 px-3 py-1.5 text-xs font-semibold text-amber-400 transition hover:bg-ink-800 disabled:opacity-50"
+            >
+              <FileEdit size={14} /> Mark Draft
+            </button>
+            <button
+              onClick={() => setBulkDeleteOpen(true)}
+              className="flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-400 transition hover:bg-rose-500/20"
+            >
+              <Trash2 size={14} /> Delete
+            </button>
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="grid h-7 w-7 place-items-center rounded-lg text-cloud-400 transition hover:bg-white/5 hover:text-cloud-100"
+              aria-label="Clear selection"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        </div>
+      )}
+
       <DataTable
         columns={columns}
         rows={data?.items || []}
         loading={isLoading}
         emptyMessage="No products yet — create your first one."
+        selectable
+        selectedIds={selectedIds}
+        onSelectionChange={setSelectedIds}
         actions={(p) => (
           <>
             <Link
@@ -161,8 +236,27 @@ export default function ProductList() {
         )}
       />
 
-      {data && data.pages > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-3">
+      {data && data.total > 0 && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm text-cloud-400">
+            <span>
+              Showing {(data.page - 1) * limit + 1}–{Math.min(data.page * limit, data.total)} of {data.total}
+            </span>
+            <select
+              value={limit}
+              onChange={(e) => {
+                setPage(1)
+                setLimit(Number(e.target.value))
+              }}
+              className="rounded-lg border border-white/10 bg-ink-850 px-2.5 py-1.5 text-sm text-cloud-200 focus:outline-none"
+            >
+              {PAGE_SIZE_OPTIONS.map((n) => (
+                <option key={n} value={n}>{n} / page</option>
+              ))}
+            </select>
+          </div>
+          {data.pages > 1 && (
+          <div className="flex items-center gap-3">
           <button
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
@@ -178,6 +272,8 @@ export default function ProductList() {
           >
             <ChevronRight size={16} />
           </button>
+          </div>
+          )}
         </div>
       )}
 
@@ -188,6 +284,16 @@ export default function ProductList() {
         busy={deleteProduct.isPending}
         onCancel={() => setPendingDelete(null)}
         onConfirm={confirmDelete}
+      />
+
+      <ConfirmDialog
+        open={bulkDeleteOpen}
+        title="Delete selected products?"
+        message={`This will permanently delete ${selectedIds.size} product${selectedIds.size === 1 ? "" : "s"}. This cannot be undone.`}
+        confirmLabel="Delete all"
+        busy={bulkDeleteProducts.isPending}
+        onCancel={() => setBulkDeleteOpen(false)}
+        onConfirm={confirmBulkDelete}
       />
     </div>
   )

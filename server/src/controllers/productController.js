@@ -65,3 +65,20 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   if (!product) throw new ApiError(404, "Product not found")
   res.json({ message: "Product deleted" })
 })
+
+export const bulkDeleteProducts = asyncHandler(async (req, res) => {
+  const { ids } = req.body
+  if (!Array.isArray(ids) || ids.length === 0) throw new ApiError(400, "No product ids provided")
+
+  const result = await Product.deleteMany({ _id: { $in: ids } })
+  res.json({ message: "Products deleted", deletedCount: result.deletedCount })
+})
+
+export const bulkUpdateProductStatus = asyncHandler(async (req, res) => {
+  const { ids, status } = req.body
+  if (!Array.isArray(ids) || ids.length === 0) throw new ApiError(400, "No product ids provided")
+  if (!["published", "draft"].includes(status)) throw new ApiError(400, "Invalid status")
+
+  const result = await Product.updateMany({ _id: { $in: ids } }, { $set: { status } })
+  res.json({ message: "Products updated", modifiedCount: result.modifiedCount })
+})
