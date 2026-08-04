@@ -87,3 +87,28 @@ export async function sendCustomerDeliveryEmail(order) {
     return { ok: false, error: err.message }
   }
 }
+
+export async function sendWelcomeEmail(user) {
+  try {
+    const clientUrl = (process.env.CLIENT_URL || "").replace(/\/$/, "")
+
+    const html = await renderTemplate(path.join(TEMPLATES_DIR, "welcome.html"), {
+      customerName: escapeHtml(user.name),
+      customerEmail: escapeHtml(user.email),
+      userId: escapeHtml(user.userId),
+      loginUrl: `${clientUrl}/login`,
+    })
+
+    await transporter.sendMail({
+      from: mailFrom,
+      to: user.email,
+      subject: `Welcome to RSWebSoft — your User ID is ${user.userId}`,
+      html,
+    })
+
+    return { ok: true }
+  } catch (err) {
+    console.error("sendWelcomeEmail failed:", err.message)
+    return { ok: false, error: err.message }
+  }
+}
