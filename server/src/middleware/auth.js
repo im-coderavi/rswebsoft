@@ -27,6 +27,7 @@ export const protect = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, "Session expired, please sign in again")
   }
 
+  req.tokenIssuedAt = payload.iat
   req.user = user
   next()
 })

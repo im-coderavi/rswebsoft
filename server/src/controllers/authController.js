@@ -78,8 +78,96 @@ export const login = asyncHandler(async (req, res) => {
   res.json({ token, user: toPublicUser(user) })
 })
 
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000 // 1 hour
+const RENEW_TOKEN_AFTER_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
+
+function hashResetToken(raw) {
+  return crypto.createHash("sha256").update(raw).digest("hex")
+}
+
 export const me = asyncHandler(async (req, res) => {
-  res.json({ user: toPublicUser(req.user) })
+  const body = { user: toPublicUser(req.user) }
+
+  // Slide the session forward for anyone still using the site, so an active
+  // customer is never forced to sign in again. `req.tokenIssuedAt` is set by
+  // `protect`.
+  const issuedAtMs = (req.tokenIssuedAt ?? 0) * 1000
+  if (issuedAtMs && Date.now() - issuedAtMs > RENEW_TOKEN_AFTER_MS) {
+    body.token = generateToken(req.user)
+  }
+
+  res.json(body)
+})
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { identifier } = req.body
+
+  // Always the same answer, always 200: replying "no such account" would let
+  // anyone test which emails and phone numbers are registered here.
+  const genericResponse = { message: "If that account exists, a reset link is on its way." }
+
+  if (!identifier) return res.json(genericResponse)
+
+  const or = identifierQuery(String(identifier))
+  if (or.length === 0) return res.json(genericResponse)
+
+  const user = await User.findOne({ $or: or })
+  if (!user) return res.json(genericResponse)
+
+  const rawToken = crypto.randomBytes(32).toString("hex")
+  user.passwordResetToken = hashResetToken(rawToken)
+  user.passwordResetExpires = new Date(Date.now() + RESET_TOKEN_TTL_MS)
+  await user.save()
+
+  await sendPasswordResetEmail(user, rawToken)
+
+  res.json(genericResponse)
+})
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { token, password } = req.body
+
+  if (!token) throw new ApiError(400, "This reset link is invalid or has expired")
+  if (!password) throw new ApiError(400, "Password is required")
+  if (password.length < 6) throw new ApiError(400, "Password must be at least 6 characters")
+
+  const user = await User.findOne({
+    passwordResetToken: hashResetToken(String(token)),
+    passwordResetExpires: { $gt: new Date() },
+  }).select("+password +passwordResetToken +passwordResetExpires")
+
+  if (!user) throw new ApiError(400, "This reset link is invalid or has expired")
+
+  user.password = password
+  user.tokenVersion = (user.tokenVersion ?? 0) + 1
+  user.passwordResetToken = undefined
+  user.passwordResetExpires = undefined
+  await user.save()
+
+  // Signed in immediately — the customer just proved control of the inbox.
+  const newToken = generateToken(user)
+  res.json({ token: newToken, user: toPublicUser(user) })
+})
+
+export const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, password } = req.body
+
+  if (!currentPassword || !password) throw new ApiError(400, "Both passwords are required")
+  if (password.length < 6) throw new ApiError(400, "Password must be at least 6 characters")
+
+  const user = await User.findById(req.user._id).select("+password")
+  if (!(await user.comparePassword(currentPassword))) {
+    throw new ApiError(401, "Your current password is not correct")
+  }
+
+  user.password = password
+  user.tokenVersion = (user.tokenVersion ?? 0) + 1
+  await user.save()
+
+  // Bumping tokenVersion invalidated this caller's own token too, so hand
+  // back a fresh one — they stay signed in here, everywhere else is signed out.
+  const newToken = generateToken(user)
+  res.json({ token: newToken, user: toPublicUser(user) })
 })
 
 export const register = asyncHandler(async (req, res) => {
