@@ -6,6 +6,7 @@ import { sendAdminNewOrderEmail, sendCustomerDeliveryEmail } from "../services/m
 import { buildPricedItems } from "../services/pricingService.js"
 import { resolveCoupon } from "../services/couponService.js"
 import { issueLicencesForOrder } from "../services/licenceService.js"
+import { sendNewOrderWhatsapp } from "../services/whatsappService.js"
 import Coupon from "../models/Coupon.js"
 
 export const listOrders = asyncHandler(async (req, res) => {
@@ -175,6 +176,14 @@ export const createOrder = asyncHandler(async (req, res) => {
   sendAdminNewOrderEmail(order)
     .then((emailResult) => Order.updateOne({ _id: order._id }, { orderNotified: emailResult.ok }))
     .catch((err) => console.error("Background sendAdminNewOrderEmail failed:", err.message))
+
+  // Same treatment for the WhatsApp ping, and for a stronger reason: it goes
+  // through a free third-party relay with no uptime promise. A customer's
+  // order must never fail, or even slow down, because that service is having
+  // a bad day. Email remains the reliable channel.
+  sendNewOrderWhatsapp(order).catch((err) =>
+    console.error("Background sendNewOrderWhatsapp failed:", err.message)
+  )
 
   res.status(201).json(order)
 })

@@ -4,6 +4,7 @@ import toast from "react-hot-toast"
 import { usePaymentSettings, useUpdatePaymentSettings } from "../../hooks/usePaymentSettings"
 import { apiErrorMessage } from "../../lib/api"
 import ImageUploader from "../components/ImageUploader"
+import WhatsappAlertSettings from "../components/WhatsappAlertSettings"
 
 export default function Settings() {
   const { data: settings, isLoading } = usePaymentSettings()
@@ -128,6 +129,10 @@ export default function Settings() {
           </button>
         </div>
       </form>
+
+      <div className="mt-5">
+        <WhatsappAlertSettings />
+      </div>
     </div>
   )
 }
