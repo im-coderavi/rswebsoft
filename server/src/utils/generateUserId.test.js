@@ -31,8 +31,21 @@ test("USER_ID_PATTERN accepts generated ids and rejects near-misses", () => {
   assert.doesNotMatch("8F3K2M", USER_ID_PATTERN) // no prefix
 })
 
-test("does not collide across a large sample", () => {
+test("stays essentially collision-free across a large sample", () => {
+  const SAMPLE = 5000
   const seen = new Set()
-  for (let i = 0; i < 5000; i++) seen.add(generateUserId())
-  assert.equal(seen.size, 5000)
+  for (let i = 0; i < SAMPLE; i++) seen.add(generateUserId())
+
+  // Not asserted as exactly SAMPLE on purpose. The keyspace is 31^6 ≈ 887M, so
+  // by the birthday bound a run of 5000 has roughly a 1.4% chance of one
+  // honest collision — a strict equality here fails about once every seventy
+  // runs with nothing wrong, which just teaches people to ignore red tests.
+  //
+  // Anything that actually broke the generator (a constant seed, a truncated
+  // alphabet, a modulo that collapses the range) would produce collisions by
+  // the hundred, so this bound still catches every real failure.
+  assert.ok(
+    seen.size >= SAMPLE - 5,
+    `expected near-total uniqueness, got ${seen.size} distinct out of ${SAMPLE}`
+  )
 })
