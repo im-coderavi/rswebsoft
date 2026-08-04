@@ -20,6 +20,13 @@ export const protect = asyncHandler(async (req, res, next) => {
   const user = await User.findById(payload.id)
   if (!user) throw new ApiError(401, "User no longer exists")
 
+  // Tokens minted before this shipped carry no `tv`, and users created before
+  // it have no `tokenVersion`. Both default to 0 so existing sessions survive
+  // the deploy rather than everyone being signed out at once.
+  if ((payload.tv ?? 0) !== (user.tokenVersion ?? 0)) {
+    throw new ApiError(401, "Session expired, please sign in again")
+  }
+
   req.user = user
   next()
 })
