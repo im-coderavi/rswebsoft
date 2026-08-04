@@ -13,7 +13,8 @@
     "seed-package-features": "node scripts/seedProductPackageFeatures.js",
     "seed-demo-packages": "node scripts/seedDemoPackages.js",
     "import": "node src/import.js",
-    "fix-package-types": "node src/fixPackageMisclassification.js"
+    "fix-package-types": "node src/fixPackageMisclassification.js",
+    "backfill-user-ids": "node scripts/backfillUserIds.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
