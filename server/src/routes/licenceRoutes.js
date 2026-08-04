@@ -1,7 +1,9 @@
 import { Router } from "express"
 import {
   myLicences,
-  revealLicence,
+  unlockLicence,
+  createOpenToken,
+  openLicenceFile,
   listLicences,
   getLicence,
   setLicenceStatus,
@@ -10,9 +12,15 @@ import { protect, adminOnly } from "../middleware/auth.js"
 
 const router = Router()
 
-// Customer — signing in is the whole point, so nothing here is public.
+// Unauthenticated by design — a browser navigation can't send a bearer token,
+// so the single-use 60-second ticket in the path is the credential. Declared
+// before "/:id" so "open" is never read as an id.
+router.get("/open/:token", openLicenceFile)
+
+// Customer
 router.get("/mine", protect, myLicences)
-router.post("/:key/reveal", protect, revealLicence)
+router.post("/unlock", protect, unlockLicence)
+router.post("/open-token", protect, createOpenToken)
 
 // Admin
 router.get("/", protect, adminOnly, listLicences)

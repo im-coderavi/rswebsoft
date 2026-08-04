@@ -1,8 +1,17 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { Download, Copy, Check, ExternalLink, ShieldAlert, ArrowRight, KeyRound } from "lucide-react"
+import {
+  Download,
+  Copy,
+  Check,
+  ExternalLink,
+  ShieldAlert,
+  ArrowRight,
+  Lock,
+  LockOpen,
+} from "lucide-react"
 import toast from "react-hot-toast"
-import { useMyLicences, useRevealLicence } from "../../hooks/useLicences"
+import { useMyLicences, useUnlockLicence, useOpenLicenceFile } from "../../hooks/useLicences"
 import { apiErrorMessage } from "../../lib/api"
 
 function CopyButton({ value, label }) {
@@ -30,55 +39,113 @@ function CopyButton({ value, label }) {
   )
 }
 
-function RevealedFile({ reveal }) {
+function UnlockForm({ licence, onUnlocked }) {
+  const unlock = useUnlockLicence()
+  const [key, setKey] = useState("")
+  const [error, setError] = useState("")
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError("")
+    try {
+      const result = await unlock.mutateAsync(key.trim())
+      onUnlocked({ ...result, key: key.trim().toUpperCase() })
+    } catch (err) {
+      setError(apiErrorMessage(err))
+    }
+  }
+
   return (
-    <div className="mt-4 space-y-3 rounded-xl border border-ink-700 bg-ink-800/60 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="min-w-0">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cloud-500">
-            Download link
-          </div>
-          <a
-            href={reveal.downloadUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-1 flex items-center gap-1.5 break-all text-sm font-medium text-brand-300 hover:underline"
-          >
-            {reveal.downloadUrl} <ExternalLink size={13} className="shrink-0" />
-          </a>
-        </div>
-        <CopyButton value={reveal.downloadUrl} label="Copy link" />
+    <form onSubmit={handleSubmit} className="mt-4">
+      <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+        Enter your licence key to unlock
+      </label>
+      <div className="flex flex-wrap gap-2">
+        <input
+          value={key}
+          onChange={(e) => {
+            setKey(e.target.value)
+            setError("")
+          }}
+          required
+          autoComplete="off"
+          spellCheck="false"
+          placeholder={licence.maskedKey}
+          aria-invalid={error ? "true" : undefined}
+          className={`min-w-[13rem] flex-1 rounded-lg border bg-ink-800 px-3.5 py-2.5 font-mono text-sm uppercase tracking-wide text-cloud-100 placeholder:font-mono placeholder:tracking-wide placeholder:text-cloud-500 focus:outline-none ${
+            error ? "border-status-bad" : "border-ink-700 focus:border-brand-500"
+          }`}
+        />
+        <button
+          type="submit"
+          disabled={unlock.isPending}
+          className="flex items-center justify-center gap-2 rounded-xl bg-brand-gradient px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-95 disabled:opacity-50"
+        >
+          <LockOpen size={15} /> {unlock.isPending ? "Checking…" : "Unlock"}
+        </button>
+      </div>
+      {error ? (
+        <p className="mt-1.5 text-xs text-status-bad">{error}</p>
+      ) : (
+        <p className="mt-1.5 text-xs text-cloud-500">
+          The full key is in your delivery email. We only show the last part here.
+        </p>
+      )}
+    </form>
+  )
+}
+
+function UnlockedFile({ unlocked }) {
+  const open = useOpenLicenceFile()
+
+  async function handleOpen() {
+    try {
+      await open.mutateAsync(unlocked.key)
+    } catch (err) {
+      toast.error(apiErrorMessage(err))
+    }
+  }
+
+  return (
+    <div className="mt-4 space-y-3 rounded-xl border border-status-ok/25 bg-status-ok/5 p-4">
+      <div className="flex items-center gap-2 text-sm font-medium text-status-ok">
+        <LockOpen size={15} /> Unlocked
       </div>
 
-      {reveal.downloadPassword && (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-ink-700 pt-3">
+      <button
+        type="button"
+        onClick={handleOpen}
+        disabled={open.isPending}
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-gradient px-5 py-3 text-sm font-semibold text-white transition hover:opacity-95 disabled:opacity-50 sm:w-auto"
+      >
+        <ExternalLink size={15} /> {open.isPending ? "Opening…" : "Open download"}
+      </button>
+
+      {unlocked.downloadPassword && (
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-status-ok/20 pt-3">
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cloud-500">
-              Password
+              File password
             </div>
             <div className="mt-1 font-mono text-sm font-bold text-cloud-100">
-              {reveal.downloadPassword}
+              {unlocked.downloadPassword}
             </div>
           </div>
-          <CopyButton value={reveal.downloadPassword} label="Copy password" />
+          <CopyButton value={unlocked.downloadPassword} label="Copy password" />
         </div>
       )}
+
+      <p className="text-xs text-cloud-500">
+        The file opens in a new tab. There's no link to copy — each open goes through your licence
+        and is logged against your account.
+      </p>
     </div>
   )
 }
 
 function LicenceCard({ licence }) {
-  const reveal = useRevealLicence()
-  const [revealed, setRevealed] = useState(null)
+  const [unlocked, setUnlocked] = useState(null)
   const isRevoked = licence.status === "revoked"
-
-  async function handleReveal() {
-    try {
-      setRevealed(await reveal.mutateAsync(licence.key))
-    } catch (err) {
-      toast.error(apiErrorMessage(err))
-    }
-  }
 
   return (
     <section className="rounded-2xl border border-ink-800 bg-ink-850 p-5">
@@ -88,8 +155,8 @@ function LicenceCard({ licence }) {
             {licence.productName}
           </h2>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-cloud-500">
-            <KeyRound size={12} />
-            <span className="font-mono tracking-wide text-cloud-300">{licence.key}</span>
+            {unlocked ? <LockOpen size={12} /> : <Lock size={12} />}
+            <span className="font-mono tracking-wide text-cloud-300">{licence.maskedKey}</span>
             {licence.accessCount > 0 && (
               <>
                 <span className="text-cloud-500/40">·</span>
@@ -100,7 +167,6 @@ function LicenceCard({ licence }) {
             )}
           </div>
         </div>
-        <CopyButton value={licence.key} label="Copy key" />
       </div>
 
       {isRevoked ? (
@@ -113,21 +179,14 @@ function LicenceCard({ licence }) {
               <Link to="/support" className="text-brand-300 hover:underline">
                 contact support
               </Link>{" "}
-              and quote the key above.
+              and quote the key from your email.
             </p>
           </div>
         </div>
-      ) : revealed ? (
-        <RevealedFile reveal={revealed} />
+      ) : unlocked ? (
+        <UnlockedFile unlocked={unlocked} />
       ) : (
-        <button
-          type="button"
-          onClick={handleReveal}
-          disabled={reveal.isPending}
-          className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-brand-gradient px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-95 disabled:opacity-50"
-        >
-          <Download size={15} /> {reveal.isPending ? "Opening…" : "Show download"}
-        </button>
+        <UnlockForm licence={licence} onUnlocked={setUnlocked} />
       )}
     </section>
   )
@@ -140,7 +199,7 @@ export default function Downloads() {
     return (
       <div className="space-y-3">
         {[0, 1].map((i) => (
-          <div key={i} className="h-32 animate-pulse rounded-2xl bg-ink-850" />
+          <div key={i} className="h-40 animate-pulse rounded-2xl bg-ink-850" />
         ))}
       </div>
     )
@@ -169,8 +228,8 @@ export default function Downloads() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-cloud-500">
-        These files are registered to your account and every download is logged. Sharing a licence
-        key or its password can get it revoked.
+        Unlock a product with the licence key from its delivery email. Files are registered to your
+        account and every open is logged — sharing a key can get it revoked.
       </p>
       {licences.map((licence) => (
         <LicenceCard key={licence.id} licence={licence} />

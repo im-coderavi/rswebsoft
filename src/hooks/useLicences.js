@@ -10,12 +10,30 @@ export function useMyLicences() {
   })
 }
 
-// Revealing is a POST because it has a side effect: the server records who
+// Unlocking is a POST because it has a side effect: the server records who
 // opened the licence, from where, and when. Never cache the result.
-export function useRevealLicence() {
+//
+// The response carries the file's password but NOT its URL — the download is
+// only reachable through the redirect below, so there is no link anywhere in
+// the page to right-click and copy.
+export function useUnlockLicence() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (key) => (await api.post(`/licences/${key}/reveal`)).data,
+    mutationFn: async (key) => (await api.post("/licences/unlock", { key })).data,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-licences"] }),
+  })
+}
+
+// Mints a single-use ticket and navigates to it. The real download URL never
+// reaches the browser as data — the server answers the navigation with a
+// redirect, so there's nothing in the DOM or in any response body to copy.
+export function useOpenLicenceFile() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (key) => {
+      const { data } = await api.post("/licences/open-token", { key })
+      window.open(`/api/licences/open/${data.token}`, "_blank", "noopener,noreferrer")
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-licences"] }),
   })
 }

@@ -41,6 +41,14 @@ const licenceSchema = new mongoose.Schema(
     // Most recent reveals, capped by $slice so the document can't grow without
     // bound on a licence that is hammered.
     accessLog: [accessSchema],
+
+    // Single-use, 60-second ticket for the download redirect. The browser
+    // navigates to /licences/open/<token>, which is a plain navigation and so
+    // carries no Authorization header — the token itself is the credential.
+    // Stored hashed and cleared on use, so it is worthless once redeemed or
+    // if the database is read.
+    openToken: { type: String, default: null, select: false },
+    openTokenExpires: { type: Date, default: null, select: false },
   },
   { timestamps: true }
 )
