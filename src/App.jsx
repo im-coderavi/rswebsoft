@@ -16,6 +16,8 @@ import Tools from "./pages/Tools"
 import Demos from "./pages/Demos"
 import CustomerLogin from "./pages/Login"
 import Register from "./pages/Register"
+import ForgotPassword from "./pages/ForgotPassword"
+import ResetPassword from "./pages/ResetPassword"
 import AccountOrders from "./pages/AccountOrders"
 import RequireAuth from "./components/RequireAuth"
 import { AuthProvider } from "./context/AuthContext"
@@ -69,6 +71,8 @@ function App() {
 
               <Route path="/login" element={<CustomerLogin />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
               <Route path="*" element={<Placeholder title="Page Not Found" />} />
             </Route>
 
