@@ -7,3 +7,10 @@ export function useDashboardStats() {
     queryFn: async () => (await api.get("/dashboard/stats")).data,
   })
 }
+
+export function useDashboardAnalytics() {
+  return useQuery({
+    queryKey: ["dashboard-analytics"],
+    queryFn: async () => (await api.get("/dashboard/analytics")).data,
+  })
+}
