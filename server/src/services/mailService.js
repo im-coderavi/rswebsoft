@@ -112,3 +112,27 @@ export async function sendWelcomeEmail(user) {
     return { ok: false, error: err.message }
   }
 }
+
+export async function sendPasswordResetEmail(user, rawToken) {
+  try {
+    const clientUrl = (process.env.CLIENT_URL || "").replace(/\/$/, "")
+    const resetUrl = `${clientUrl}/reset-password/${rawToken}`
+
+    const html = await renderTemplate(path.join(TEMPLATES_DIR, "passwordReset.html"), {
+      customerName: escapeHtml(user.name),
+      resetUrl,
+    })
+
+    await transporter.sendMail({
+      from: mailFrom,
+      to: user.email,
+      subject: "Reset your RSWebSoft password",
+      html,
+    })
+
+    return { ok: true }
+  } catch (err) {
+    console.error("sendPasswordResetEmail failed:", err.message)
+    return { ok: false, error: err.message }
+  }
+}
