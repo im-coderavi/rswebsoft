@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/apiError.js"
 import Product from "../models/Product.js"
+import { slugify } from "../utils/slugify.js"
 
 export const listProducts = asyncHandler(async (req, res) => {
   const { search, category, brand, status, type, featured, page = 1, limit = 20 } = req.query
@@ -37,7 +38,12 @@ export const listProducts = asyncHandler(async (req, res) => {
 
 export const getProduct = asyncHandler(async (req, res) => {
   const { id } = req.params
-  const query = mongoose.isValidObjectId(id) ? { _id: id } : { slug: id }
+
+  // An id, the current slug, or one this product used to live at — so a URL
+  // that was shared or indexed before a slug change still resolves.
+  const query = mongoose.isValidObjectId(id)
+    ? { _id: id }
+    : { $or: [{ slug: id }, { previousSlugs: id }] }
 
   const product = await Product.findOne(query)
     .populate("category", "name slug icon tone")
@@ -46,18 +52,78 @@ export const getProduct = asyncHandler(async (req, res) => {
   res.json(product)
 })
 
+// Turns a duplicate-slug write into something the admin can act on. Without
+// this Mongo's raw E11000 surfaces as an unexplained 500.
+function slugConflictError(err) {
+  if (err?.code === 11000 && err?.keyPattern?.slug) {
+    return new ApiError(409, "That URL is already used by another product — pick a different one")
+  }
+  return err
+}
+
+// Finds a free slug near the one asked for: "gp-sports", then "gp-sports-2",
+// "gp-sports-3". Only used when the admin left the field empty; a slug they
+// typed themselves is never silently altered — they get the 409 instead.
+async function findFreeSlug(base, excludeId) {
+  const taken = async (candidate) =>
+    Product.exists({
+      slug: candidate,
+      ...(excludeId ? { _id: { $ne: excludeId } } : {}),
+    })
+
+  if (!(await taken(base))) return base
+
+  for (let n = 2; n < 200; n++) {
+    const candidate = `${base}-${n}`
+    if (!(await taken(candidate))) return candidate
+  }
+  // Absurd number of near-identical names; fall back to something unique.
+  return `${base}-${Date.now().toString(36)}`
+}
+
 export const createProduct = asyncHandler(async (req, res) => {
-  const product = await Product.create({ ...req.body, createdBy: req.user._id })
-  res.status(201).json(product)
+  const payload = { ...req.body, createdBy: req.user._id }
+
+  // Only auto-resolve collisions for a slug we generated ourselves.
+  if (!payload.slug?.trim() && payload.name) {
+    payload.slug = await findFreeSlug(slugify(payload.name))
+  }
+
+  try {
+    const product = await Product.create(payload)
+    res.status(201).json(product)
+  } catch (err) {
+    throw slugConflictError(err)
+  }
 })
 
 export const updateProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id)
   if (!product) throw new ApiError(404, "Product not found")
 
-  Object.assign(product, req.body)
-  await product.save()
-  res.json(product)
+  const slugBefore = product.slug
+
+  const payload = { ...req.body }
+  if (payload.slug !== undefined && !String(payload.slug).trim()) {
+    // Cleared on purpose — regenerate from the (possibly new) name.
+    payload.slug = await findFreeSlug(slugify(payload.name || product.name), product._id)
+  }
+
+  Object.assign(product, payload)
+
+  // Keep the old address working. Guarded against re-adding a slug the product
+  // has since moved back to.
+  if (slugBefore && product.slug !== slugBefore && !product.previousSlugs.includes(slugBefore)) {
+    product.previousSlugs.push(slugBefore)
+  }
+  product.previousSlugs = product.previousSlugs.filter((s) => s !== product.slug)
+
+  try {
+    await product.save()
+    res.json(product)
+  } catch (err) {
+    throw slugConflictError(err)
+  }
 })
 
 export const deleteProduct = asyncHandler(async (req, res) => {

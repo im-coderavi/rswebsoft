@@ -12,6 +12,7 @@ const TYPES = ["plugin", "theme", "ready-website", "delivered-website", "package
 
 const emptyForm = {
   name: "",
+  slug: "",
   shortDescription: "",
   displayTag: "",
   description: "",
@@ -30,6 +31,16 @@ const emptyForm = {
   featured: false,
   status: "draft",
   images: [],
+}
+
+// Mirrors server/src/utils/slugify.js so the preview under the field matches
+// exactly what gets saved — the server normalises whatever is typed.
+function slugifyText(text) {
+  return String(text)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
 }
 
 // Descriptions are stored and shown as plain text (see ProductDetail.jsx) —
@@ -86,6 +97,7 @@ export default function ProductForm() {
     if (!existing) return
     setForm({
       name: existing.name || "",
+      slug: existing.slug || "",
       shortDescription: existing.shortDescription || "",
       displayTag: existing.displayTag || "",
       description: existing.description || "",
@@ -119,6 +131,10 @@ export default function ProductForm() {
   function setField(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
   }
+
+  // The address this product is already published at, so the form can warn
+  // when an edit is about to move it.
+  const originalSlug = existing?.slug ?? ""
 
   const [featureInput, setFeatureInput] = useState("")
 
@@ -237,6 +253,7 @@ export default function ProductForm() {
 
     const payload = {
       name: form.name,
+      slug: form.slug.trim(),
       shortDescription: form.shortDescription,
       displayTag: form.displayTag,
       description: form.description,
@@ -301,6 +318,56 @@ export default function ProductForm() {
             className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
             placeholder="e.g. Rank Math SEO Pro"
           />
+        </div>
+
+        <div>
+          <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+            <label className="block text-xs font-medium text-cloud-400">
+              URL slug <span className="text-cloud-500">(this is the page address on Google)</span>
+            </label>
+            <button
+              type="button"
+              onClick={() => setField("slug", slugifyText(form.name))}
+              disabled={!form.name.trim()}
+              className="text-xs font-medium text-brand-300 transition hover:text-brand-200 disabled:opacity-40"
+            >
+              Generate from name
+            </button>
+          </div>
+          <input
+            value={form.slug}
+            onChange={(e) => setField("slug", e.target.value)}
+            className="w-full rounded-lg border border-white/10 bg-ink-800 px-3.5 py-2.5 font-mono text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+            placeholder="rank-math-seo-pro"
+          />
+
+          <p className="mt-1.5 break-all text-xs text-cloud-500">
+            {form.slug.trim() ? (
+              <>
+                Page address: <span className="text-cloud-300">/products/{slugifyText(form.slug)}</span>
+              </>
+            ) : (
+              <>
+                Leave empty and we'll build one from the name
+                {form.name.trim() && (
+                  <>
+                    : <span className="text-cloud-300">/products/{slugifyText(form.name)}</span>
+                  </>
+                )}
+              </>
+            )}
+          </p>
+
+          {/* Old addresses keep working (the server remembers them), but the
+              admin should still know the canonical URL is moving. */}
+          {isEdit && originalSlug && slugifyText(form.slug) !== originalSlug && (
+            <p className="mt-2 rounded-lg border border-status-warn/25 bg-status-warn/5 px-3 py-2 text-xs text-cloud-300">
+              This changes the product's address from{" "}
+              <span className="font-mono text-cloud-400">/{originalSlug}</span>. The old one will
+              still open this product, but Google takes a while to catch up — only change it if the
+              current address is genuinely wrong.
+            </p>
+          )}
         </div>
 
         <div>

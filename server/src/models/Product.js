@@ -13,6 +13,11 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     slug: { type: String, unique: true },
+
+    // Slugs this product used to live at. Changing a URL otherwise 404s every
+    // link and search result pointing at the old one, so getProduct falls back
+    // to these and the old address keeps working.
+    previousSlugs: { type: [String], default: [], index: true },
     description: { type: String, default: "" },
     shortDescription: { type: String, default: "" },
     displayTag: { type: String, default: "" },
@@ -59,9 +64,20 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
+// The slug is the product's public URL, so the admin owns it. This hook only
+// fills one in when none was given, and normalises whatever was typed.
+//
+// It deliberately does NOT regenerate on rename any more. It used to, which
+// meant tweaking a product title silently changed its URL and broke every
+// inbound link and search result pointing at the old one.
 productSchema.pre("validate", function (next) {
-  if (this.isNew || this.isModified("name")) {
-    this.slug = `${slugify(this.name)}-${Date.now().toString(36)}`
+  if (this.slug) {
+    this.slug = slugify(this.slug)
+  }
+  if (!this.slug && this.name) {
+    // Bare slug, no timestamp suffix — the controller resolves collisions by
+    // appending -2, -3, which reads far better than -mf3k2p.
+    this.slug = slugify(this.name)
   }
   next()
 })
