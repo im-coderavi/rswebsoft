@@ -45,8 +45,20 @@ export function AuthProvider({ children }) {
     return data.user
   }, [resetCache])
 
-  const register = useCallback(async ({ name, email, phone, password }) => {
-    const { data } = await api.post("/auth/register", { name, email, phone, password })
+  // Signing up is two calls: this one only sends the code. No account exists
+  // until verifySignup below succeeds, so there is nothing to sign in to yet.
+  const startSignup = useCallback(async ({ name, email, phone, password }) => {
+    const { data } = await api.post("/auth/signup/start", { name, email, phone, password })
+    return data
+  }, [])
+
+  const resendSignupOtp = useCallback(async (email) => {
+    const { data } = await api.post("/auth/signup/resend", { email })
+    return data
+  }, [])
+
+  const verifySignup = useCallback(async (email, code) => {
+    const { data } = await api.post("/auth/signup/verify", { email, code })
     resetCache()
     localStorage.setItem(TOKEN_KEY, data.token)
     setUser(data.user)
@@ -91,7 +103,9 @@ export function AuthProvider({ children }) {
         user,
         loading,
         login,
-        register,
+        startSignup,
+        resendSignupOtp,
+        verifySignup,
         forgotPassword,
         resetPassword,
         updateProfile,

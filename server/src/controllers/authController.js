@@ -1,11 +1,14 @@
 import crypto from "crypto"
+import bcrypt from "bcryptjs"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/apiError.js"
 import { generateToken } from "../utils/generateToken.js"
 import { generateUserId, USER_ID_PATTERN } from "../utils/generateUserId.js"
 import { normalizePhone } from "../utils/normalizePhone.js"
-import { sendWelcomeEmail, sendPasswordResetEmail } from "../services/mailService.js"
+import { sendWelcomeEmail, sendPasswordResetEmail, sendSignupOtpEmail } from "../services/mailService.js"
+import { hitRateLimit } from "../services/rateLimitService.js"
 import User from "../models/User.js"
+import PendingSignup from "../models/PendingSignup.js"
 
 function toPublicUser(user) {
   return {
@@ -21,10 +24,16 @@ function toPublicUser(user) {
 
 // Retries on the unique-index race: two concurrent signups can generate the
 // same ID, and the loser must get a different one rather than a 500.
-async function createUserWithUniqueId(fields) {
+//
+// `passwordIsHashed` is set when the value came from a pending signup, where
+// it was hashed before being stored — the User pre-save hook must not hash it
+// again or nobody could log in.
+async function createUserWithUniqueId(fields, { passwordIsHashed = false } = {}) {
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      return await User.create({ ...fields, userId: generateUserId() })
+      const user = new User({ ...fields, userId: generateUserId() })
+      if (passwordIsHashed) user.$locals.passwordAlreadyHashed = true
+      return await user.save()
     } catch (err) {
       const isDuplicateUserId = err?.code === 11000 && err?.keyPattern?.userId
       if (!isDuplicateUserId) throw err
@@ -206,7 +215,59 @@ export const changePassword = asyncHandler(async (req, res) => {
   res.json({ token: newToken, user: toPublicUser(user) })
 })
 
-export const register = asyncHandler(async (req, res) => {
+// ---- signup ----------------------------------------------------------------
+//
+// Two steps on purpose. The account is only created once the code from the
+// email has been entered, so an address nobody controls never becomes a row in
+// the users collection. There is deliberately no endpoint that creates an
+// account directly — one would let anyone skip the whole thing.
+
+const OTP_TTL_MS = 10 * 60 * 1000
+const PENDING_TTL_MS = 30 * 60 * 1000
+const OTP_MAX_ATTEMPTS = 5
+const OTP_RESEND_COOLDOWN_MS = 60 * 1000
+const OTP_MAX_SENDS_PER_EMAIL = 5
+
+// Caps how many verification emails one address can trigger in an hour.
+// Without it this endpoint is a way to bomb someone's inbox — and the shop
+// sends through Gmail, which stops delivering entirely once its daily
+// allowance is used up.
+const OTP_EMAIL_RATE = { limit: OTP_MAX_SENDS_PER_EMAIL, windowMs: 60 * 60 * 1000 }
+
+function generateOtp() {
+  return String(crypto.randomInt(0, 1_000_000)).padStart(6, "0")
+}
+
+function hashOtp(code) {
+  return crypto.createHash("sha256").update(String(code)).digest("hex")
+}
+
+// Shared by start and resend: mint a code, store its hash, email the plaintext.
+async function issueOtp(pending, name) {
+  const code = generateOtp()
+
+  pending.otpHash = hashOtp(code)
+  pending.otpExpires = new Date(Date.now() + OTP_TTL_MS)
+  pending.attempts = 0
+  pending.lastSentAt = new Date()
+  pending.expiresAt = new Date(Date.now() + PENDING_TTL_MS)
+  await pending.save()
+
+  const sent = await sendSignupOtpEmail({
+    name,
+    email: pending.email,
+    code,
+    minutes: Math.round(OTP_TTL_MS / 60000),
+  })
+
+  // A failed send has to surface — otherwise the customer sits waiting for a
+  // code that was never going to arrive.
+  if (!sent.ok) {
+    throw new ApiError(502, "Couldn't send the verification email. Check the address and try again.")
+  }
+}
+
+export const startSignup = asyncHandler(async (req, res) => {
   const { name, email, phone, password } = req.body
 
   if (!name?.trim()) throw new ApiError(400, "Name is required")
@@ -227,12 +288,112 @@ export const register = asyncHandler(async (req, res) => {
     throw new ApiError(409, "That phone number is already registered")
   }
 
-  const user = await createUserWithUniqueId({
-    name: name.trim(),
+  const rate = await hitRateLimit(`signup-otp:${normalizedEmail}`, OTP_EMAIL_RATE)
+  if (!rate.allowed) {
+    throw new ApiError(429, "Too many codes requested for this email. Try again in an hour.")
+  }
+
+  // Hashed now so the plaintext password is never written down, not even for
+  // the few minutes this record exists.
+  const passwordHash = await bcrypt.hash(password, 10)
+
+  // Restarting replaces whatever was pending for this address, so a customer
+  // who mistyped their phone can simply go back and do it again.
+  const pending =
+    (await PendingSignup.findOne({ email: normalizedEmail }).select(
+      "+passwordHash +otpHash"
+    )) ?? new PendingSignup({ email: normalizedEmail })
+
+  pending.name = name.trim()
+  pending.phone = normalizedPhone
+  pending.passwordHash = passwordHash
+  pending.sendCount = 1
+
+  await issueOtp(pending, pending.name)
+
+  res.status(202).json({
     email: normalizedEmail,
-    phone: normalizedPhone,
-    password,
+    message: "We've sent a 6-digit code to your email. It expires in 10 minutes.",
   })
+})
+
+export const resendSignupOtp = asyncHandler(async (req, res) => {
+  const normalizedEmail = String(req.body.email ?? "").toLowerCase().trim()
+
+  const pending = await PendingSignup.findOne({ email: normalizedEmail }).select("+otpHash")
+  if (!pending) {
+    throw new ApiError(400, "That signup has expired. Please start again.")
+  }
+
+  const sinceLast = Date.now() - new Date(pending.lastSentAt).getTime()
+  if (sinceLast < OTP_RESEND_COOLDOWN_MS) {
+    throw new ApiError(
+      429,
+      `Please wait ${Math.ceil((OTP_RESEND_COOLDOWN_MS - sinceLast) / 1000)} seconds before asking for another code.`
+    )
+  }
+
+  const rate = await hitRateLimit(`signup-otp:${normalizedEmail}`, OTP_EMAIL_RATE)
+  if (!rate.allowed) {
+    throw new ApiError(429, "Too many codes requested for this email. Try again in an hour.")
+  }
+
+  pending.sendCount += 1
+  await issueOtp(pending, pending.name)
+
+  res.json({ message: "A new code is on its way." })
+})
+
+export const verifySignup = asyncHandler(async (req, res) => {
+  const normalizedEmail = String(req.body.email ?? "").toLowerCase().trim()
+  const code = String(req.body.code ?? "").trim()
+
+  const pending = await PendingSignup.findOne({ email: normalizedEmail }).select(
+    "+passwordHash +otpHash"
+  )
+  if (!pending) throw new ApiError(400, "That signup has expired. Please start again.")
+
+  if (pending.otpExpires < new Date()) {
+    throw new ApiError(400, "That code has expired. Ask for a new one.")
+  }
+
+  if (pending.attempts >= OTP_MAX_ATTEMPTS) {
+    throw new ApiError(429, "Too many wrong codes. Ask for a new one.")
+  }
+
+  if (hashOtp(code) !== pending.otpHash) {
+    pending.attempts += 1
+    await pending.save()
+    const left = OTP_MAX_ATTEMPTS - pending.attempts
+    throw new ApiError(
+      400,
+      left > 0 ? `That code isn't right — ${left} ${left === 1 ? "try" : "tries"} left.` : "Too many wrong codes. Ask for a new one."
+    )
+  }
+
+  // Re-checked here, not just at step one: someone else may have taken the
+  // email or phone during the ten minutes this was pending.
+  if (await User.exists({ email: pending.email })) {
+    await PendingSignup.deleteOne({ _id: pending._id })
+    throw new ApiError(409, "That email is already registered")
+  }
+  if (await User.exists({ phone: pending.phone })) {
+    await PendingSignup.deleteOne({ _id: pending._id })
+    throw new ApiError(409, "That phone number is already registered")
+  }
+
+  const user = await createUserWithUniqueId(
+    {
+      name: pending.name,
+      email: pending.email,
+      phone: pending.phone,
+      password: pending.passwordHash,
+      emailVerifiedAt: new Date(),
+    },
+    { passwordIsHashed: true }
+  )
+
+  await PendingSignup.deleteOne({ _id: pending._id })
 
   // A mail outage must not cost the customer their account — they are already
   // signed in, and can read the User ID off their account page.

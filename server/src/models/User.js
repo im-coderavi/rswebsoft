@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema(
     // `tv` claim, so changing a password signs out every other device.
     tokenVersion: { type: Number, default: 0 },
 
+    // When the emailed code was entered. Every account created after signup
+    // verification shipped has this; the handful that predate it are null,
+    // which is honest — nobody ever proved those addresses.
+    emailVerifiedAt: { type: Date, default: null },
+
     // SHA-256 hash of the token that went out in the reset email — never the
     // raw token, so a leaked database dump cannot be used to take accounts.
     passwordResetToken: { type: String, select: false },
@@ -35,6 +40,13 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next()
+
+  // Signup verification hands over a password that was already hashed when the
+  // pending record was created, so the plaintext never had to be stored while
+  // waiting for the emailed code. Hashing it a second time here would produce
+  // a password nobody could ever log in with.
+  if (this.$locals.passwordAlreadyHashed) return next()
+
   this.password = await bcrypt.hash(this.password, 10)
   next()
 })

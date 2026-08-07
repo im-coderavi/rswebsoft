@@ -100,6 +100,28 @@ export async function sendCustomerDeliveryEmail(order, licences = []) {
   }
 }
 
+export async function sendSignupOtpEmail({ name, email, code, minutes }) {
+  try {
+    const html = await renderTemplate(path.join(TEMPLATES_DIR, "signupOtp.html"), {
+      customerName: escapeHtml(name),
+      code: escapeHtml(code),
+      minutes: String(minutes),
+    })
+
+    await transporter.sendMail({
+      from: mailFrom,
+      to: email,
+      subject: `${code} is your RSWebSoft verification code`,
+      html,
+    })
+
+    return { ok: true }
+  } catch (err) {
+    console.error("sendSignupOtpEmail failed:", err.message)
+    return { ok: false, error: err.message }
+  }
+}
+
 export async function sendWelcomeEmail(user) {
   try {
 
