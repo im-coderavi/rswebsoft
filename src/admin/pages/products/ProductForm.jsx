@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
-import { ArrowLeft, Save, Plus, X, ArrowUp, ArrowDown } from "lucide-react"
+import { ArrowLeft, Save, Plus, X, ArrowUp, ArrowDown, Layers, Trash2, Check } from "lucide-react"
 import toast from "react-hot-toast"
 import { useCategories } from "../../../hooks/useCategories"
 import { useBrands } from "../../../hooks/useBrands"
@@ -577,111 +577,211 @@ export default function ProductForm() {
           </div>
         </div>
 
-        <div>
-          <div className="mb-1.5 flex items-center justify-between">
-            <label className="block text-xs font-medium text-cloud-400">
-              Packages <span className="text-cloud-500">(each gets its own "Buy on WhatsApp" button and feature checklist on the product page)</span>
-            </label>
+        <div className="rounded-xl border border-ink-800 bg-ink-850/60 p-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-cloud-100">
+                <Layers size={15} className="text-brand-300" />
+                Packages
+                {form.packages.length > 0 && (
+                  <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-xs font-semibold text-brand-300">
+                    {form.packages.length}
+                  </span>
+                )}
+              </h3>
+              <p className="mt-1 max-w-xl text-xs text-cloud-500">
+                Optional tiers shown side by side on the product page. Each one gets its own price,
+                feature checklist and "Buy on WhatsApp" button — use them for things like
+                Installation, Setup + Support, or Lifetime.
+              </p>
+            </div>
+            {form.packages.length > 0 && (
+              <button
+                type="button"
+                onClick={addPackageBlock}
+                className="flex shrink-0 items-center gap-1.5 rounded-lg border border-ink-700 px-3 py-2 text-xs font-semibold text-cloud-200 transition hover:bg-ink-800 hover:text-cloud-100"
+              >
+                <Plus size={14} /> Add package
+              </button>
+            )}
+          </div>
+
+          {form.packages.length === 0 ? (
             <button
               type="button"
               onClick={addPackageBlock}
-              className="flex items-center gap-1.5 text-xs font-medium text-brand-300 hover:underline"
+              className="mt-4 flex w-full flex-col items-center gap-2 rounded-xl border border-dashed border-ink-700 px-6 py-8 text-center transition hover:border-brand-500/50 hover:bg-ink-800/50"
             >
-              <Plus size={14} /> Add Package
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-ink-800 text-cloud-500">
+                <Layers size={18} />
+              </span>
+              <span className="text-sm font-semibold text-cloud-200">Add a package</span>
+              <span className="max-w-sm text-xs text-cloud-500">
+                Leave this empty if the product is a single price. Most products don't need packages.
+              </span>
             </button>
-          </div>
-
-          <div className="space-y-3">
-            {form.packages.map((pkg, i) => (
-              <div key={i} className="space-y-3 rounded-xl border border-white/10 bg-ink-800 p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
-                    <input
-                      value={pkg.name}
-                      onChange={(e) => updatePackageField(i, "name", e.target.value)}
-                      placeholder="Package name, e.g. Installation"
-                      className="rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-                    />
-                    <input
-                      type="number"
-                      min="0"
-                      value={pkg.price}
-                      onChange={(e) => updatePackageField(i, "price", e.target.value)}
-                      placeholder="Price"
-                      className="rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-                    />
+          ) : (
+            <div className="mt-4 space-y-3">
+              {form.packages.map((pkg, i) => (
+                <div key={i} className="rounded-xl border border-ink-700 bg-ink-800 p-4">
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-cloud-500">
+                      <span className="grid h-5 w-5 place-items-center rounded-md bg-ink-750 text-[11px] text-cloud-300">
+                        {i + 1}
+                      </span>
+                      {pkg.name?.trim() || "Untitled package"}
+                    </span>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => movePackage(i, "up")}
+                        disabled={i === 0}
+                        aria-label="Move package up"
+                        className="grid h-7 w-7 place-items-center rounded text-cloud-400 transition hover:bg-white/5 disabled:opacity-25"
+                      >
+                        <ArrowUp size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => movePackage(i, "down")}
+                        disabled={i === form.packages.length - 1}
+                        aria-label="Move package down"
+                        className="grid h-7 w-7 place-items-center rounded text-cloud-400 transition hover:bg-white/5 disabled:opacity-25"
+                      >
+                        <ArrowDown size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removePackage(i)}
+                        aria-label="Remove package"
+                        className="grid h-7 w-7 place-items-center rounded text-cloud-400 transition hover:bg-rose-500/15 hover:text-status-bad"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-1 pt-1">
-                    <button type="button" onClick={() => movePackage(i, "up")} className="grid h-7 w-7 place-items-center rounded text-cloud-400 hover:bg-white/5">
-                      <ArrowUp size={14} />
-                    </button>
-                    <button type="button" onClick={() => movePackage(i, "down")} className="grid h-7 w-7 place-items-center rounded text-cloud-400 hover:bg-white/5">
-                      <ArrowDown size={14} />
-                    </button>
-                    <button type="button" onClick={() => removePackage(i)} className="grid h-7 w-7 place-items-center rounded text-cloud-400 hover:bg-rose-500/15 hover:text-rose-400">
-                      <X size={14} />
-                    </button>
-                  </div>
-                </div>
 
-                <input
-                  value={pkg.description}
-                  onChange={(e) => updatePackageField(i, "description", e.target.value)}
-                  placeholder="Description (optional)"
-                  className="w-full rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-                />
-
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-cloud-500">Feature bullet points for this package</label>
-                  <div className="flex gap-2">
-                    <input
-                      value={packageFeatureInput[i] || ""}
-                      onChange={(e) => setPackageFeatureInputValue(i, e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault()
-                          addPackageFeature(i)
-                        }
-                      }}
-                      placeholder="e.g. Free lifetime updates"
-                      className="flex-1 rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => addPackageFeature(i)}
-                      className="flex items-center gap-1.5 rounded-lg border border-white/10 px-3.5 py-2.5 text-sm font-medium text-cloud-300 transition hover:bg-white/5"
-                    >
-                      <Plus size={15} /> Add
-                    </button>
-                  </div>
-                  <div className="mt-2 space-y-1.5">
-                    {(pkg.features || []).map((feature, fi) => (
-                      <div key={fi} className="flex items-center justify-between rounded-lg bg-ink-850 px-3 py-2 text-sm text-cloud-200">
-                        <span className="truncate">{feature}</span>
-                        <div className="flex items-center gap-1">
-                          <button type="button" onClick={() => movePackageFeature(i, fi, "up")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
-                            <ArrowUp size={13} />
-                          </button>
-                          <button type="button" onClick={() => movePackageFeature(i, fi, "down")} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5">
-                            <ArrowDown size={13} />
-                          </button>
-                          <button type="button" onClick={() => removePackageFeature(i, fi)} className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-rose-500/15 hover:text-rose-400">
-                            <X size={13} />
-                          </button>
-                        </div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_10rem]">
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-cloud-400">Name</label>
+                      <input
+                        value={pkg.name}
+                        onChange={(e) => updatePackageField(i, "name", e.target.value)}
+                        placeholder="e.g. Installation"
+                        className="w-full rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-cloud-400">Price</label>
+                      <div className="relative">
+                        <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-cloud-500">
+                          ₹
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={pkg.price}
+                          onChange={(e) => updatePackageField(i, "price", e.target.value)}
+                          placeholder="0"
+                          className="w-full rounded-lg border border-white/10 bg-ink-850 py-2.5 pl-7 pr-3.5 text-sm text-cloud-100 tabular-nums focus:border-brand-500/60 focus:outline-none"
+                        />
                       </div>
-                    ))}
-                    {(!pkg.features || pkg.features.length === 0) && (
-                      <p className="text-xs text-cloud-500">No feature bullets yet.</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+                      Description <span className="text-cloud-500">(optional, one line)</span>
+                    </label>
+                    <input
+                      value={pkg.description}
+                      onChange={(e) => updatePackageField(i, "description", e.target.value)}
+                      placeholder="What's included in short"
+                      className="w-full rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="mb-1.5 block text-xs font-medium text-cloud-400">
+                      Feature checklist{" "}
+                      <span className="text-cloud-500">
+                        ({(pkg.features || []).length} on the product page)
+                      </span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        value={packageFeatureInput[i] || ""}
+                        onChange={(e) => setPackageFeatureInputValue(i, e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault()
+                            addPackageFeature(i)
+                          }
+                        }}
+                        placeholder="e.g. Free lifetime updates — press Enter to add"
+                        className="min-w-0 flex-1 rounded-lg border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-cloud-100 focus:border-brand-500/60 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => addPackageFeature(i)}
+                        disabled={!(packageFeatureInput[i] || "").trim()}
+                        className="flex shrink-0 items-center gap-1.5 rounded-lg border border-ink-700 px-3.5 py-2.5 text-sm font-medium text-cloud-300 transition hover:bg-white/5 disabled:opacity-40"
+                      >
+                        <Plus size={15} /> Add
+                      </button>
+                    </div>
+
+                    {(pkg.features || []).length > 0 ? (
+                      <ul className="mt-2 space-y-1.5">
+                        {pkg.features.map((feature, fi) => (
+                          <li
+                            key={fi}
+                            className="group flex items-center gap-2 rounded-lg bg-ink-850 px-3 py-2 text-sm text-cloud-200"
+                          >
+                            {/* Same tick the customer sees on the product page */}
+                            <Check size={14} className="shrink-0 text-status-ok" />
+                            <span className="min-w-0 flex-1 truncate">{feature}</span>
+                            <span className="flex shrink-0 items-center gap-1 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+                              <button
+                                type="button"
+                                onClick={() => movePackageFeature(i, fi, "up")}
+                                disabled={fi === 0}
+                                aria-label="Move feature up"
+                                className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5 disabled:opacity-25"
+                              >
+                                <ArrowUp size={13} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => movePackageFeature(i, fi, "down")}
+                                disabled={fi === pkg.features.length - 1}
+                                aria-label="Move feature down"
+                                className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-white/5 disabled:opacity-25"
+                              >
+                                <ArrowDown size={13} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removePackageFeature(i, fi)}
+                                aria-label="Remove feature"
+                                className="grid h-6 w-6 place-items-center rounded text-cloud-400 hover:bg-rose-500/15 hover:text-status-bad"
+                              >
+                                <X size={13} />
+                              </button>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 text-xs text-cloud-500">
+                        No features yet — these show as a ticked list under the package price.
+                      </p>
                     )}
                   </div>
                 </div>
-              </div>
-            ))}
-            {form.packages.length === 0 && (
-              <p className="text-xs text-cloud-500">No packages added yet.</p>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>
