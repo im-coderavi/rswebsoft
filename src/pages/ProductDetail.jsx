@@ -184,19 +184,25 @@ export default function ProductDetail() {
           {/* LEFT COLUMN: Main Image Gallery (lg:col-span-7) */}
           <div className="lg:col-span-7 space-y-4">
             
-            {/* Main Product Image Container */}
-            <div 
-              className="group relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/10 bg-ink-900 shadow-2xl transition duration-300"
+            {/* Main Product Image Container.
+                No fixed aspect ratio and object-contain, so whatever the admin
+                uploads is shown whole. It used to be aspect-[16/10] with
+                object-cover, which cropped every image that wasn't that shape —
+                and website screenshots are tall, so they lost most of the page.
+                The box still has a floor and a ceiling so a very wide banner
+                doesn't collapse and a very tall screenshot doesn't run off. */}
+            <div
+              className="group relative flex min-h-[16rem] max-h-[40rem] items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-ink-900 shadow-2xl transition duration-300"
               style={activeImage ? undefined : toneGradient(tone, 140)}
             >
               {activeImage ? (
-                <img 
-                  src={activeImage} 
-                  alt={product.name} 
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                <img
+                  src={activeImage}
+                  alt={product.name}
+                  className="max-h-[40rem] w-auto max-w-full object-contain transition-transform duration-500 group-hover:scale-105"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center bg-gradient-to-br from-brand-900/40 to-ink-900">
+                <div className="flex min-h-[16rem] w-full items-center justify-center bg-gradient-to-br from-brand-900/40 to-ink-900">
                   <span className="grid h-20 w-20 place-items-center rounded-2xl bg-white/95 font-display text-2xl font-extrabold text-ink-950 shadow-lg">
                     {initialsOf(product.name)}
                   </span>
@@ -225,7 +231,13 @@ export default function ProductDetail() {
                         : "border-white/10 opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img src={img.url} alt={`Preview ${idx + 1}`} className="h-full w-full object-cover" />
+                    {/* contain here too, so the thumbnail shows which image it
+                        is rather than a crop of its top-left corner */}
+                    <img
+                      src={img.url}
+                      alt={`Preview ${idx + 1}`}
+                      className="h-full w-full bg-ink-900 object-contain"
+                    />
                   </button>
                 ))}
               </div>
