@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { 
+import {
+  MousePointer2,
   ShoppingCart, 
   Zap, 
   Eye, 
@@ -87,6 +88,18 @@ export default function ProductDetail() {
   const { data: paymentSettings } = usePaymentSettings()
   const [selectedImgIndex, setSelectedImgIndex] = useState(0)
   const [showFullDesc, setShowFullDesc] = useState(false)
+
+  // Website screenshots are much taller than they are wide. Shrinking one to
+  // fit makes the text on it unreadable, so a tall image is instead shown at
+  // full width — cropped to a comfortable viewport — and pans from top to
+  // bottom on hover so the whole page can still be read. Anything close to
+  // landscape doesn't need that and is just shown whole.
+  //
+  // Declared up here with the other hooks: the early returns for the loading
+  // and not-found states are below, and a hook after them would run
+  // conditionally.
+  const [naturalSize, setNaturalSize] = useState(null)
+  const isTallImage = naturalSize ? naturalSize.height / naturalSize.width > 1.15 : false
 
   function handleOpenPreview(e) {
     if (e) {
@@ -192,21 +205,55 @@ export default function ProductDetail() {
                 The box still has a floor and a ceiling so a very wide banner
                 doesn't collapse and a very tall screenshot doesn't run off. */}
             <div
-              className="group relative flex min-h-[16rem] max-h-[40rem] items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-ink-900 shadow-2xl transition duration-300"
+              className={`group relative flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-ink-900 shadow-2xl transition duration-300 ${
+                isTallImage ? "h-[28rem]" : "min-h-[16rem] max-h-[40rem]"
+              }`}
               style={activeImage ? undefined : toneGradient(tone, 140)}
             >
               {activeImage ? (
-                <img
-                  src={activeImage}
-                  alt={product.name}
-                  className="max-h-[40rem] w-auto max-w-full object-contain transition-transform duration-500 group-hover:scale-105"
-                />
+                isTallImage ? (
+                  // Full width so the screenshot stays legible, anchored to the
+                  // top, and panned to the bottom on hover. The translate is
+                  // "-100% of my own height, plus the box height", which lands
+                  // exactly on the bottom edge whatever the image's size.
+                  <img
+                    src={activeImage}
+                    alt={product.name}
+                    onLoad={(e) =>
+                      setNaturalSize({
+                        width: e.currentTarget.naturalWidth,
+                        height: e.currentTarget.naturalHeight,
+                      })
+                    }
+                    className="h-auto w-full self-start transition-transform duration-[6000ms] ease-linear will-change-transform group-hover:[transform:translateY(calc(-100%+28rem))] motion-reduce:transition-none motion-reduce:group-hover:[transform:none]"
+                  />
+                ) : (
+                  <img
+                    src={activeImage}
+                    alt={product.name}
+                    onLoad={(e) =>
+                      setNaturalSize({
+                        width: e.currentTarget.naturalWidth,
+                        height: e.currentTarget.naturalHeight,
+                      })
+                    }
+                    className="max-h-[40rem] w-auto max-w-full object-contain transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                  />
+                )
               ) : (
                 <div className="flex min-h-[16rem] w-full items-center justify-center bg-gradient-to-br from-brand-900/40 to-ink-900">
                   <span className="grid h-20 w-20 place-items-center rounded-2xl bg-white/95 font-display text-2xl font-extrabold text-ink-950 shadow-lg">
                     {initialsOf(product.name)}
                   </span>
                 </div>
+              )}
+
+              {/* Only worth saying when there's actually more image to see.
+                  Fades out once they hover, since by then it's obvious. */}
+              {isTallImage && (
+                <span className="pointer-events-none absolute left-4 top-4 flex items-center gap-1.5 rounded-lg bg-ink-950/80 px-2.5 py-1.5 text-[11px] font-semibold text-cloud-200 backdrop-blur-md transition-opacity duration-300 group-hover:opacity-0">
+                  <MousePointer2 size={12} className="text-brand-400" /> Hover to see the full page
+                </span>
               )}
 
               {/* Floating Live Preview CTA on Image */}
@@ -224,7 +271,12 @@ export default function ProductDetail() {
                 {images.map((img, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setSelectedImgIndex(idx)}
+                    onClick={() => {
+                      // The next image may be a different shape, so re-measure
+                      // rather than carrying the previous one's decision over.
+                      setNaturalSize(null)
+                      setSelectedImgIndex(idx)
+                    }}
                     className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-xl border transition cursor-pointer ${
                       selectedImgIndex === idx 
                         ? "border-brand-400 ring-2 ring-brand-500/30" 
